@@ -22,8 +22,9 @@ my_account.get_messages()
 #### get_message(message_id)
 This method retrieves the information for the message matching the id provided
 ```python
-get_email = my_account.get_messages()
-print get_email[0].body
+email_id = get_messages()[0]
+get_email = my_account.get_message(email_id)
+print get_email.body
 ```
 Sample Output
 ```
