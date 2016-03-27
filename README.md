@@ -45,7 +45,8 @@ After creating an email object, there are several methods which can be (or must 
 Example:
 ```python
 test_email = my_account.new_email
-test_email.to('anEmailAccount@gmail.com').set_subject('This is a test subject').set_body('This is a test body. <br> Best, <br> John Smith').add_attachment('FILE_BYTES_HERE', 'FileName', 'pdf').send()```
+test_email.to('anEmailAccount@gmail.com').set_subject('This is a test subject').set_body('This is a test body. <br> Best, <br> John Smith').add_attachment('FILE_BYTES_HERE', 'FileName', 'pdf').send()
+```
 
 ### Interacting with Messages
 Once you have the ID of a message, you can interact with that message in a few ways aside from using ```get_message(id)```
@@ -54,7 +55,8 @@ Once you have the ID of a message, you can interact with that message in a few w
 This method can be used to forward the provided message to a comma-separated list of recipient's emails.
 ```
 message_id = my_account.get_inbox()[0]
-my_account.forward_message(message_id, 'john.smith@domain.com, ellen.brown@domain2.com')```
+my_account.forward_message(message_id, 'john.smith@domain.com, ellen.brown@domain2.com')
+```
 
 #### forward_message_with_comment(message_id, to_recipients, comment)
 Duplicate of the above, with the obvious addition of being able to send a 'comment' along with the forwarded message
