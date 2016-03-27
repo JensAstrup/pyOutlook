@@ -1,7 +1,6 @@
-from types import *
 import requests
-from internal_methods import jsonify_receps
-from internal_methods import MiscError
+from pyOutlook.internal_methods import jsonify_receps
+from pyOutlook.internal_methods import MiscError
 
 
 class SendError(Exception):
@@ -25,27 +24,27 @@ class Message(object):
         self.__file_name = None
         self.__file_extension = None
 
-###
-# Send Email Function
-###
+    ###
+    # Send Email Function
+    ###
     def __send_email(self):
         global json_send
         json_send = '{ "Message": {"'
 
         if hasattr(self, '__to_line'):
-            json_to = jsonify_receps(self.__getattribute__('__to_line'), "to")
+            json_to = jsonify_receps(self.__getattribute__('__to_line'), "to", False)
 
         else:
             raise SendError('Error, to must be specified.')
 
         if hasattr(self, '__cc_line'):
-            json_cc = jsonify_receps(self.__getattribute__('__cc_line'), "cc")
+            json_cc = jsonify_receps(self.__getattribute__('__cc_line'), "cc", False)
 
         else:
             json_cc = None
 
         if hasattr(self, '__bcc_line'):
-            json_bcc = jsonify_receps(self.__getattribute__('__bcc_line'), "bcc")
+            json_bcc = jsonify_receps(self.__getattribute__('__bcc_line'), "bcc", False)
 
         else:
             json_bcc = None
@@ -60,17 +59,17 @@ class Message(object):
         # set the receipients
         json_send += ',' + json_to + ']'
 
-        if type(json_cc) is not NoneType:
+        if type(json_cc) is not None:
             json_send += ',' + json_cc + ']'
 
-        if type(json_bcc) is not NoneType:
+        if type(json_bcc) is not None:
             json_send += ',' + json_bcc + ']'
 
         if hasattr(self, '__send_as'):
             json_send += ',"From":{ "EmailAddress": { "Address": "' + self.__send_as + '" } }'
 
-        if type(self.__file_bytes) is not NoneType:
-            if self.__file_name is not NoneType and self.__file_extension is not NoneType:
+        if type(self.__file_bytes) is not None:
+            if self.__file_name is not None and self.__file_extension is not None:
                 full_file_name = str(self.__file_name) + '.' + str(self.__file_extension)
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
                              '"Name": "' + full_file_name + '", "ContentBytes": "' + self.__file_bytes + '" } ]'
@@ -83,9 +82,9 @@ class Message(object):
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
                             'is current. STATUS CODE: ' + str(r.status_code))
 
-###
-# Get and Set Functions
-###
+        ###
+        # Get and Set Functions
+        ###
 
     def set_subject(self, subject):
         self.subject = subject
@@ -96,30 +95,15 @@ class Message(object):
         return self
 
     def to(self, receipients):
-        receps = receipients.split(',')
-
-        for num in range(len(receps)):
-            receps[num] = receps[num].strip()
-
-        self.__setattr__('__to_line', receps)
+        self.__setattr__('__to_line', receipients)
         return self
 
     def cc(self, receipients):
-        receps = receipients.split(',')
-
-        for num in range(len(receps)):
-            receps[num] = receps[num].strip()
-
-        self.__setattr__('__cc_line', receps)
+        self.__setattr__('__cc_line', receipients)
         return self
 
     def bcc(self, receipients):
-        receps = receipients.split(',')
-
-        for num in range(len(receps)):
-            receps[num] = receps[num].strip()
-
-        self.__setattr__('__bcc_line', receps)
+        self.__setattr__('__bcc_line', receipients)
         return self
 
     def send_as(self, email):
@@ -134,4 +118,3 @@ class Message(object):
 
     def send(self):
         self.__send_email()
-

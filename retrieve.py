@@ -1,5 +1,5 @@
 import requests
-import main
+from pyOutlook import main
 
 
 class Message(object):
@@ -37,7 +37,7 @@ def clean_return_single(json):
 
 
 def get_messages(self):
-    headers = {"Authorization": "Bearer " + self.token(), "Content-Type": "application/json"}
+    headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     r = requests.get('https://outlook.office.com/api/v2.0/me/messages', headers=headers)
     if r.status_code == 401:
         raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')

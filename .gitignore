@@ -47,4 +47,11 @@ Temporary Items
 .apdisk
 
 # Compiled python
-.py
+*.pyc
+
+# Setuptools distribution folder.
+/dist/
+
+# Python egg metadata, regenerated from source files by setuptools.
+/*.egg-info
+/*.egg
