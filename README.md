@@ -51,7 +51,7 @@ test_email.to('anEmailAccount@gmail.com').set_subject('This is a test subject').
 #### new_email Methods
 
 | Method       | Description                       | In action                                                            |
-|:---------:   |----------------------             |-------------------------------------------------------------------:  |
+|:---------:   |:----------------------:           |:-------------------------------------------------------------------: |
 |set_subject   |Sets Subject                       |```python test_email.set_subject('This is a subject')```              |
 |set_body      |Sets Body                          |```python test_email.set_body('This is body text')```                 |
 |to            |Recipients                         |```python test_email.to('first@person.com, second@person.com')```     |
