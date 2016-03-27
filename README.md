@@ -5,12 +5,14 @@ A Python module for connecting to the Outlook REST API, without the hassle of de
 All current methods available, with descriptions, parameters, and examples.
 
 #### Instantiation
-Creating the object: Before anything can be retrieved or sent, the OutlookAccount object must be created. Following that, the access token should be provided using ```set_access_token(token_input)``` where 'token_input' is the OAuth Access token you receive from Outlook. Note that this module does not handle the OAuth process, gaining an access token must be done outside of this module.
+Creating the object: Before anything can be retrieved or sent, the OutlookAccount object must be created. The only parameter required is the access token for the account. This can be changed later with the method ```set_access_token(token_input)``` where 'token_input' is the OAuth Access token you receive from Outlook. Note that this module does not handle the OAuth process, gaining an access token must be done outside of this module.
 
 ```python
 token = 'OAuth Access Token Here'
-my_account = pyOutlook.OutlookAccount()
-my_account = my_account.set_access_token(token)
+new_token = 'OAuth Access Token2 Here'
+my_account = pyOutlook.OutlookAccount(token)
+# If our token is refreshed, or to ensure that the latest token is saved prior to calling a method. 
+my_account = my_account.set_access_token(new_token)
 ```
 ### Retrieving Messages
 
