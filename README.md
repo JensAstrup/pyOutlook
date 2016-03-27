@@ -33,7 +33,7 @@ Sample Output
 This is a test message body. <br> Best, <br> John Smith
 ```
 #### get_inbox()
-This method is identical to get_messages(), however it returns only the five most recent message in the inbox (ignoring messages that were put into seperate folders by an Outlook rule, junk email, etc)
+This method is identical to get_messages(), however it returns only the ten most recent message in the inbox (ignoring messages that were put into seperate folders by an Outlook rule, junk email, etc)
 
 ```python
 my_account.get_inbox()
