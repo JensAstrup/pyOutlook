@@ -48,6 +48,18 @@ test_email = my_account.new_email
 test_email.to('anEmailAccount@gmail.com').set_subject('This is a test subject').set_body('This is a test body. <br> Best, <br> John Smith').add_attachment('FILE_BYTES_HERE', 'FileName', 'pdf').send()
 ```
 
+#### new_email Methods
+
+| Method       | Description                       | In action                                                            |
+|:---------:   |----------------------             |-------------------------------------------------------------------:  |
+|set_subject   |Sets Subject                       |```python test_email.set_subject('This is a subject')```              |
+|set_body      |Sets Body                          |```python test_email.set_body('This is body text')```                 |
+|to            |Recipients                         |```python test_email.to('first@person.com, second@person.com')```     |
+|cc            |Secondary Recipients               |```python test_email.cc('you_to@domain.com, and_you@domain.com')```   |
+|bcc           |Hidden recipients                  |```python test_email.bcc('secretive@guy.com, undercover@agent.com')```|
+|send_as       |Send with secondary Outlook account|``python test_email.send_as('my_second_alias@outlook.com')```         |
+|add_attachment|file_bytes, file_name, file_ext    |``python test_email.add_attachment('FILE_BYTES', 'FileName', 'pdf')```|
+
 ### Interacting with Messages
 Once you have the ID of a message, you can interact with that message in a few ways aside from using ```get_message(id)```
 
