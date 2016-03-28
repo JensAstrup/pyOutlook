@@ -32,6 +32,18 @@ Sample Output
 ```
 This is a test message body. <br> Best, <br> John Smith
 ```
+You can access the body, subject, sender_email, sender_name, and to_recipients using dot notation:
+```python
+email_id = get_messages()[0]
+get_email = my_account.get_message(email_id)
+
+body = get_email.body
+subject = get_email.subject
+sender_email = get_email.sender_email
+sender_name = get_email.sender_name
+to_recipients = get_email.to_recipients
+```
+
 #### get_inbox()
 This method is identical to get_messages(), however it returns only the ten most recent message in the inbox (ignoring messages that were put into seperate folders by an Outlook rule, junk email, etc)
 
