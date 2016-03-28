@@ -78,3 +78,15 @@ class OutlookAccount(object):
             raise internal_methods.MiscError('Message ID not provided. Can not forward message.')
 
         message_actions.reply(self, message_id, reply_comment, True)
+
+    def get_sent_messages(self):
+        return retrieve.get_messages_from_folder_name(self, 'SentItems')
+
+    def get_deleted_messages(self):
+        return retrieve.get_messages_from_folder_name(self, 'DeletedItems')
+
+    def get_draft_messages(self):
+        return retrieve.get_messages_from_folder_name(self, 'Drafts')
+
+    def get_folder_messages(self, folder: str):
+        return retrieve.get_messages_from_folder_name(self, folder)
