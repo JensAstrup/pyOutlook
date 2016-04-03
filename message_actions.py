@@ -1,5 +1,5 @@
 import requests
-import internal_methods
+import message
 import main
 
 
@@ -17,9 +17,9 @@ def forward_message(self, message_id, to_recipients, forward_comment):
     if type(forward_comment) is not None:
         payload += '"Comment" : "' + str(forward_comment) + '",'
     if type(to_recipients) is None:
-        raise internal_methods.MiscError('To Recipients is not defined. Can not forward message.')
+        raise message.MiscError('To Recipients is not defined. Can not forward message.')
 
-    payload += '"ToRecipients" : [' + internal_methods.jsonify_receps(to_recipients, 'to', True) + ']}'
+    payload += '"ToRecipients" : [' + message.jsonify_receps(to_recipients, 'to', True) + ']}'
 
     r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + message_id + '/forward',
                       headers=headers, data=payload)

@@ -1,6 +1,6 @@
 import requests
-from pyOutlook.internal_methods import jsonify_receps
-from pyOutlook.internal_methods import MiscError
+from pyOutlook.message import jsonify_receps
+from pyOutlook.message import MiscError
 
 
 class SendError(Exception):

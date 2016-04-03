@@ -1,33 +1,44 @@
 import requests
 import main
-from internal_methods import Message
-
-
-class Messages(object):
-    def __init__(self):
-        self.messages = []
+from message import Message
 
 
 def clean_return_multiple(json):
+    """
+    :param json:
+    :return: List of messages
+    :rtype: list of Message
+    """
     return_list = []
     for key in json['value']:
         uid = key['Id']
-        return_list.append(uid)
+        subject = key['Subject']
+        sender_email = key['Sender']['EmailAddress']['Address']
+        sender_name = key['Sender']['EmailAddress']['Name']
+        body = key['Body']['Content']
+        to_recipients = key['ToRecipients']
+        return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
     return return_list
 
 
-def clean_return_single(self, json):
+def clean_return_single(json):
     uid = json['Id']
     subject = json['Subject']
     sender_email = json['Sender']['EmailAddress']['Address']
     sender_name = json['Sender']['EmailAddress']['Name']
     body = json['Body']['Content']
     to_recipients = json['ToRecipients']
-    return_message = Message(self, uid, body, subject, sender_email, sender_name, to_recipients)
+    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
     return return_message
 
 
 def get_messages(self, skip):
+    """
+    :param self:
+    :param skip:
+    :return:
+    :rtype: list of Message
+    """
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
     if skip > 0:
@@ -51,10 +62,16 @@ def get_message(self, message_id):
     r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=headers)
     if r.status_code == 401:
         raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-    return clean_return_single(self, r.json())
+    return clean_return_single(r.json())
 
 
 def get_messages_from_folder_id(self, folder_id):
+    """
+    :rtype: list of Message
+    :param self:
+    :param folder_id:
+    :return:
+    """
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id + '/messages', headers=headers)
     if r.status_code == 401:
@@ -63,6 +80,12 @@ def get_messages_from_folder_id(self, folder_id):
 
 
 def get_messages_from_folder_name(self, folder_name):
+    """
+    :rtype: list of Message
+    :param self:
+    :param folder_name:
+    :return:
+    """
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages', headers=headers)
     if r.status_code == 401:

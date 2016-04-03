@@ -1,8 +1,11 @@
 # Authorization and misc functions
-from pyOutlook import retrieve
-from pyOutlook import create_message
-from pyOutlook import folders
-from pyOutlook.internal_methods import MiscError
+import retrieve
+from retrieve import Message
+import create_message
+import folders
+from message import MiscError
+from folders import Folder
+import internal_methods
 
 
 class AuthError(Exception):
@@ -18,10 +21,11 @@ class OutlookAccount(object):
         if type(access_token) is None:
             raise AuthError('No access token provided with object instantiation.')
         self.access_token = access_token
-        pass
+        internal_methods.set_global_token__(access_token)
 
     def set_access_token(self, access_token):
         self.access_token = access_token
+        internal_methods.set_global_token__(access_token)
 
     def __get_access_token(self):
         return self.access_token
@@ -35,15 +39,30 @@ class OutlookAccount(object):
         return retrieve.get_message(self, message_id)
 
     def get_messages(self):
+        """
+        :rtype: list of Message
+        :return:
+        """
         return retrieve.get_messages(self, 0)
 
     def get_more_messages(self, page):
+        """
+        :rtype: list of Message
+        :param page:
+        :return:
+        """
         if not isinstance(page, int):
             print type(page)
             raise MiscError('page parameter must be of type integer')
+        if page == 1:
+            print 'Note that pulling the first page is equivalent to calling get_messages()'
         return retrieve.get_messages(self, page)
 
     def get_inbox(self):
+        """
+        :rtype: list of Message
+        :return:
+        """
         return retrieve.get_inbox(self)
 
     # create_message.py
@@ -66,10 +85,18 @@ class OutlookAccount(object):
     # folders
     def get_folders(self):
         """
-
         :return: a list of Folder objects
+        :rtype: list of Folder
         """
         return folders.get_folders(self)
+
+    def get_folder(self, folder_id):
+        """
+        :param folder_id: Id or standard name of folder to retrieve
+        :return: Folder
+        :rtype: Folder
+        """
+        return folders.get_folder(self, folder_id)
 
     def create_folder(self, parent_folder_id, new_folder_name):
         """
