@@ -1,8 +1,8 @@
 # Authorization and misc functions
-from pyOutlook import message_actions
-from pyOutlook import internal_methods
 from pyOutlook import retrieve
 from pyOutlook import create_message
+from pyOutlook import folders
+from pyOutlook.internal_methods import MiscError
 
 
 class AuthError(Exception):
@@ -35,7 +35,13 @@ class OutlookAccount(object):
         return retrieve.get_message(self, message_id)
 
     def get_messages(self):
-        return retrieve.get_messages(self)
+        return retrieve.get_messages(self, 0)
+
+    def get_more_messages(self, page):
+        if not isinstance(page, int):
+            print type(page)
+            raise MiscError('page parameter must be of type integer')
+        return retrieve.get_messages(self, page)
 
     def get_inbox(self):
         return retrieve.get_inbox(self)
@@ -43,41 +49,7 @@ class OutlookAccount(object):
     # create_message.py
     @property
     def new_email(self):
-        return create_message.Message(self.access_token)
-
-    # message_actions.py
-    def forward_message(self, message_id: str, to_recipients: str):
-        if type(message_id) is None:
-            raise internal_methods.MiscError('Message ID not provided. Can not forward message.')
-
-        if type(to_recipients) is None:
-            raise internal_methods.MiscError('Message Recipients not provided. Can not forward message.')
-
-        message_actions.forward_message(self, message_id, to_recipients, None)
-
-    def forward_message_with_comment(self, message_id: str, to_recipients: str, forward_comment: str):
-
-        if type(message_id) is None:
-            raise internal_methods.MiscError('Message ID not provided. Can not forward message.')
-
-        if type(to_recipients) is None:
-            raise internal_methods.MiscError('Message Recipients not provided. Can not forward message.')
-
-        message_actions.forward_message(self, message_id, to_recipients, forward_comment)
-
-    def reply(self, message_id: str, reply_comment: str):
-
-        if type(message_id) is None:
-            raise internal_methods.MiscError('Message ID not provided. Can not forward message.')
-
-        message_actions.reply(self, message_id, reply_comment, True)
-
-    def reply_all(self, message_id: str, reply_comment: str):
-
-        if type(message_id) is None:
-            raise internal_methods.MiscError('Message ID not provided. Can not forward message.')
-
-        message_actions.reply(self, message_id, reply_comment, True)
+        return create_message.NewMessage(self.access_token)
 
     def get_sent_messages(self):
         return retrieve.get_messages_from_folder_name(self, 'SentItems')
@@ -88,5 +60,21 @@ class OutlookAccount(object):
     def get_draft_messages(self):
         return retrieve.get_messages_from_folder_name(self, 'Drafts')
 
-    def get_folder_messages(self, folder: str):
+    def get_folder_messages(self, folder):
         return retrieve.get_messages_from_folder_name(self, folder)
+
+    # folders
+    def get_folders(self):
+        """
+
+        :return: a list of Folder objects
+        """
+        return folders.get_folders(self)
+
+    def create_folder(self, parent_folder_id, new_folder_name):
+        """
+        :param parent_folder_id: Either the ID of the parent folder, or a common name ('Inbox', 'Drafts', 'DeletedItems'
+        :param new_folder_name: The name for the new folder
+        :return: new folder Id
+        """
+        return folders.create_folder(self, parent_folder_id, new_folder_name)

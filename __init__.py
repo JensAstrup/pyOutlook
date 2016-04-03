@@ -1,2 +1,1 @@
 # Dependecies
-import requests

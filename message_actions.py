@@ -1,6 +1,6 @@
 import requests
-from pyOutlook import internal_methods
-from pyOutlook import main
+import internal_methods
+import main
 
 
 class SendError(Exception):

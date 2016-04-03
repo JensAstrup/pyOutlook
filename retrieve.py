@@ -1,15 +1,6 @@
 import requests
-from pyOutlook import main
-
-
-class Message(object):
-    def __init__(self, message_id, body, subject, sender_email, sender_name, to_recipients):
-        self.id = message_id
-        self.body = body
-        self.subject = subject
-        self.senderEmail = sender_email
-        self.senderName = sender_name
-        self.toRecipients = to_recipients
+import main
+from internal_methods import Message
 
 
 class Messages(object):
@@ -25,20 +16,23 @@ def clean_return_multiple(json):
     return return_list
 
 
-def clean_return_single(json):
+def clean_return_single(self, json):
     uid = json['Id']
     subject = json['Subject']
     sender_email = json['Sender']['EmailAddress']['Address']
     sender_name = json['Sender']['EmailAddress']['Name']
     body = json['Body']['Content']
     to_recipients = json['ToRecipients']
-    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
+    return_message = Message(self, uid, body, subject, sender_email, sender_name, to_recipients)
     return return_message
 
 
-def get_messages(self):
+def get_messages(self, skip):
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
-    r = requests.get('https://outlook.office.com/api/v2.0/me/messages', headers=headers)
+    endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
+    if skip > 0:
+        endpoint = endpoint + '/?%24skip=' + str(skip) + '0'
+    r = requests.get(endpoint, headers=headers)
     if r.status_code == 401:
         raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
     return clean_return_multiple(r.json())
@@ -57,7 +51,7 @@ def get_message(self, message_id):
     r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=headers)
     if r.status_code == 401:
         raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-    return clean_return_single(r.json())
+    return clean_return_single(self, r.json())
 
 
 def get_messages_from_folder_id(self, folder_id):

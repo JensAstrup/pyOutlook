@@ -11,7 +11,7 @@ class SendError(Exception):
         return self.value
 
 
-class Message(object):
+class NewMessage(object):
     def __init__(self, token):
         self.__access_token = token
         self.subject = None
