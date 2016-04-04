@@ -98,7 +98,7 @@ forward\_message(to\_recipients, forward\_comment)
 
 This method forwards a message to the list of recipients, along with an
 optional 'comment' which is sent along with the message. The
-forward\_comment parameter can be sent to None to just forward the
+forward\_comment parameter can be set to None to just forward the
 message.
 
 .. code:: python
@@ -129,8 +129,9 @@ comment appended (use this wisely).
     email = my_account.get_message(id)
     email.reply_all('I am replying to everyone, which will likely annoy 9/10 of those who receive this')
 
-move\_to\* You can move a message from one folder to another via several methods. For default folders, there are specific methods - for everything else there is a method to move to a folder designated by its id.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+move\_to\* 
+^^^^^^^^^^
+You can move a message from one folder to another via several methods. For default folders, there are specific methods - for everything else there is a method to move to a folder designated by its id.
 
 .. code:: python
 
