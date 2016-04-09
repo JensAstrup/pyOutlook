@@ -1,14 +1,6 @@
 import requests
 import message
-import main
-
-
-class SendError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return self.value
+from errors import AuthError, MiscError
 
 
 def forward_message(self, message_id, to_recipients, forward_comment):
@@ -17,7 +9,7 @@ def forward_message(self, message_id, to_recipients, forward_comment):
     if type(forward_comment) is not None:
         payload += '"Comment" : "' + str(forward_comment) + '",'
     if type(to_recipients) is None:
-        raise message.MiscError('To Recipients is not defined. Can not forward message.')
+        raise MiscError('To Recipients is not defined. Can not forward message.')
 
     payload += '"ToRecipients" : [' + message.jsonify_receps(to_recipients, 'to', True) + ']}'
 
@@ -25,7 +17,7 @@ def forward_message(self, message_id, to_recipients, forward_comment):
                       headers=headers, data=payload)
 
     if r.status_code == 401:
-        raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
 
     else:
         print('Message Forwarded. Received the following status code from Outlook: ', r.status_code)
@@ -43,7 +35,7 @@ def reply(self, message_id, reply_comment, reply_all):
                       data=payload)
 
     if r.status_code == 401:
-        raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
     else:
         print('Replied to Message. Received the following status code from Outlook: ', r.status_code)

@@ -1,14 +1,6 @@
 import requests
 from pyOutlook.message import jsonify_receps
-from pyOutlook.message import MiscError
-
-
-class SendError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return self.value
+from errors import SendError, MiscError
 
 
 class NewMessage(object):
@@ -56,7 +48,7 @@ class NewMessage(object):
 
         # now we can set the body
         json_send += '"Body": { "ContentType": "HTML", "Content": "' + self.body + '"}'
-        # set the receipients
+        # set the recipients
         json_send += ',' + json_to + ']'
 
         if type(json_cc) is not None:
@@ -94,16 +86,16 @@ class NewMessage(object):
         self.body = body
         return self
 
-    def to(self, receipients):
-        self.__setattr__('__to_line', receipients)
+    def to(self, recipients):
+        self.__setattr__('__to_line', recipients)
         return self
 
-    def cc(self, receipients):
-        self.__setattr__('__cc_line', receipients)
+    def cc(self, recipients):
+        self.__setattr__('__cc_line', recipients)
         return self
 
-    def bcc(self, receipients):
-        self.__setattr__('__bcc_line', receipients)
+    def bcc(self, recipients):
+        self.__setattr__('__bcc_line', recipients)
         return self
 
     def send_as(self, email):

@@ -1,6 +1,7 @@
 import requests
 import main
 import internal_methods
+from errors import AuthError
 
 
 def clean_return_multiple(json):
@@ -40,7 +41,7 @@ class Folder(object):
         r = requests.patch(endpoint, headers=headers, data=payload)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Renamed folder to: ' + new_folder_name + '. Received the following status code from Outlook: ',
@@ -58,7 +59,7 @@ class Folder(object):
         r = requests.get(endpoint, headers=headers)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Retrieved folders. Received the following status code from Outlook: ',
@@ -73,7 +74,7 @@ class Folder(object):
         r = requests.delete(endpoint, headers=headers)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Deleted folder: ' + self.name + '. Received the following status code from Outlook: ',
@@ -94,7 +95,7 @@ class Folder(object):
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Moved folder. Received the following status code from Outlook: ',
@@ -119,7 +120,7 @@ class Folder(object):
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Copied folder. Received the following status code from Outlook: ',
@@ -132,8 +133,11 @@ class Folder(object):
 
 def create_folder(self, parent_id, folder_name):
     """
-    :param parent_id:
-    :param folder_name:
+    :param self:
+    :param parent_id: The id of the folder which should house the new folder
+    :type parent_id: str
+    :param folder_name: The name of the new folder
+    :type folder_name: str
     :return: Folder
     :rtype: Folder
     """
@@ -144,7 +148,7 @@ def create_folder(self, parent_id, folder_name):
     r = requests.post(endpoint, headers=headers, data=payload)
 
     if 399 < r.status_code < 452:
-        raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
     else:
         print 'Created folder: ' + folder_name + '. Received the following status code from Outlook: ',
@@ -167,7 +171,7 @@ def get_folders(self):
     r = requests.get(endpoint, headers=headers)
 
     if 399 < r.status_code < 452:
-        raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
     else:
         return clean_return_multiple(r.json())
@@ -186,7 +190,7 @@ def get_folder(self, folder_id):
     r = requests.get(endpoint, headers=headers)
 
     if 399 < r.status_code < 452:
-        raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
     else:
         return_folder = r.json()

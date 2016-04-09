@@ -1,3 +1,8 @@
+from errors import MiscError
+
+token = 0
+
+
 def jsonify_receps(recep_input, recep_type, silent):
 
     json_return = ''
@@ -33,11 +38,3 @@ def set_global_token__(access_token):
 
 def get_global_token():
     return token
-
-
-class MiscError(Exception):
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
-        return self.value

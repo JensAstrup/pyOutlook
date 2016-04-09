@@ -1,7 +1,8 @@
 # Functions used by other files, but not used directly in parent code
 import main
 import requests
-from internal_methods import jsonify_receps, MiscError, get_global_token
+from internal_methods import jsonify_receps, get_global_token
+from errors import AuthError, MiscError
     
 
 class Message(object):
@@ -21,18 +22,18 @@ class Message(object):
         :param to_recipients: Comma separated list of recipients
         :type to_recipients: str
         """
-        self.id = message_id
-        self.body = body
-        self.subject = subject
-        self.senderEmail = sender_email
-        self.senderName = sender_name
-        self.toRecipients = to_recipients
+        self.__setattr__('message_id', message_id)
+        self.__setattr__('body', body)
+        self.__setattr__('subject', subject)
+        self.__setattr__('senderEmail', sender_email)
+        self.__setattr__('senderName', sender_name)
+        self.__setattr__('toRecipients', to_recipients)
 
     def __str__(self):
-        return self.id
+        return self.__getattribute__('message_id')
 
     def __repr__(self):
-        return self.subject
+        return self.__getattribute__('subject')
         
     def forward_message(self, to_recipients, forward_comment):
         """
@@ -51,11 +52,11 @@ class Message(object):
 
         payload += '"ToRecipients" : [' + jsonify_receps(to_recipients, 'to', True) + ']}'
 
-        r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + self.id + '/forward',
+        r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/forward',
                           headers=headers, data=payload)
 
         if r.status_code == 401:
-            raise main.AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
 
         else:
             print 'Message Forwarded. Received the following status code from Outlook: ',
@@ -65,12 +66,12 @@ class Message(object):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{ "Comment": "' + reply_comment + '"}'
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.id + '/reply'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/reply'
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if r.status_code == 401:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Replied to Message. Received the following status code from Outlook: ',
@@ -80,12 +81,12 @@ class Message(object):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{ "Comment": "' + reply_comment + '"}'
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.id + '/replyall'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/replyall'
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if r.status_code == 401:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Replied to Message. Received the following status code from Outlook: ',
@@ -94,7 +95,7 @@ class Message(object):
     def delete_message(self):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.id
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
 
         r = requests.delete(endpoint, headers=headers)
 
@@ -108,7 +109,7 @@ class Message(object):
     def __move_to(self, destination):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.id + '/move'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -135,7 +136,7 @@ class Message(object):
     def __copy_to(self, destination):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.id + '/copy'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
         payload = '{ "DestinationId": "' + destination + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
