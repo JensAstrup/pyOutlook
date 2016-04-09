@@ -6,14 +6,41 @@ from internal_methods import jsonify_receps, MiscError, get_global_token
 
 class Message(object):
     def __init__(self, message_id, body, subject, sender_email, sender_name, to_recipients):
+        # type: (str, str, str, str, str, str) -> object
+        """
+        :param message_id: Unique identifier for email provided by Outlook
+        :type message_id: str
+        :param body: The content of the email
+        :type body: str
+        :param subject: The subject of the email
+        :type subject: str
+        :param sender_email: Email address of the sender
+        :type sender_email: str
+        :param sender_name: The name associated with the sender email, provided by Outlook
+        :type sender_name: str
+        :param to_recipients: Comma separated list of recipients
+        :type to_recipients: str
+        """
         self.id = message_id
         self.body = body
         self.subject = subject
         self.senderEmail = sender_email
         self.senderName = sender_name
         self.toRecipients = to_recipients
+
+    def __str__(self):
+        return self.id
+
+    def __repr__(self):
+        return self.subject
         
     def forward_message(self, to_recipients, forward_comment):
+        """
+        :param to_recipients: Comma separated string of recipient emails
+        :type to_recipients: str
+        :param forward_comment: A comment to include with message
+        :type forward_comment: str
+        """
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{'
