@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # pyOutlook documentation build configuration file, created by
-# sphinx-quickstart on Sat Apr  9 22:04:29 2016.
+# sphinx-quickstart on Sun Apr 10 09:22:49 2016.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -29,7 +29,20 @@ import os
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc','sphinxcontrib.napoleon']
+    'sphinx.ext.autodoc','sphinx.ext.napoleon',
+]
+
+# Napoleon settings
+napoleon_google_docstring = True
+napoleon_numpy_docstring = True
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = True
+napoleon_use_admonition_for_examples = False
+napoleon_use_admonition_for_notes = False
+napoleon_use_admonition_for_references = False
+napoleon_use_ivar = False
+napoleon_use_param = True
+napoleon_use_rtype = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -75,7 +88,7 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'internal']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -109,7 +122,7 @@ todo_include_todos = False
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
