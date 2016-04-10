@@ -2,38 +2,20 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="53e924e9-ba44-4579-972b-c2f4e9601c3e" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/docs/_build/doctrees/pyOutlook.internal.doctree" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/docs/_build/html/_sources/pyOutlook.internal.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/docs/_build/html/pyOutlook.internal.html" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/doctrees/environment.pickle" afterPath="$PROJECT_DIR$/docs/_build/doctrees/environment.pickle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/doctrees/index.doctree" afterPath="$PROJECT_DIR$/docs/_build/doctrees/index.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/doctrees/modules.doctree" afterPath="$PROJECT_DIR$/docs/_build/doctrees/modules.doctree" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/doctrees/pyOutlook.doctree" afterPath="$PROJECT_DIR$/docs/_build/doctrees/pyOutlook.doctree" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/doctrees/setup.doctree" afterPath="$PROJECT_DIR$/docs/_build/doctrees/setup.doctree" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/objects.inv" afterPath="$PROJECT_DIR$/docs/_build/html/objects.inv" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/pyOutlook.iml" afterPath="$PROJECT_DIR$/.idea/pyOutlook.iml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/_sources/index.txt" afterPath="$PROJECT_DIR$/docs/_build/html/_sources/index.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/_sources/modules.txt" afterPath="$PROJECT_DIR$/docs/_build/html/_sources/modules.txt" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/_sources/pyOutlook.txt" afterPath="$PROJECT_DIR$/docs/_build/html/_sources/pyOutlook.txt" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/genindex.html" afterPath="$PROJECT_DIR$/docs/_build/html/genindex.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/index.html" afterPath="$PROJECT_DIR$/docs/_build/html/index.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/modules.html" afterPath="$PROJECT_DIR$/docs/_build/html/modules.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/py-modindex.html" afterPath="$PROJECT_DIR$/docs/_build/html/py-modindex.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/pyOutlook.html" afterPath="$PROJECT_DIR$/docs/_build/html/pyOutlook.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/search.html" afterPath="$PROJECT_DIR$/docs/_build/html/search.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/searchindex.js" afterPath="$PROJECT_DIR$/docs/_build/html/searchindex.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/_build/html/setup.html" afterPath="$PROJECT_DIR$/docs/_build/html/setup.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/conf.py" afterPath="$PROJECT_DIR$/docs/conf.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/index.rst" afterPath="$PROJECT_DIR$/docs/index.rst" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/modules.rst" afterPath="$PROJECT_DIR$/docs/modules.rst" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/__init__.py" afterPath="$PROJECT_DIR$/pyOutlook/__init__.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/internal/createMessage.py" afterPath="$PROJECT_DIR$/pyOutlook/internal/createMessage.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/internal/internalMethods.py" afterPath="$PROJECT_DIR$/pyOutlook/internal/internalMethods.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/internal/messageActions.py" afterPath="$PROJECT_DIR$/pyOutlook/internal/messageActions.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/internal/retrieve.py" afterPath="$PROJECT_DIR$/pyOutlook/internal/retrieve.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/main.py" afterPath="$PROJECT_DIR$/pyOutlook/main.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/pyOutlook.rst" afterPath="$PROJECT_DIR$/docs/pyOutlook.rst" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/folders.py" afterPath="$PROJECT_DIR$/pyOutlook/folders.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pyOutlook/message.py" afterPath="$PROJECT_DIR$/pyOutlook/message.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/setup.py" afterPath="$PROJECT_DIR$/setup.py" />
     </list>
     <ignored path="pyOutlook.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -58,9 +40,11 @@
       <file leaf-file-name="createMessage.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyOutlook/internal/createMessage.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="18">
-              <caret line="1" column="17" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
-              <folding />
+            <state relative-caret-position="-18">
+              <caret line="56" column="38" selection-start-line="56" selection-start-column="38" selection-end-line="56" selection-end-column="38" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -78,11 +62,33 @@
       <file leaf-file-name="message.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pyOutlook/message.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+            <state relative-caret-position="270">
+              <caret line="15" column="103" selection-start-line="15" selection-start-column="103" selection-end-line="15" selection-end-column="103" />
               <folding>
                 <element signature="e#70#85#0" expanded="true" />
-                <element signature="e#905#1152#1" expanded="true" />
+                <element signature="e#1478#2129#1" expanded="true" />
+                <element signature="e#3099#3321#1" expanded="true" />
+                <element signature="e#4022#4253#1" expanded="true" />
+                <element signature="e#6681#6919#1" expanded="true" />
+                <element signature="e#8090#8330#1" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="folders.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/pyOutlook/folders.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="514">
+              <caret line="217" column="32" selection-start-line="217" selection-start-column="32" selection-end-line="217" selection-end-column="32" />
+              <folding>
+                <element signature="e#0#15#0" expanded="true" />
+                <element signature="e#624#1140#1" expanded="true" />
+                <element signature="e#1530#1890#1" expanded="true" />
+                <element signature="e#2918#3154#1" expanded="true" />
+                <element signature="e#3844#4120#1" expanded="true" />
+                <element signature="e#4778#5292#1" expanded="true" />
+                <element signature="e#6348#6793#1" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -101,10 +107,11 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/pyOutlook/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="144">
-              <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+            <state relative-caret-position="1728">
+              <caret line="126" column="11" selection-start-line="126" selection-start-column="11" selection-end-line="126" selection-end-column="11" />
               <folding>
                 <element signature="e#35#49#0" expanded="true" />
+                <element signature="e#197#603#1" expanded="true" />
                 <element signature="e#917#1136#1" expanded="true" />
                 <element signature="e#1393#1646#1" expanded="true" />
                 <element signature="e#1946#2200#1" expanded="true" />
@@ -185,8 +192,9 @@
         <option value="$PROJECT_DIR$/pyOutlook/internal/internalMethods.py" />
         <option value="$PROJECT_DIR$/pyOutlook/internal/messageActions.py" />
         <option value="$PROJECT_DIR$/pyOutlook/internal/retrieve.py" />
-        <option value="$PROJECT_DIR$/pyOutlook/message.py" />
         <option value="$PROJECT_DIR$/pyOutlook/main.py" />
+        <option value="$PROJECT_DIR$/pyOutlook/message.py" />
+        <option value="$PROJECT_DIR$/pyOutlook/folders.py" />
       </list>
     </option>
   </component>
@@ -603,7 +611,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32899022" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3286334" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24973656" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.329718" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.329718" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -627,12 +635,11 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="2" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/README.md" />
     <entry file="file://$PROJECT_DIR$/folders.py" />
     <entry file="file://$PROJECT_DIR$/retrieve.py" />
     <entry file="file://$PROJECT_DIR$/createMessage.py" />
@@ -681,14 +688,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pyOutlook/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -713,19 +712,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyOutlook/internal/createMessage.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="18">
-          <caret line="1" column="17" selection-start-line="1" selection-start-column="17" selection-end-line="1" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pyOutlook/internal/messageActions.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="36">
           <caret line="2" column="5" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyOutlook/internal/createMessage.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-18">
+          <caret line="56" column="38" selection-start-line="56" selection-start-column="38" selection-end-line="56" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#15#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pyOutlook/message.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="15" column="103" selection-start-line="15" selection-start-column="103" selection-end-line="15" selection-end-column="103" />
+          <folding>
+            <element signature="e#70#85#0" expanded="true" />
+            <element signature="e#1478#2129#1" expanded="true" />
+            <element signature="e#3099#3321#1" expanded="true" />
+            <element signature="e#4022#4253#1" expanded="true" />
+            <element signature="e#6681#6919#1" expanded="true" />
+            <element signature="e#8090#8330#1" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -737,23 +761,29 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pyOutlook/message.py">
+    <entry file="file://$PROJECT_DIR$/pyOutlook/folders.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+        <state relative-caret-position="514">
+          <caret line="217" column="32" selection-start-line="217" selection-start-column="32" selection-end-line="217" selection-end-column="32" />
           <folding>
-            <element signature="e#70#85#0" expanded="true" />
-            <element signature="e#905#1152#1" expanded="true" />
+            <element signature="e#0#15#0" expanded="true" />
+            <element signature="e#624#1140#1" expanded="true" />
+            <element signature="e#1530#1890#1" expanded="true" />
+            <element signature="e#2918#3154#1" expanded="true" />
+            <element signature="e#3844#4120#1" expanded="true" />
+            <element signature="e#4778#5292#1" expanded="true" />
+            <element signature="e#6348#6793#1" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/pyOutlook/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
+        <state relative-caret-position="1728">
+          <caret line="126" column="11" selection-start-line="126" selection-start-column="11" selection-end-line="126" selection-end-column="11" />
           <folding>
             <element signature="e#35#49#0" expanded="true" />
+            <element signature="e#197#603#1" expanded="true" />
             <element signature="e#917#1136#1" expanded="true" />
             <element signature="e#1393#1646#1" expanded="true" />
             <element signature="e#1946#2200#1" expanded="true" />

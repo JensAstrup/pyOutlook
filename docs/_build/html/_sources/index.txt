@@ -9,9 +9,11 @@ Welcome to pyOutlook's documentation!
 Contents:
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    
    modules
+   readmeLink
+
 
 Indices and tables
 ==================

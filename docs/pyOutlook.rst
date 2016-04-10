@@ -1,45 +1,22 @@
-pyOutlook package
-=================
-
-Subpackages
------------
-
-.. toctree::
-
-    pyOutlook.internal
-
-Submodules
-----------
-
-pyOutlook.folders module
-------------------------
-
-.. automodule:: pyOutlook.folders
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-pyOutlook.main module
+Outlook Account
 ---------------------
 
-.. automodule:: pyOutlook.main
+.. autoclass:: pyOutlook.main.OutlookAccount
     :members:
-    :undoc-members:
     :show-inheritance:
 
-pyOutlook.message module
+Message
 ------------------------
 
-.. automodule:: pyOutlook.message
+.. autoclass:: pyOutlook.message.Message
     :members:
     :undoc-members:
     :show-inheritance:
 
+Folder
+------------------------
 
-Module contents
----------------
-
-.. automodule:: pyOutlook
+.. autoclass:: pyOutlook.folders.Folder
     :members:
     :undoc-members:
     :show-inheritance:

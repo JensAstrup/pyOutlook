@@ -1,12 +1,18 @@
-Walkthrough
+pyOutlook
 =========
 
 A Python module for connecting to the Outlook REST API, without the
 hassle of dealing with the JSON formatting for requests/responses and
 the REST endpoints and their varying requirements
 
+Methods
+-------
+
+All current methods available, with descriptions, parameters, and
+examples.
+
 Instantiation
------------
+^^^^^^^^^^^^^
 
 Creating the object: Before anything can be retrieved or sent, the
 OutlookAccount object must be created. The only parameter required is
@@ -23,12 +29,6 @@ outside of this module.
     my_account = pyOutlook.OutlookAccount(token)
     # If our token is refreshed, or to ensure that the latest token is saved prior to calling a method. 
     my_account = my_account.set_access_token(new_token)
-
-Methods
--------
-
-All current methods available, with descriptions, parameters, and
-examples.
 
 Retrieving Messages
 ~~~~~~~~~~~~~~~~~~~
@@ -181,7 +181,7 @@ Folder ID parameters can be replaced with the following strings where
 indicated: 'Inbox', 'Drafts', 'SentItems', or 'DeletedItems'
 
 get\_folders()
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~
 
 This methods returns a list of Folder objects representing each folder
 in the user's account.
@@ -193,7 +193,7 @@ in the user's account.
     'Inbox'
 
 get\_folder(folder\_id)
-^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~
 
 If you have the id of a folder, you can get a Folder object for it with
 this method
@@ -227,10 +227,10 @@ object you have created in Outlook.
     '0'
 
 The Folder Object
-~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^
 
 rename\_folder(new\_folder\_name)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This method renames the folder object in Outlook, and returns a new
 Folder object representing that folder.
@@ -240,7 +240,7 @@ Folder object representing that folder.
     folder.rename_folder('My New Folder v2')
 
 get\_subfolders()
-^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~
 
 Returns a list of Folder objects, representing all child Folders within
 the Folder provided.
@@ -254,7 +254,7 @@ the Folder provided.
     'Some Other Folder'
 
 delete\_folder()
-^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~
 
 Self-explanatory, deletes the provided folder in Outlook
 
@@ -264,7 +264,7 @@ Self-explanatory, deletes the provided folder in Outlook
     # and now it doesn't exist
 
 move\_folder(destination\_folder)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Move the Folder provided into a new folder. The new folder parameter can
 either be a folder id, or a 'well known' folder name.
@@ -275,7 +275,7 @@ either be a folder id, or a 'well known' folder name.
     folder1.move_folder(folder_id)
 
 copy\_folder(destination\_folder)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Copies the folder and its contents to the designated folder which can be
 either a folder ID or well known folder name.

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>pyOutlook package &mdash; pyOutlook b0 documentation</title>
+  <title>Outlook Account &mdash; pyOutlook b0 documentation</title>
   
 
   
@@ -83,17 +83,9 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">pyOutlook</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">pyOutlook package</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#subpackages">Subpackages</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyOutlook.folders">pyOutlook.folders module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyOutlook.main">pyOutlook.main module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyOutlook.message">pyOutlook.message module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-pyOutlook">Module contents</a></li>
-</ul>
-</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Outlook Account</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#message">Message</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#folder">Folder</a></li>
 </ul>
 </li>
 </ul>
@@ -128,7 +120,7 @@
       
           <li><a href="modules.html">pyOutlook</a> &raquo;</li>
       
-    <li>pyOutlook package</li>
+    <li>Outlook Account</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -142,159 +134,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="pyoutlook-package">
-<h1>pyOutlook package<a class="headerlink" href="#pyoutlook-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
-<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul class="simple">
-</ul>
-</div>
-</div>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pyOutlook.folders">
-<span id="pyoutlook-folders-module"></span><h2>pyOutlook.folders module<a class="headerlink" href="#module-pyOutlook.folders" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="pyOutlook.folders.Folder">
-<em class="property">class </em><code class="descclassname">pyOutlook.folders.</code><code class="descname">Folder</code><span class="sig-paren">(</span><em>folder_id</em>, <em>folder_name</em>, <em>parent_id</em>, <em>child_folder_count</em>, <em>unread_count</em>, <em>total_items</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<dl class="method">
-<dt id="pyOutlook.folders.Folder.copy_folder">
-<code class="descname">copy_folder</code><span class="sig-paren">(</span><em>destination_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.copy_folder" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>destination_folder</strong> &#8211; Folder Id</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Folder</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyOutlook.folders.Folder" title="pyOutlook.folders.Folder">Folder</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyOutlook.folders.Folder.delete_folder">
-<code class="descname">delete_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.delete_folder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyOutlook.folders.Folder.get_subfolders">
-<code class="descname">get_subfolders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.get_subfolders" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="pyOutlook.folders.Folder.move_folder">
-<code class="descname">move_folder</code><span class="sig-paren">(</span><em>destination_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.move_folder" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>destination_folder</strong> &#8211; Folder Id</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Folder</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#pyOutlook.folders.Folder" title="pyOutlook.folders.Folder">Folder</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="pyOutlook.folders.Folder.rename_folder">
-<code class="descname">rename_folder</code><span class="sig-paren">(</span><em>new_folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.rename_folder" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="pyOutlook.folders.clean_return_multiple">
-<code class="descclassname">pyOutlook.folders.</code><code class="descname">clean_return_multiple</code><span class="sig-paren">(</span><em>json</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.clean_return_multiple" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>json</strong> &#8211; </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of Folders</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of Folder</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyOutlook.folders.create_folder">
-<code class="descclassname">pyOutlook.folders.</code><code class="descname">create_folder</code><span class="sig-paren">(</span><em>self</em>, <em>parent_id</em>, <em>folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.create_folder" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>self</strong> &#8211; </li>
-<li><strong>parent_id</strong> (<em>str</em>) &#8211; The id of the folder which should house the new folder</li>
-<li><strong>folder_name</strong> (<em>str</em>) &#8211; The name of the new folder</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Folder</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyOutlook.folders.Folder" title="pyOutlook.folders.Folder">Folder</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyOutlook.folders.get_folder">
-<code class="descclassname">pyOutlook.folders.</code><code class="descname">get_folder</code><span class="sig-paren">(</span><em>self</em>, <em>folder_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.get_folder" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>self</strong> &#8211; </li>
-<li><strong>folder_id</strong> &#8211; </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Folder</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#pyOutlook.folders.Folder" title="pyOutlook.folders.Folder">Folder</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyOutlook.folders.get_folders">
-<code class="descclassname">pyOutlook.folders.</code><code class="descname">get_folders</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.get_folders" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>self</strong> &#8211; </td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of Folders</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of Folder</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-pyOutlook.main">
-<span id="pyoutlook-main-module"></span><h2>pyOutlook.main module<a class="headerlink" href="#module-pyOutlook.main" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="outlook-account">
+<h1>Outlook Account<a class="headerlink" href="#outlook-account" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pyOutlook.main.OutlookAccount">
 <em class="property">class </em><code class="descclassname">pyOutlook.main.</code><code class="descname">OutlookAccount</code><span class="sig-paren">(</span><em>access_token</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.main.OutlookAccount" title="Permalink to this definition">¶</a></dt>
@@ -306,8 +147,8 @@
 <p class="last">This module does not handle the OAuth process. You must retrieve and refresh tokens separately.</p>
 </div>
 <dl class="attribute">
-<dt id="pyOutlook.main.OutlookAccount.access_token">
-<code class="descname">access_token</code><a class="headerlink" href="#pyOutlook.main.OutlookAccount.access_token" title="Permalink to this definition">¶</a></dt>
+<dt id="OutlookAccount.access_token">
+<code class="descname">access_token</code><a class="headerlink" href="#OutlookAccount.access_token" title="Permalink to this definition">¶</a></dt>
 <dd><p>A string OAuth token from Outlook allowing access to a user&#8217;s account</p>
 </dd></dl>
 
@@ -518,44 +359,90 @@
 </table>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="pyOutlook.main.OutlookAccount.token">
-<code class="descname">token</code><a class="headerlink" href="#pyOutlook.main.OutlookAccount.token" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 </div>
-<div class="section" id="module-pyOutlook.message">
-<span id="pyoutlook-message-module"></span><h2>pyOutlook.message module<a class="headerlink" href="#module-pyOutlook.message" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="message">
+<h1>Message<a class="headerlink" href="#message" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="pyOutlook.message.Message">
 <em class="property">class </em><code class="descclassname">pyOutlook.message.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>message_id</em>, <em>body</em>, <em>subject</em>, <em>sender_email</em>, <em>sender_name</em>, <em>to_recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>An object representing an email inside of the OutlookAccount.</p>
+<dl class="attribute">
+<dt id="Message.message_id">
+<code class="descname">message_id</code><a class="headerlink" href="#Message.message_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A string provided by Outlook identifying this specific email</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Message.body">
+<code class="descname">body</code><a class="headerlink" href="#Message.body" title="Permalink to this definition">¶</a></dt>
+<dd><p>The body content of the email, including HTML formatting</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Message.subject">
+<code class="descname">subject</code><a class="headerlink" href="#Message.subject" title="Permalink to this definition">¶</a></dt>
+<dd><p>The subject of the email</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Message.senderEmail">
+<code class="descname">senderEmail</code><a class="headerlink" href="#Message.senderEmail" title="Permalink to this definition">¶</a></dt>
+<dd><p>The email of the person who sent this email</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Message.senderName">
+<code class="descname">senderName</code><a class="headerlink" href="#Message.senderName" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the person who sent this email, as provided by Outlook</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Message.toRecipients">
+<code class="descname">toRecipients</code><a class="headerlink" href="#Message.toRecipients" title="Permalink to this definition">¶</a></dt>
+<dd><p>A comma separated string of emails who were sent this email in the &#8216;To&#8217; field</p>
+</dd></dl>
+
 <dl class="method">
 <dt id="pyOutlook.message.Message.copy_to">
 <code class="descname">copy_to</code><span class="sig-paren">(</span><em>folder_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.copy_to" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copies the email to the folder specified by the folder_id.</p>
+<p>The folder id must match the id provided by Outlook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>folder_id</strong> &#8211; A string containing the folder ID the message should be copied to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.copy_to_deleted">
 <code class="descname">copy_to_deleted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.copy_to_deleted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copies Message to account&#8217;s Deleted Items folder</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.copy_to_drafts">
 <code class="descname">copy_to_drafts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.copy_to_drafts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copies Message to account&#8217;s Drafts folder</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.copy_to_inbox">
 <code class="descname">copy_to_inbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.copy_to_inbox" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Copies Message to account&#8217;s Inbox</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.delete_message">
 <code class="descname">delete_message</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.delete_message" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Deletes the email</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.forward_message">
@@ -573,44 +460,232 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;john.doe@domain.com, betsy.donalds@domain.com&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;john.doe@domain.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Hey Joe&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">MiscError</span></code> &#8211; A comma separated string of emails, or one string email, must be provided</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.move_to">
 <code class="descname">move_to</code><span class="sig-paren">(</span><em>folder_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.move_to" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Moves the email to the folder specified by the folder_id.</p>
+<p>The folder id must match the id provided by Outlook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>folder_id</strong> &#8211; A string containing the folder ID the message should be moved to</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.move_to_deleted">
 <code class="descname">move_to_deleted</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.move_to_deleted" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Moves the email to the account&#8217;s Deleted Items folder</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.move_to_drafts">
 <code class="descname">move_to_drafts</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.move_to_drafts" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Moves the email to the account&#8217;s Drafts folder</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.move_to_inbox">
 <code class="descname">move_to_inbox</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.move_to_inbox" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Moves the email to the account&#8217;s Inbox</p>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.reply">
 <code class="descname">reply</code><span class="sig-paren">(</span><em>reply_comment</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.reply" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Reply to the Message.</p>
+<p class="rubric">Notes</p>
+<p>HTML can be inserted in the string and will be interpreted properly by Outlook.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reply_comment</strong> &#8211; String message to send with email.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="pyOutlook.message.Message.reply_all">
 <code class="descname">reply_all</code><span class="sig-paren">(</span><em>reply_comment</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.message.Message.reply_all" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Replies to everyone on the email, including those on the CC line.</p>
+<p>With great power, comes great responsibility.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>reply_comment</strong> &#8211; The string comment to send to everyone on the email.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
 </div>
-<div class="section" id="module-pyOutlook">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyOutlook" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="folder">
+<h1>Folder<a class="headerlink" href="#folder" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyOutlook.folders.Folder">
+<em class="property">class </em><code class="descclassname">pyOutlook.folders.</code><code class="descname">Folder</code><span class="sig-paren">(</span><em>folder_id</em>, <em>folder_name</em>, <em>parent_id</em>, <em>child_folder_count</em>, <em>unread_count</em>, <em>total_items</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>An object representing a Folder in the OutlookAccount provided.</p>
+<dl class="attribute">
+<dt id="Folder.folder_id">
+<code class="descname">folder_id</code><a class="headerlink" href="#Folder.folder_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The static id generated by Outlook to identify this folder.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Folder.folder_name">
+<code class="descname">folder_name</code><a class="headerlink" href="#Folder.folder_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of this folder as displayed in the account</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Folder.parent_id">
+<code class="descname">parent_id</code><a class="headerlink" href="#Folder.parent_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The id of the folder which houses this Folder object</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Folder.child_folder_count">
+<code class="descname">child_folder_count</code><a class="headerlink" href="#Folder.child_folder_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of child folders inside this Folder</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Folder.unread_count">
+<code class="descname">unread_count</code><a class="headerlink" href="#Folder.unread_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of unread messages inside this Folder</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Folder.total_items">
+<code class="descname">total_items</code><a class="headerlink" href="#Folder.total_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>A sum of all items inside Folder</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.folders.Folder.copy_folder">
+<code class="descname">copy_folder</code><span class="sig-paren">(</span><em>destination_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.copy_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Copies the Folder into the provided destination folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>destination_folder</strong> &#8211; A string containing the id of the folder, as provided by Outlook, that this Folder</li>
+<li><strong>be copied to.</strong> (<em>should</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A new Folder representing the newly created folder.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.folders.Folder.delete_folder">
+<code class="descname">delete_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.delete_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes this Folder.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This deletes the folder inside of the account provided - not the Folder object!</p>
 </div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.folders.Folder.get_subfolders">
+<code class="descname">get_subfolders</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.get_subfolders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve all child Folders inside of this Folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List[Folder]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.folders.Folder.move_folder">
+<code class="descname">move_folder</code><span class="sig-paren">(</span><em>destination_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.move_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move the Folder into a different folder.</p>
+<p>This makes the Folder provided a child folder of the destination_folder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><strong>destination_folder</strong> &#8211; An id, provided by Outlook, specifying the folder that should become the parent</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new Folder object representing the folder that is now inside of the destination_folder.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.folders.Folder.rename_folder">
+<code class="descname">rename_folder</code><span class="sig-paren">(</span><em>new_folder_name</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.folders.Folder.rename_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renames the Folder to the provided name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_folder_name</strong> &#8211; A string of the replacement name.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new Folder representing the folder with the new name on Outlook.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
