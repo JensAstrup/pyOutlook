@@ -1,7 +1,6 @@
 import requests
-
 import message
-from internal.errors import AuthError, MiscError
+from errors import AuthError, MiscError
 
 
 def forward_message(self, message_id, to_recipients, forward_comment):

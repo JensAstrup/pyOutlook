@@ -10,5 +10,6 @@ setup(
     author='Jens Astrup',
     author_email='jensaiden@gmail.com',
     description='A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON '
-                'formatting for requests/responses and the REST endpoints and their varying requirements'
+                'formatting for requests/responses and the REST endpoints and their varying requirements',
+    requires=['requests']
 )

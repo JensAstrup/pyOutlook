@@ -7,16 +7,15 @@ from internal.errors import MiscError, AuthError
 class OutlookAccount(object):
     """Sets up access to Outlook account for all methods & classes.
 
-    Access token required for instantiation. Can be refreshed at a later time using .set_access_token(). Note that
-    this module does not handle the OAuth process.
+    Access token required for instantiation. Can be refreshed at a later time using .set_access_token().
+
+    Warnings:
+        This module does not handle the OAuth process. You must retrieve and refresh tokens separately.
 
     Attributes:
         access_token: A string OAuth token from Outlook allowing access to a user's account
 
     """
-    if __name__ == '__main__':
-        pass
-
     def __init__(self, access_token):
         if type(access_token) is None:
             raise AuthError('No access token provided with object instantiation.')
@@ -30,6 +29,9 @@ class OutlookAccount(object):
 
         Args:
             access_token: A string representing the OAuth token
+
+        Returns:
+            None
 
         """
         self.access_token = access_token
@@ -65,6 +67,9 @@ class OutlookAccount(object):
 
     def get_more_messages(self, page):
         """Retrieves additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
+
+        Args:
+            page: Integer representing the 'page' of results to fetch
 
         Returns:
             List[Message]

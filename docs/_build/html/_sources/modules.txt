@@ -5,4 +5,3 @@ pyOutlook
    :maxdepth: 4
 
    pyOutlook
-   setup

@@ -1,5 +1,5 @@
 import requests
-from pyOutlook.message import jsonify_receps
+from internalMethods import jsonify_receps
 from errors import SendError, MiscError
 
 

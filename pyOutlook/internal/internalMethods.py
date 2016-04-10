@@ -1,4 +1,4 @@
-from internal.errors import MiscError
+from errors import MiscError
 
 token = 0
 

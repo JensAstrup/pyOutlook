@@ -1,7 +1,6 @@
 import requests
-
-from internal.errors import AuthError
-from message import Message
+from errors import AuthError
+from pyOutlook.message import Message
 
 
 def clean_return_multiple(json):

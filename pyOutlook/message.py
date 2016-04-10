@@ -1,7 +1,5 @@
 # Functions used by other files, but not used directly in parent code
 import requests
-
-import main
 from internal.errors import AuthError, MiscError
 from internal.internalMethods import jsonify_receps, get_global_token
 
@@ -9,20 +7,6 @@ from internal.internalMethods import jsonify_receps, get_global_token
 class Message(object):
     def __init__(self, message_id, body, subject, sender_email, sender_name, to_recipients):
         # type: (str, str, str, str, str, str) -> object
-        """
-        :param message_id: Unique identifier for email provided by Outlook
-        :type message_id: str
-        :param body: The content of the email
-        :type body: str
-        :param subject: The subject of the email
-        :type subject: str
-        :param sender_email: Email address of the sender
-        :type sender_email: str
-        :param sender_name: The name associated with the sender email, provided by Outlook
-        :type sender_name: str
-        :param to_recipients: Comma separated list of recipients
-        :type to_recipients: str
-        """
         self.__setattr__('message_id', message_id)
         self.__setattr__('body', body)
         self.__setattr__('subject', subject)
@@ -37,11 +21,12 @@ class Message(object):
         return self.__getattribute__('subject')
         
     def forward_message(self, to_recipients, forward_comment):
-        """
-        :param to_recipients: Comma separated string of recipient emails
-        :type to_recipients: str
-        :param forward_comment: A comment to include with message
-        :type forward_comment: str
+        """Forward Message to recipients with an optional comment.
+
+        Args:
+            to_recipients: Comma separated string list of recipients to send email to.
+            forward_comment: String comment to append to forwarded email.
+
         """
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
@@ -101,7 +86,7 @@ class Message(object):
         r = requests.delete(endpoint, headers=headers)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Deleted Message. Received the following status code from Outlook: ',
@@ -116,7 +101,7 @@ class Message(object):
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Moved Message to ' + destination + '. Received the following status code from Outlook: ',
@@ -143,7 +128,7 @@ class Message(object):
         r = requests.post(endpoint, headers=headers, data=payload)
 
         if 399 < r.status_code < 452:
-            raise main.AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
             print 'Copied Message to ' + destination + '. Received the following status code from Outlook: ',
