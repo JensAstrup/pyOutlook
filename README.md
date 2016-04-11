@@ -3,7 +3,9 @@ A Python module for connecting to the Outlook REST API, without the hassle of de
 
 [![PyPI](https://img.shields.io/pypi/v/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
 [![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
-[![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)]()
+[![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
+[![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.org/en/latest/?badge=latest)
+
 ## Methods
 All current methods available, with descriptions, parameters, and examples.
 
