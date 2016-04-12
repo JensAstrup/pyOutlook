@@ -52,10 +52,10 @@ class NewMessage(object):
         # set the recipients
         json_send += ',' + json_to + ']'
 
-        if type(json_cc) is not NoneType:
+        if json_cc is not None:
             json_send += ',' + json_cc + ']'
 
-        if type(json_bcc) is not NoneType:
+        if json_bcc is not None:
             json_send += ',' + json_bcc + ']'
 
         if hasattr(self, '__send_as'):
