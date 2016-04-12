@@ -1,6 +1,7 @@
 import requests
-import message
+
 from errors import AuthError, MiscError
+from pyOutlook import message
 
 
 def forward_message(self, message_id, to_recipients, forward_comment):
