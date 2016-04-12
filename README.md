@@ -1,5 +1,5 @@
 [![PyPI](https://img.shields.io/pypi/v/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
-[![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)	[![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
+[![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)	
 [![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
 [![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.org/en/latest/?badge=latest)
 [![Code Health](https://landscape.io/github/JensAstrup/pyOutlook/master/landscape.svg?style=flat)](https://landscape.io/github/JensAstrup/pyOutlook/master)
