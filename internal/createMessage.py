@@ -1,6 +1,7 @@
 import requests
-from internalMethods import jsonify_receps
-from errors import SendError, MiscError
+from pyOutlook.internal.internalMethods import jsonify_receps
+from pyOutlook.internal.errors import SendError, MiscError
+from types import *
 
 
 class NewMessage(object):
@@ -51,10 +52,10 @@ class NewMessage(object):
         # set the recipients
         json_send += ',' + json_to + ']'
 
-        if type(json_cc) is not None:
+        if type(json_cc) is not NoneType:
             json_send += ',' + json_cc + ']'
 
-        if type(json_bcc) is not None:
+        if type(json_bcc) is not NoneType:
             json_send += ',' + json_bcc + ']'
 
         if hasattr(self, '__send_as'):
