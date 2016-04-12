@@ -73,7 +73,7 @@ class NewMessage(object):
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
         if r.status_code != 202:
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
-                            'is current. STATUS CODE: ' + str(r.status_code))
+                            'is current. STATUS CODE: ' + str(r.status_code) + '. RESPONSE: ' + r.content)
 
         ###
         # Get and Set Functions
