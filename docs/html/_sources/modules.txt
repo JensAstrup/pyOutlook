@@ -1,0 +1,7 @@
+pyOutlook
+=========
+
+.. toctree::
+   :maxdepth: 4
+
+   pyOutlook

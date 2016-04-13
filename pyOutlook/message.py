@@ -1,5 +1,6 @@
 # Functions used by other files, but not used directly in parent code
 import requests
+
 from internal.errors import AuthError, MiscError
 from internal.internalMethods import jsonify_receps, get_global_token
 

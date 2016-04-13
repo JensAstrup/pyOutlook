@@ -1,6 +1,7 @@
 import requests
-from pyOutlook.internal.internalMethods import jsonify_receps
+
 from pyOutlook.internal.errors import SendError, MiscError
+from pyOutlook.internal.internalMethods import jsonify_receps
 
 
 class NewMessage(object):

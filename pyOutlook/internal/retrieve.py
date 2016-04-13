@@ -1,4 +1,5 @@
 import requests
+
 from errors import AuthError
 from pyOutlook.message import Message
 
