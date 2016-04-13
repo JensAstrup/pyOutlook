@@ -1,7 +1,10 @@
 # Authorization and misc functions
 import folders
-from internal import createMessage, internalMethods, retrieve
+from internal import internalMethods, retrieve
 from internal.errors import MiscError, AuthError
+# For Docstrings
+from pyOutlook.internal.createMessage import NewMessage
+from folders import Folder
 
 
 class OutlookAccount(object):
@@ -95,16 +98,16 @@ class OutlookAccount(object):
         """Creates a NewMessage object.
 
         Returns:
-            object: NewMessage
+            NewMessage
 
         """
-        return createMessage.NewMessage(self.access_token)
+        return NewMessage(self.access_token)
 
     def get_sent_messages(self):
         """Retrieves last ten sent messages.
 
         Returns:
-            List[Message]
+            list[Message]
 
         """
         return retrieve.get_messages_from_folder_name(self, 'SentItems')
@@ -113,7 +116,7 @@ class OutlookAccount(object):
         """Retrieves last ten deleted messages.
 
         Returns:
-            List[Message]
+            list[Message]
 
         """
         return retrieve.get_messages_from_folder_name(self, 'DeletedItems')
@@ -122,7 +125,7 @@ class OutlookAccount(object):
         """Retrieves last ten draft messages.
 
         Returns:
-            List[Message]
+            list[Message]
 
         """
         return retrieve.get_messages_from_folder_name(self, 'Drafts')
@@ -134,7 +137,7 @@ class OutlookAccount(object):
             folder: String providing the folder ID, from Outlook, to retrieve messages from
 
         Returns:
-            List[Message]
+            list[Message]
 
         """
         return retrieve.get_messages_from_folder_name(self, folder)
@@ -144,7 +147,7 @@ class OutlookAccount(object):
         """Retrieves a list of folders in the account.
 
         Returns:
-            List[Folder]
+            list[Folder]
 
         """
         return folders.get_folders(self)
