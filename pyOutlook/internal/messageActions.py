@@ -1,7 +1,6 @@
 import requests
-
-from errors import AuthError, MiscError
-from pyOutlook import message
+from .errors import AuthError, MiscError
+from ..internal.internalMethods import jsonify_receps
 
 
 def forward_message(self, message_id, to_recipients, forward_comment):
@@ -12,7 +11,7 @@ def forward_message(self, message_id, to_recipients, forward_comment):
     if type(to_recipients) is None:
         raise MiscError('To Recipients is not defined. Can not forward message.')
 
-    payload += '"ToRecipients" : [' + message.jsonify_receps(to_recipients, 'to', True) + ']}'
+    payload += '"ToRecipients" : [' + jsonify_receps(to_recipients, 'to', True) + ']}'
 
     r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + message_id + '/forward',
                       headers=headers, data=payload)

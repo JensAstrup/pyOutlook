@@ -1,10 +1,11 @@
 # Authorization and misc functions
-import folders
-from internal import internalMethods, retrieve
-from internal.errors import MiscError, AuthError
+# noinspection PyUnresolvedReferences,PyUnresolvedReferences
+from ..internal import retrieve, internalMethods
+# noinspection PyUnresolvedReferences
+from ..internal.errors import MiscError, AuthError
 # For Docstrings
 from pyOutlook.internal.createMessage import NewMessage
-from folders import Folder
+from .folders import *
 
 
 class OutlookAccount(object):
@@ -79,10 +80,10 @@ class OutlookAccount(object):
 
         """
         if not isinstance(page, int):
-            print type(page)
+            print(type(page))
             raise MiscError('page parameter must be of type integer')
         if page == 1:
-            print 'Note that pulling the first page is equivalent to calling get_messages()'
+            print('Note that pulling the first page is equivalent to calling get_messages()')
         return retrieve.get_messages(self, page)
 
     def get_inbox(self):
@@ -150,7 +151,7 @@ class OutlookAccount(object):
             list[Folder]
 
         """
-        return folders.get_folders(self)
+        return get_folders(self)
 
     def get_folder(self, folder_id):
         """Retrieve a Folder object matching the folder ID provided.
@@ -162,7 +163,7 @@ class OutlookAccount(object):
             object: Folder
 
         """
-        return folders.get_folder(self, folder_id)
+        return get_folder(self, folder_id)
 
     def create_folder(self, parent_folder_id, new_folder_name):
         """
@@ -174,4 +175,4 @@ class OutlookAccount(object):
             object: Folder
 
         """
-        return folders.create_folder(self, parent_folder_id, new_folder_name)
+        return create_folder(self, parent_folder_id, new_folder_name)

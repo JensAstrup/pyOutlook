@@ -21,7 +21,6 @@ class NewMessage(object):
     # Send Email Function
     ###
     def __send_email(self):
-        global json_send
         json_send = '{ "Message": {"'
 
         if hasattr(self, '__to_line'):

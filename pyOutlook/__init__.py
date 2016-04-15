@@ -1,4 +1,5 @@
-from main import OutlookAccount
+from pyOutlook.core.main import OutlookAccount
 
 if __name__ == '__main__':
-    print 'pyOutlook ready.'
+    init = OutlookAccount(None)
+    print('pyOutlook ready.')

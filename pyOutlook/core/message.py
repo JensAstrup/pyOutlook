@@ -1,10 +1,11 @@
 # Functions used by other files, but not used directly in parent code
 import requests
 
-from internal.errors import AuthError, MiscError
-from internal.internalMethods import jsonify_receps, get_global_token
+from ..internal.errors import AuthError, MiscError
+from ..internal.internalMethods import jsonify_receps, get_global_token
 
 
+# noinspection PyUnresolvedReferences
 class Message(object):
     """An object representing an email inside of the OutlookAccount.
 
@@ -65,8 +66,8 @@ class Message(object):
             raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
 
         else:
-            print 'Message Forwarded. Received the following status code from Outlook: ',
-            print r.status_code
+            print('Message Forwarded. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -89,8 +90,8 @@ class Message(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print 'Replied to Message. Received the following status code from Outlook: ',
-            print r.status_code
+            print('Replied to Message. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
 
     def reply_all(self, reply_comment):
         """Replies to everyone on the email, including those on the CC line.
@@ -112,8 +113,8 @@ class Message(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print 'Replied to Message. Received the following status code from Outlook: ',
-            print r.status_code
+            print('Replied to Message. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
 
     def delete_message(self):
         """Deletes the email"""
@@ -127,8 +128,8 @@ class Message(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print 'Deleted Message. Received the following status code from Outlook: ',
-            print r.status_code
+            print('Deleted Message. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
 
     def __move_to(self, destination):
         access_token = get_global_token()
@@ -142,8 +143,8 @@ class Message(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print 'Moved Message to ' + destination + '. Received the following status code from Outlook: ',
-            print r.status_code
+            print('Moved Message to ' + destination + '. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
@@ -180,9 +181,9 @@ class Message(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print 'Copied Message to ' + destination + '. Received the following status code from Outlook: ',
-            print r.status_code
-            
+            print('Copied Message to ' + destination + '. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
+
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
         self.__copy_to('Inbox')
