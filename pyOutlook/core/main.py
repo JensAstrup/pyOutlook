@@ -160,7 +160,7 @@ class OutlookAccount(object):
             folder_id: String identifying the Outlook folder to return
 
         Returns:
-            object: Folder
+            Folder
 
         """
         return get_folder(self, folder_id)
@@ -172,7 +172,7 @@ class OutlookAccount(object):
             new_folder_name: String indicating the name the new folder should have
 
         Returns:
-            object: Folder
+            Folder
 
         """
         return create_folder(self, parent_folder_id, new_folder_name)
