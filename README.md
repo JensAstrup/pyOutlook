@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
+[![PyPI version](https://badge.fury.io/py/pyOutlook.svg)](https://badge.fury.io/py/pyOutlook)
 [![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)	
 [![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
 [![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.org/en/latest/?badge=latest)
