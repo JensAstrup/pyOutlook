@@ -1,7 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/pyOutlook.svg)](https://badge.fury.io/py/pyOutlook)
 [![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)	
 [![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
-[![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.org/en/latest/?badge=latest)
 [![Code Health](https://landscape.io/github/JensAstrup/pyOutlook/master/landscape.svg?style=flat)](https://landscape.io/github/JensAstrup/pyOutlook/master)
 
 
@@ -9,10 +8,9 @@
 # pyOutlook
 A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
 
-## Methods
-All current methods available, with descriptions, parameters, and examples.
+The most up to date documentation can be found on [pyOutlook's pypi docs page](http://pythonhosted.org/pyOutlook).
 
-#### Instantiation
+## Instantiation
 Creating the object: Before anything can be retrieved or sent, the OutlookAccount object must be created. The only parameter required is the access token for the account. This can be changed later with the method ```set_access_token(token_input)``` where 'token_input' is the OAuth Access token you receive from Outlook. Note that this module does not handle the OAuth process, gaining an access token must be done outside of this module.
 
 ```python
@@ -22,6 +20,10 @@ my_account = pyOutlook.OutlookAccount(token)
 # If our token is refreshed, or to ensure that the latest token is saved prior to calling a method. 
 my_account = my_account.set_access_token(new_token)
 ```
+
+## Methods
+All current methods available, with descriptions, parameters, and examples.
+
 ### Retrieving Messages
 
 #### get_messages()
