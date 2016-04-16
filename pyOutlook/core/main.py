@@ -73,7 +73,7 @@ class OutlookAccount(object):
         """Retrieves additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
 
         Args:
-            page: Integer representing the 'page' of results to fetch
+            page (int): Integer representing the 'page' of results to fetch
 
         Returns:
             List[Message]
@@ -100,6 +100,8 @@ class OutlookAccount(object):
 
         Returns:
             NewMessage
+
+        References:
 
         """
         return NewMessage(self.access_token)

@@ -5,7 +5,7 @@ from pyOutlook.internal.internalMethods import jsonify_receps
 
 
 class NewMessage(object):
-    """A constructor for new emails.
+    """ A constructor for new emails.
 
     Each method, excluding send(), returns the NewMessage object allowing chaining of methods.
 
