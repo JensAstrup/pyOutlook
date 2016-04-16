@@ -20,12 +20,12 @@ class Message(object):
         """
     def __init__(self, message_id, body, subject, sender_email, sender_name, to_recipients):
         # type: (str, str, str, str, str, str) -> object
-        self.__setattr__('message_id', message_id)
-        self.__setattr__('body', body)
-        self.__setattr__('subject', subject)
-        self.__setattr__('senderEmail', sender_email)
-        self.__setattr__('senderName', sender_name)
-        self.__setattr__('toRecipients', to_recipients)
+        self.message_id = message_id
+        self.body = body
+        self.subject = subject
+        self.sender_email = sender_email
+        self.sender_name = sender_name
+        self.to_recipients = to_recipients
 
     def __str__(self):
         return self.__getattribute__('message_id')
