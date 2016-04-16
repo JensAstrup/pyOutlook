@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Walkthrough &mdash; pyOutlook b0 documentation</title>
+  <title>Walkthrough &mdash; pyOutlook 3.0b0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="pyOutlook b0 documentation" href="index.html"/>
+    <link rel="top" title="pyOutlook 3.0b0 documentation" href="index.html"/>
         <link rel="prev" title="Outlook Account" href="pyOutlook.html"/> 
 
   
@@ -59,7 +59,7 @@
             
             
               <div class="version">
-                1.1
+                3.0
               </div>
             
           
@@ -82,7 +82,7 @@
             
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="modules.html">pyOutlook</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Walkthrough</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Walkthrough</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#instantiation">Instantiation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#methods">Methods</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#retrieving-messages">Retrieving Messages</a><ul>
@@ -142,7 +142,7 @@
         <div class="rst-content">
           
 
- 
+
 
 
 
@@ -178,7 +178,7 @@ method <code class="docutils literal"><span class="pre">set_access_token(token_i
 OAuth Access token you receive from Outlook. Note that this module does
 not handle the OAuth process, gaining an access token must be done
 outside of this module.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;OAuth Access Token Here&#39;</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">token</span> <span class="o">=</span> <span class="s1">&#39;OAuth Access Token Here&#39;</span>
 <span class="n">new_token</span> <span class="o">=</span> <span class="s1">&#39;OAuth Access Token2 Here&#39;</span>
 <span class="n">my_account</span> <span class="o">=</span> <span class="n">pyOutlook</span><span class="o">.</span><span class="n">OutlookAccount</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
 <span class="c1"># If our token is refreshed, or to ensure that the latest token is saved prior to calling a method.</span>
@@ -196,7 +196,7 @@ examples.</p>
 <h4>get_messages()<a class="headerlink" href="#get-messages" title="Permalink to this headline">¶</a></h4>
 <p>This method retrieves the five most recent emails, returning a list of
 Message objects.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_messages</span><span class="p">()</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_messages</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -205,7 +205,7 @@ Message objects.</p>
 <p>This method returns additional messages, allowing you to select which
 page you&#8217;d like to pull. Note that get_messages() is page 1. This
 returns a list of Message objects as well.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_more_messages</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_more_messages</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -213,13 +213,13 @@ returns a list of Message objects as well.</p>
 <h4>get_message(message_id)<a class="headerlink" href="#get-message-message-id" title="Permalink to this headline">¶</a></h4>
 <p>This method retrieves the information for the message matching the id
 provided</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">email_id</span> <span class="o">=</span> <span class="n">get_messages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">email_id</span> <span class="o">=</span> <span class="n">get_messages</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">get_email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="n">email_id</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">get_email</span><span class="o">.</span><span class="n">body</span>
+<span class="k">print</span> <span class="n">get_email</span><span class="o">.</span><span class="n">body</span>
 </pre></div>
 </div>
 <p>Sample Output</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">test</span> <span class="n">message</span> <span class="n">body</span><span class="o">.</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">&gt;</span> <span class="n">Best</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">br</span><span class="o">&gt;</span> <span class="n">John</span> <span class="n">Smith</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span>This is a test message body. &lt;br&gt; Best, &lt;br&gt; John Smith
 </pre></div>
 </div>
 </div>
@@ -228,7 +228,7 @@ provided</p>
 <p>This method is identical to get_messages(), however it returns only the
 ten most recent message in the inbox (ignoring messages that were put
 into seperate folders by an Outlook rule, junk email, etc)</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_inbox</span><span class="p">()</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">my_account</span><span class="o">.</span><span class="n">get_inbox</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>Identical methods for additional folders: &#8216;get_sent_messages()&#8217;,
@@ -246,8 +246,8 @@ deleted, etc.</p>
 optional &#8216;comment&#8217; which is sent along with the message. The
 forward_comment parameter can be set to None to just forward the
 message.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
-<span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;John.Adams@domain.com, Nice.Guy@domain.com&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;John.Adams@domain.com, Nice.Guy@domain.com&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
 <span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;John.Smith@domain.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Read the message below&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -256,7 +256,7 @@ message.</p>
 <h4>reply(reply_comment)<a class="headerlink" href="#reply-reply-comment" title="Permalink to this headline">¶</a></h4>
 <p>This method allows you to respond to the sender of an email with a
 comment appended.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
 <span class="n">email</span><span class="o">.</span><span class="n">reply</span><span class="p">(</span><span class="s1">&#39;That was a nice email Lisa&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -265,7 +265,7 @@ comment appended.</p>
 <h4>reply_all(reply_comment)<a class="headerlink" href="#reply-all-reply-comment" title="Permalink to this headline">¶</a></h4>
 <p>This method allows you to respond to all recipients an email with a
 comment appended (use this wisely).</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_message</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span>
 <span class="n">email</span><span class="o">.</span><span class="n">reply_all</span><span class="p">(</span><span class="s1">&#39;I am replying to everyone, which will likely annoy 9/10 of those who receive this&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -273,7 +273,7 @@ comment appended (use this wisely).</p>
 <div class="section" id="move-to">
 <h4>move_to*<a class="headerlink" href="#move-to" title="Permalink to this headline">¶</a></h4>
 <p>You can move a message from one folder to another via several methods. For default folders, there are specific methods - for everything else there is a method to move to a folder designated by its id.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">move_to_ibox</span><span class="p">()</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">move_to_ibox</span><span class="p">()</span>
 <span class="n">message</span><span class="o">.</span><span class="n">move_to_deleted</span><span class="p">()</span>
 <span class="n">message</span><span class="o">.</span><span class="n">move_to_drafts</span><span class="p">()</span>
 <span class="n">message</span><span class="o">.</span><span class="n">move_to</span><span class="p">(</span><span class="n">my_folder_id</span><span class="p">)</span>
@@ -284,7 +284,7 @@ comment appended (use this wisely).</p>
 <h4>delete_message()<a class="headerlink" href="#delete-message" title="Permalink to this headline">¶</a></h4>
 <p>Deletes the email. Note that the email will still exist in the user&#8217;s
 &#8216;Deleted Items&#8217; folder.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">delete_message</span><span class="p">()</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">delete_message</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -296,7 +296,7 @@ comment appended (use this wisely).</p>
 pieces of the message to be sent ranging from the subject to
 attachments.</p>
 <p>Example:</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">test_email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">new_email</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">test_email</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">new_email</span>
 <span class="n">test_email</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;anEmailAccount@gmail.com&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_subject</span><span class="p">(</span><span class="s1">&#39;This is a test subject&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">set_body</span><span class="p">(</span><span class="s1">&#39;This is a test body. &lt;br&gt; Best, &lt;br&gt; John Smith&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">add_attachment</span><span class="p">(</span><span class="s1">&#39;FILE_BYTES_HERE&#39;</span><span class="p">,</span> <span class="s1">&#39;FileName&#39;</span><span class="p">,</span> <span class="s1">&#39;pdf&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -317,8 +317,8 @@ indicated: &#8216;Inbox&#8217;, &#8216;Drafts&#8217;, &#8216;SentItems&#8217;, o
 <h4>get_folders()<a class="headerlink" href="#get-folders" title="Permalink to this headline">¶</a></h4>
 <p>This methods returns a list of Folder objects representing each folder
 in the user&#8217;s account.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folders</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
-<span class="nb">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folders</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
 <span class="s1">&#39;Inbox&#39;</span>
 </pre></div>
 </div>
@@ -327,15 +327,15 @@ in the user&#8217;s account.</p>
 <h4>get_folder(folder_id)<a class="headerlink" href="#get-folder-folder-id" title="Permalink to this headline">¶</a></h4>
 <p>If you have the id of a folder, you can get a Folder object for it with
 this method</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folder</span><span class="p">(</span><span class="n">the_folder_id</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folder</span><span class="p">(</span><span class="n">the_folder_id</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
 </pre></div>
 </div>
 <p>Note that you can replace the folder ID parameter with the name of a
 &#8216;well known&#8217; folder such as: &#8216;Inbox&#8217;, &#8216;Drafts&#8217;, SentItems&#8217;, and
 &#8216;DeletedItems&#8217;</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folder</span><span class="p">(</span><span class="s1">&#39;Drafts&#39;</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folder</span><span class="p">(</span><span class="s1">&#39;Drafts&#39;</span><span class="p">)</span>
+<span class="k">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
 <span class="s1">&#39;Drafts&#39;</span>
 </pre></div>
 </div>
@@ -344,9 +344,9 @@ this method</p>
 <h4>create_folder(parent_folder_id, new_folder_name)<a class="headerlink" href="#create-folder-parent-folder-id-new-folder-name" title="Permalink to this headline">¶</a></h4>
 <p>This methods is called from OutlookAccount(), but returns the Folder
 object you have created in Outlook.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folders</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">get_folders</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">new_folder</span> <span class="o">=</span> <span class="n">my_account</span><span class="o">.</span><span class="n">create_folder</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="s1">&#39;My New Folder&#39;</span><span class="p">)</span>
-<span class="nb">print</span> <span class="n">new_folder</span><span class="o">.</span><span class="n">unread_count</span>
+<span class="k">print</span> <span class="n">new_folder</span><span class="o">.</span><span class="n">unread_count</span>
 <span class="s1">&#39;0&#39;</span>
 </pre></div>
 </div>
@@ -358,7 +358,7 @@ object you have created in Outlook.</p>
 <h4>rename_folder(new_folder_name)<a class="headerlink" href="#rename-folder-new-folder-name" title="Permalink to this headline">¶</a></h4>
 <p>This method renames the folder object in Outlook, and returns a new
 Folder object representing that folder.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">rename_folder</span><span class="p">(</span><span class="s1">&#39;My New Folder v2&#39;</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">rename_folder</span><span class="p">(</span><span class="s1">&#39;My New Folder v2&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -366,8 +366,8 @@ Folder object representing that folder.</p>
 <h4>get_subfolders()<a class="headerlink" href="#get-subfolders" title="Permalink to this headline">¶</a></h4>
 <p>Returns a list of Folder objects, representing all child Folders within
 the Folder provided.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">get_subfolders</span><span class="p">():</span>
-  <span class="nb">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">folder</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">get_subfolders</span><span class="p">():</span>
+  <span class="k">print</span> <span class="n">folder</span><span class="o">.</span><span class="n">name</span>
 
 <span class="s1">&#39;My New Folder v2&#39;</span>
 <span class="s1">&#39;Some Other Folder&#39;</span>
@@ -377,7 +377,7 @@ the Folder provided.</p>
 <div class="section" id="delete-folder">
 <h4>delete_folder()<a class="headerlink" href="#delete-folder" title="Permalink to this headline">¶</a></h4>
 <p>Self-explanatory, deletes the provided folder in Outlook</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">delete_folder</span><span class="p">()</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">delete_folder</span><span class="p">()</span>
 <span class="c1"># and now it doesn&#39;t exist</span>
 </pre></div>
 </div>
@@ -386,7 +386,7 @@ the Folder provided.</p>
 <h4>move_folder(destination_folder)<a class="headerlink" href="#move-folder-destination-folder" title="Permalink to this headline">¶</a></h4>
 <p>Move the Folder provided into a new folder. The new folder parameter can
 either be a folder id, or a &#8216;well known&#8217; folder name.</p>
-<div class="code python highlight-default"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">move_folder</span><span class="p">(</span><span class="s1">&#39;Drafts&#39;</span><span class="p">)</span>
+<div class="code python highlight-python"><div class="highlight"><pre><span></span><span class="n">folder</span><span class="o">.</span><span class="n">move_folder</span><span class="p">(</span><span class="s1">&#39;Drafts&#39;</span><span class="p">)</span>
 <span class="n">folder1</span><span class="o">.</span><span class="n">move_folder</span><span class="p">(</span><span class="n">folder_id</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -439,7 +439,7 @@ either a folder ID or well known folder name.</p>
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'b0',
+            VERSION:'3.0b0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

@@ -13,6 +13,14 @@ Message
     :undoc-members:
     :show-inheritance:
 
+NewMessage
+------------------------
+
+.. autoclass:: pyOutlook.internal.createMessage.NewMessage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 Folder
 ------------------------
 
