@@ -16,7 +16,7 @@ Message
 NewMessage
 ------------------------
 
-.. autoclass:: pyOutlook.internal.createMessage.NewMessage
+.. autoclass:: internal.createMessage.NewMessage
     :members:
     :undoc-members:
     :show-inheritance:

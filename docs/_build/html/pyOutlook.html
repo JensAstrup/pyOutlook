@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Outlook Account &mdash; pyOutlook 3.0b0 documentation</title>
+  <title>Outlook Account &mdash; pyOutlook 3.0.1b0 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="pyOutlook 3.0b0 documentation" href="index.html"/>
+    <link rel="top" title="pyOutlook 3.0.1b0 documentation" href="index.html"/>
         <link rel="up" title="pyOutlook" href="modules.html"/>
         <link rel="next" title="Walkthrough" href="readmeLink.html"/>
         <link rel="prev" title="pyOutlook" href="modules.html"/> 
@@ -84,7 +84,7 @@
             
                 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">pyOutlook</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="">Outlook Account</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Outlook Account</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#message">Message</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#newmessage">NewMessage</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#folder">Folder</a></li>
@@ -113,7 +113,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -464,7 +464,7 @@
 </tbody>
 </table>
 <p class="rubric">Examples</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;john.doe@domain.com, betsy.donalds@domain.com&#39;</span><span class="p">)</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;john.doe@domain.com, betsy.donalds@domain.com&#39;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">forward_message</span><span class="p">(</span><span class="s1">&#39;john.doe@domain.com&#39;</span><span class="p">,</span> <span class="s1">&#39;Hey Joe&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -473,10 +473,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><code class="xref py py-exc docutils literal"><span class="pre">MiscError</span></code> &#8211;
-A comma separated string of emails, or one string email, must be provided</li>
-<li><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">MiscError</span></code> &#8211; A comma separated string of emails, or one string email, must be provided</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</li>
 </ul>
 </td>
 </tr>
@@ -554,48 +552,167 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <div class="section" id="newmessage">
 <h1>NewMessage<a class="headerlink" href="#newmessage" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="pyOutlook.internal.createMessage.NewMessage">
-<em class="property">class </em><code class="descclassname">pyOutlook.internal.createMessage.</code><code class="descname">NewMessage</code><span class="sig-paren">(</span><em>token</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage" title="Permalink to this definition">¶</a></dt>
+<dt id="internal.createMessage.NewMessage">
+<em class="property">class </em><code class="descclassname">internal.createMessage.</code><code class="descname">NewMessage</code><span class="sig-paren">(</span><em>token</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A constructor for new emails.</p>
+<p>Each method, excluding send(), returns the NewMessage object allowing chaining of methods.</p>
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.add_attachment">
-<code class="descname">add_attachment</code><span class="sig-paren">(</span><em>file_bytes</em>, <em>file_name</em>, <em>file_extension</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.add_attachment" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.add_attachment">
+<code class="descname">add_attachment</code><span class="sig-paren">(</span><em>file_bytes</em>, <em>file_name</em>, <em>file_extension</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.add_attachment" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an attachment to the email.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This method does minimal escaping of input for the file_name. Slashes and periods will both be replaced by
+dashs (/), (.) &gt; (-). Outlook may cut off portions of the file name due to some characters, if you encounter
+one, please create an issue on this module&#8217;s GitHub: <a class="reference external" href="https://github.com/JensAstrup/pyOutlook/issues">https://github.com/JensAstrup/pyOutlook/issues</a>.</p>
+</div>
+<p class="rubric">Notes</p>
+<p>You can send any file with this method, so long as the content is provided in bytes. Not doing so may lead
+to malformed attachments.
+You can also send bytes in a format that was not created in the same extension as the one provided to this
+method. For example, CSV bytes sent through with an xlsx extension will be attached and usable as an Excel
+document.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_bytes</strong> &#8211; The bytes of the file to send</li>
+<li><strong>file_name</strong> &#8211; The name of the file, as a string and leaving out the extension, that should be sent</li>
+<li><strong>file_extension</strong> &#8211; The extension type (pdf, csv, etc) of the attachment. Do not include the &#8216;.&#8217; in the string.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">NewMessage</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.bcc">
-<code class="descname">bcc</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.bcc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.bcc">
+<code class="descname">bcc</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.bcc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of email addresses that should be &#8216;blind&#8217; copied on this email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recipients</strong> &#8211; A comma separated list, represented as a string, of email addresses.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.cc">
-<code class="descname">cc</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.cc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.cc">
+<code class="descname">cc</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.cc" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of email addresses that should be copied on this email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recipients</strong> &#8211; A comma separated list, represented as a string, of email addresses.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.send">
-<code class="descname">send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.send" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.send">
+<code class="descname">send</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.send" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends the email containing the information provided in the other methods.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><code class="xref py py-exc docutils literal"><span class="pre">SendError</span></code> &#8211; Occurs if a subject or to recipients are not defined</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">MiscError</span></code> &#8211; Occurs if Outlook responds with anything other than a 202, generally as a result of an expired</li>
+<li>or invalid access token.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.send_as">
-<code class="descname">send_as</code><span class="sig-paren">(</span><em>email</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.send_as" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.send_as">
+<code class="descname">send_as</code><span class="sig-paren">(</span><em>email</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.send_as" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send the email via a separate email address, which the OutlookAccount has access to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>email</strong> &#8211; A string providing the secondary email address that this email should be sent through.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.set_body">
-<code class="descname">set_body</code><span class="sig-paren">(</span><em>body</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.set_body" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.set_body">
+<code class="descname">set_body</code><span class="sig-paren">(</span><em>body</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.set_body" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the body of the email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>body</strong> &#8211; str</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.set_subject">
-<code class="descname">set_subject</code><span class="sig-paren">(</span><em>subject</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.set_subject" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.set_subject">
+<code class="descname">set_subject</code><span class="sig-paren">(</span><em>subject</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.set_subject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the subject for the email.</p>
+<p>This method is required in order to send the email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>subject</strong> &#8211; str</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
-<dt id="pyOutlook.internal.createMessage.NewMessage.to">
-<code class="descname">to</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.internal.createMessage.NewMessage.to" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="internal.createMessage.NewMessage.to">
+<code class="descname">to</code><span class="sig-paren">(</span><em>recipients</em><span class="sig-paren">)</span><a class="headerlink" href="#internal.createMessage.NewMessage.to" title="Permalink to this definition">¶</a></dt>
+<dd><p>The list of email addresses this email should be sent to.</p>
+<p>This method is required in order to send the email. The recipients parameter can either be a single address
+string or a comma separated list of addresses provided as a string.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;john@domain.com&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">email</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s1">&#39;john@domain.com, jane@domain.com&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>recipients</strong> &#8211; A comma separated list, represented as a string, of email addresses.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">NewMessage</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -651,8 +768,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</p>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
@@ -680,8 +796,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
 </tr>
 </tbody>
 </table>
@@ -695,8 +810,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List[Folder]</td>
 </tr>
@@ -713,8 +827,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Parameters:</th><td class="field-body"><strong>destination_folder</strong> &#8211; An id, provided by Outlook, specifying the folder that should become the parent</td>
 </tr>
@@ -734,8 +847,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>new_folder_name</strong> &#8211; A string of the replacement name.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211;
-Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">AuthError</span></code> &#8211; Raised if Outlook returns a 401, generally caused by an invalid or expired access token.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A new Folder representing the folder with the new name on Outlook.</td>
 </tr>
@@ -788,7 +900,7 @@ Raised if Outlook returns a 401, generally caused by an invalid or expired acces
     <script type="text/javascript">
         var DOCUMENTATION_OPTIONS = {
             URL_ROOT:'./',
-            VERSION:'3.0b0',
+            VERSION:'3.0.1b0',
             COLLAPSE_INDEX:false,
             FILE_SUFFIX:'.html',
             HAS_SOURCE:  true

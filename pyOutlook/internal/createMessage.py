@@ -9,9 +9,6 @@ class NewMessage(object):
 
     Each method, excluding send(), returns the NewMessage object allowing chaining of methods.
 
-    Examples:
-        >>> email = account.new_email()
-        >>> email.to('john@domain.com').set_subject('Subject').set_body('Test Body').send()
     """
     def __init__(self, token):
         self.__access_token = token
@@ -81,10 +78,6 @@ class NewMessage(object):
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
                             'is current. STATUS CODE: ' + str(r.status_code) + '. RESPONSE: ' + r.content)
 
-        ###
-        # Get and Set Functions
-        ###
-
     def set_subject(self, subject):
         """Sets the subject for the email.
 
@@ -95,17 +88,20 @@ class NewMessage(object):
 
         Returns:
             NewMessage
+
         """
         self.__subject = subject
         return self
 
     def set_body(self, body):
-        """Sets the body of the email
+        """Sets the body of the email.
+
         Args:
             body: str
 
         Returns:
             NewMessage
+
         """
         self.__body = body
         return self
@@ -119,11 +115,13 @@ class NewMessage(object):
         Examples:
             >>> email.to('john@domain.com')
             >>> email.to('john@domain.com, jane@domain.com')
+
         Args:
             recipients: A comma separated list, represented as a string, of email addresses.
 
         Returns:
             NewMessage
+
         """
         self.__to_line = recipients
         return self
@@ -136,6 +134,7 @@ class NewMessage(object):
 
         Returns:
             NewMessage
+
         """
         self.__cc_line = recipients
         return self
@@ -148,17 +147,20 @@ class NewMessage(object):
 
         Returns:
             NewMessage
+
         """
         self.__bcc_line = recipients
         return self
 
     def send_as(self, email):
         """Send the email via a separate email address, which the OutlookAccount has access to.
+
         Args:
             email: A string providing the secondary email address that this email should be sent through.
 
         Returns:
             NewMessage
+
         """
         self.__send_as = email
         return self
@@ -174,7 +176,6 @@ class NewMessage(object):
         Notes:
             You can send any file with this method, so long as the content is provided in bytes. Not doing so may lead
             to malformed attachments.
-
             You can also send bytes in a format that was not created in the same extension as the one provided to this
             method. For example, CSV bytes sent through with an xlsx extension will be attached and usable as an Excel
             document.
@@ -186,6 +187,7 @@ class NewMessage(object):
 
         Returns:
             NewMessage
+
         """
         self.__file_bytes = file_bytes
         self.__file_name = file_name
