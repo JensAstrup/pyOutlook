@@ -68,7 +68,7 @@ class NewMessage(object):
                 full_file_name = str(self.__file_name).replace('/', '-').replace('.', '-') + '.' + \
                                  '.' + str(self.__file_extension)
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
-                             '"Name": "' + full_file_name + '", "ContentBytes": "' + self.__file_bytes + '" } ]'
+                             '"Name": "' + full_file_name + '", "ContentBytes": "' + str(self.__file_bytes, 'UTF8') + '" } ]'
 
         json_send += '}}'
 
