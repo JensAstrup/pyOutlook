@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='pyOutlook',
-    version='3.0.3b0',
+    version='3.0.5b0',
     packages=['pyOutlook', 'pyOutlook.internal', 'pyOutlook.core'],
     url='https://pypi.python.org/pypi/pyOutlook',
     license='MIT',
