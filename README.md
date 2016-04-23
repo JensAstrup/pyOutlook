@@ -2,8 +2,8 @@
 [![PyPI](https://img.shields.io/pypi/dw/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)	
 [![PyPI](https://img.shields.io/pypi/wheel/pyOutlook.svg?maxAge=2592000)](https://pypi.python.org/pypi/pyOutlook)
 [![Code Health](https://landscape.io/github/JensAstrup/pyOutlook/master/landscape.svg?style=flat)](https://landscape.io/github/JensAstrup/pyOutlook/master)
-
-
+[![PyPI](https://img.shields.io/pypi/status/pyOutlook.svg?maxAge=2592000)]()
+[![PyPI](https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000)]()
 
 # pyOutlook
 A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
