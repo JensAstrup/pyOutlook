@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: pyOutlook
-Version: 3.0.5b0
+Version: 3.0.5b1
 Summary: A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
 Home-page: https://pypi.python.org/pypi/pyOutlook
 Author: Jens Astrup
