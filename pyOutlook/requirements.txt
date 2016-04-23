@@ -1,2 +1,2 @@
 requests == 2.9.1
-setuptools == 18.2
+setuptools == 20.9.0
