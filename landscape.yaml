@@ -2,10 +2,11 @@ doc-warnings: no
 test-warnings: no
 strictness: veryhigh
 max-line-length: 120
-uses:
-    - requests
 autodetect: yes
 ignore-paths:
     - docs
+    -build
+    -dist
+    -.idea
 python-targets:
     - 3
