@@ -1,7 +1,6 @@
-import requests
-
 from pyOutlook.internal.errors import SendError, MiscError
 from pyOutlook.internal.internalMethods import jsonify_receps
+import requests
 
 
 class NewMessage(object):
@@ -68,7 +67,8 @@ class NewMessage(object):
                 full_file_name = str(self.__file_name).replace('/', '-').replace('.', '-') + '.' + \
                                  '.' + str(self.__file_extension)
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
-                             '"Name": "' + full_file_name + '", "ContentBytes": "' + str(self.__file_bytes, 'UTF8') + '" } ]'
+                             '"Name": "' + full_file_name + '", "ContentBytes": "' + str(self.__file_bytes, 'UTF8') + \
+                             '" } ]'
 
         json_send += '}}'
 
@@ -76,7 +76,7 @@ class NewMessage(object):
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
         if r.status_code != 202:
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
-                            'is current. STATUS CODE: ' + str(r.status_code) + '. RESPONSE: ' + r.content)
+                            'is current. STATUS CODE: ' + str(r.status_code) + '. RESPONSE: ' + str(r.content))
 
     def set_subject(self, subject):
         """Sets the subject for the email.
@@ -123,7 +123,15 @@ class NewMessage(object):
             NewMessage
 
         """
-        self.__to_line = recipients
+        if isinstance(recipients, str):
+            self.__to_line = recipients
+        elif isinstance(recipients, list):
+            list2str = ''
+            for x in recipients:
+                list2str += x
+            self.__to_line = list2str
+        else:
+            raise ValueError('The recipients argument must be of type str or list')
         return self
 
     def cc(self, recipients):
@@ -136,7 +144,15 @@ class NewMessage(object):
             NewMessage
 
         """
-        self.__cc_line = recipients
+        if isinstance(recipients, str):
+            self.__cc_line = recipients
+        elif isinstance(recipients, list):
+            list2str = ''
+            for x in recipients:
+                list2str += x
+            self.__cc_line = list2str
+        else:
+            raise ValueError('The recipients argument must be of type str or list')
         return self
 
     def bcc(self, recipients):
@@ -149,7 +165,15 @@ class NewMessage(object):
             NewMessage
 
         """
-        self.__bcc_line = recipients
+        if isinstance(recipients, str):
+            self.__bcc_line = recipients
+        elif isinstance(recipients, list):
+            list2str = ''
+            for x in recipients:
+                list2str += x
+            self.__bcc_line = list2str
+        else:
+            raise ValueError('The recipients argument must be of type str or list')
         return self
 
     def send_as(self, email):

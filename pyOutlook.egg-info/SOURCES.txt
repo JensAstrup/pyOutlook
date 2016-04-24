@@ -4,6 +4,7 @@ pyOutlook/setup.py
 pyOutlook.egg-info/PKG-INFO
 pyOutlook.egg-info/SOURCES.txt
 pyOutlook.egg-info/dependency_links.txt
+pyOutlook.egg-info/requires.txt
 pyOutlook.egg-info/top_level.txt
 pyOutlook/core/__init__.py
 pyOutlook/core/folders.py

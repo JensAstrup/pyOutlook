@@ -1,9 +1,6 @@
 # Authorization and misc functions
-# noinspection PyUnresolvedReferences,PyUnresolvedReferences
-from ..internal import retrieve, internalMethods
-# noinspection PyUnresolvedReferences
+from ..internal import retrieve
 from ..internal.errors import MiscError, AuthError
-# For Docstrings
 from pyOutlook.internal.createMessage import NewMessage
 from .folders import *
 
@@ -166,15 +163,3 @@ class OutlookAccount(object):
 
         """
         return get_folder(self, folder_id)
-
-    def create_folder(self, parent_folder_id, new_folder_name):
-        """
-        Args:
-            parent_folder_id: String identifying the folder that the new folder should be placed inside
-            new_folder_name: String indicating the name the new folder should have
-
-        Returns:
-            Folder
-
-        """
-        return create_folder(self, parent_folder_id, new_folder_name)

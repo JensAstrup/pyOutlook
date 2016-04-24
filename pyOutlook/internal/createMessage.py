@@ -117,7 +117,7 @@ class NewMessage(object):
             >>> email.to('john@domain.com, jane@domain.com')
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage
@@ -138,7 +138,7 @@ class NewMessage(object):
         """The list of email addresses that should be copied on this email.
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage
@@ -159,7 +159,7 @@ class NewMessage(object):
         """The list of email addresses that should be 'blind' copied on this email.
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage

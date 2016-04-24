@@ -132,7 +132,6 @@ class Folder(object):
 
         """
         access_token = internalMethods.get_global_token()
-        print(access_token)
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/move'
         payload = '{ "DestinationId": "' + destination_folder + '"}'
@@ -165,7 +164,6 @@ class Folder(object):
 
         """
         access_token = internalMethods.get_global_token()
-        print(access_token)
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/copy'
         payload = '{ "DestinationId": "' + destination_folder + '"}'
@@ -183,24 +181,28 @@ class Folder(object):
                           return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
                           return_folder['TotalItemCount'])
 
+    def create_child_folder(self, folder_name):
+        """Creates a child folder within the Folder it is called from and returns the new Folder object
+        :param folder_name: The name of the folder to create
+        :return: Folder
+        """
+        access_token = internalMethods.get_global_token()
+        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
+        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
+        payload = '{ "DisplayName": "' + folder_name + '"}'
 
-def create_folder(self, parent_id, folder_name):
-    headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
-    endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + parent_id + '/childfolders'
-    payload = '{ "DisplayName": "' + folder_name + '"}'
+        r = requests.post(endpoint, headers=headers, data=payload)
 
-    r = requests.post(endpoint, headers=headers, data=payload)
+        if 399 < r.status_code < 452:
+            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-    if 399 < r.status_code < 452:
-        raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-    else:
-        print('Created folder: ' + folder_name + '. Received the following status code from Outlook: ', end=' ')
-        print(r.status_code)
-        return_folder = r.json()
-        return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
-                      return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
-                      return_folder['TotalItemCount'])
+        else:
+            print('Created folder: ' + folder_name + '. Received the following status code from Outlook: ', end=' ')
+            print(r.status_code)
+            return_folder = r.json()
+            return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
+                          return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
+                          return_folder['TotalItemCount'])
 
 
 def get_folders(self):
