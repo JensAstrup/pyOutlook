@@ -124,14 +124,6 @@ folder = my_account.get_folder('Drafts')
 print folder.name
 'Drafts'
 ```
-#### create_folder(parent_folder_id, new_folder_name)
-This methods is called from OutlookAccount(), but returns the Folder object you have created in Outlook. 
-```python
-folder = my_account.get_folders()[0]
-new_folder = my_account.create_folder(folder.id, 'My New Folder')
-print new_folder.unread_count
-'0'
-```
 
 #### The Folder Object
 
@@ -167,4 +159,13 @@ folder1.move_folder(folder_id)
 
 ### copy_folder(destination_folder)
 Copies the folder and its contents to the designated folder which can be either a folder ID or well known folder name.
+
+#### create_child_folder(new_folder_name)
+This creates a [folder within a folder](http://dab1nmslvvntp.cloudfront.net/wp-content/uploads/2014/03/1394332737Go-Deeper-Inception-Movie.jpg), with a title provided in the new_folder_name argument.
+```python
+folder = my_account.get_folders()[0]
+new_folder = folder.create_folder('My New Folder')
+print new_folder.unread_count
+'0'
+```
 
