@@ -12,12 +12,12 @@ Contents:
    :maxdepth: 2
 
    modules
+   readmeLink
 
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`
 
