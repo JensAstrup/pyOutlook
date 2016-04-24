@@ -12,13 +12,14 @@ def clean_return_multiple(json):
     """
     return_list = []
     for key in json['value']:
-        uid = key['Id']
-        subject = key['Subject']
-        sender_email = key['Sender']['EmailAddress']['Address']
-        sender_name = key['Sender']['EmailAddress']['Name']
-        body = key['Body']['Content']
-        to_recipients = key['ToRecipients']
-        return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
+        if key['Sender'] is not None:
+            uid = key['Id']
+            subject = key['Subject']
+            sender_email = key['Sender']['EmailAddress']['Address']
+            sender_name = key['Sender']['EmailAddress']['Name']
+            body = key['Body']['Content']
+            to_recipients = key['ToRecipients']
+            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
     return return_list
 
 
