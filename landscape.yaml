@@ -5,6 +5,5 @@ max-line-length: 120
 autodetect: yes
 ignore-paths:
     - docs
-    -dist
 python-targets:
     - 3
