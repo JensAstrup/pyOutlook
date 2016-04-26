@@ -10,6 +10,7 @@ setuptools.setup(
     author_email='jensaiden@gmail.com',
     description='A Python module for connecting to the Outlook REST API, without the hassle of dealing with the '
                 'JSON formatting for requests/responses and the REST endpoints and their varying requirements',
+    long_description=open('README.md', 'rt').read(),
     install_requires=['requests'],
     keywords='outlook office365 microsoft email',
     classifiers=[
