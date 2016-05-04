@@ -65,7 +65,7 @@ class NewMessage(object):
         if type(self.__file_bytes) is not None:
             if self.__file_name is not None and self.__file_extension is not None:
                 full_file_name = str(self.__file_name).replace('/', '-').replace('.', '-') + '.' + \
-                                 '.' + str(self.__file_extension)
+                                    str(self.__file_extension)
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
                              '"Name": "' + full_file_name + '", "ContentBytes": "' + str(self.__file_bytes, 'UTF8') + \
                              '" } ]'
