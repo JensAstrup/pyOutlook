@@ -98,13 +98,11 @@ class OutlookAccount(object):
         Returns:
             NewMessage
 
-        References:
-
         """
         return NewMessage(self.access_token)
 
-    def send_email(self, body: str=None, subject: str=None, to: list=None, cc: list=None, bcc: list=None,
-                   send_as: str=None, attachment: dict=None):
+    def send_email(self, body=None, subject=None, to=None, cc=None, bcc=None,
+                   send_as=None, attachment=None):
         """Sends an email in one method using variables to set the various pieces of the email.
 
         Args:
@@ -114,8 +112,11 @@ class OutlookAccount(object):
             cc (list): A list of email addresses which will be added to the 'Carbon Copy' line
             bcc (list): A list of email addresses while be blindly added to the email
             send_as (str): A string email address which the OutlookAccount has access to
-            attachment (dict): A dictionary with three parts. [1] 'name' - a string which will become the file's name.
-            [2] 'ext' - a string which will become the file extension. [3] 'bytes' - the bytes of the file.
+            attachment (dict): A dictionary with three parts [1] 'name' - a string which will become the file's name \
+            [2] 'ext' - a string which will become the file extension [3] 'bytes' - the bytes of the file.
+
+        See Also:
+              :func:`add_attachment` in :class:`NewMessage`
 
         """
         email = NewMessage(self.access_token)
