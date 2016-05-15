@@ -1,6 +1,6 @@
 import setuptools
 
-setuptools.setup(
+'''setuptools.setup(
     name='pyOutlook',
     version='3.0.2b0',
     packages=['pyOutlook', 'pyOutlook.internal'],
@@ -24,4 +24,4 @@ setuptools.setup(
         'Programming Language :: Python :: 3',
         'Natural Language :: English'
     ]
-)
+)'''
