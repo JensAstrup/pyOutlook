@@ -115,9 +115,6 @@ class OutlookAccount(object):
             attachment (dict): A dictionary with three parts [1] 'name' - a string which will become the file's name \
             [2] 'ext' - a string which will become the file extension [3] 'bytes' - the bytes of the file.
 
-        See Also:
-              :func:`add_attachment` in :class:`NewMessage`
-
         """
         email = NewMessage(self.access_token)
         if body is not None:

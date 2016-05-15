@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="pyOutlook 3.1.0b0 documentation" href="#"/>
-        <link rel="next" title="pyOutlook" href="modules.html"/> 
+        <link rel="next" title="Installation" href="installation.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -81,6 +81,7 @@
             
             
                 <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">pyOutlook</a></li>
 </ul>
 
@@ -128,9 +129,36 @@
             
   <div class="section" id="welcome-to-pyoutlook-s-documentation">
 <h1>Welcome to pyOutlook&#8217;s documentation!<a class="headerlink" href="#welcome-to-pyoutlook-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+<img alt="https://img.shields.io/pypi/v/pyOutlook.svg?maxAge=2592000:target:" src="https://img.shields.io/pypi/v/pyOutlook.svg?maxAge=2592000:target:" />
+<img alt="https://img.shields.io/pypi/format/pyOutlook.svg?maxAge=2592000:target:" src="https://img.shields.io/pypi/format/pyOutlook.svg?maxAge=2592000:target:" />
+<img alt="https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000:target:" src="https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000:target:" />
+<img alt="https://img.shields.io/pypi/status/pyOutlook.svg?maxAge=2592000:target:" src="https://img.shields.io/pypi/status/pyOutlook.svg?maxAge=2592000:target:" />
+<a class="reference external image-reference" href="https://requires.io/github/JensAstrup/pyOutlook/requirements/?branch=master"><img alt="Requirements Status" src="https://requires.io/github/JensAstrup/pyOutlook/requirements.svg?branch=master" /></a>
+<div class="section" id="about">
+<h2>About:<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h2>
+<p>pyOutlook was created after I found myself attempting to connect to the Outlook REST API in multiple projects. This
+provided some much needed uniformity. It&#8217;s easier to deal with than the win32com package by Microsoft, but obviously has
+a far smaller scope.</p>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements:<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<p>-Requests</p>
+</div>
+<div class="section" id="recommended">
+<h2>Recommended:<a class="headerlink" href="#recommended" title="Permalink to this headline">¶</a></h2>
+<p>pyOutlook does not handle OAuth for the access tokens provided by Outlook. These are provided by you via the OutlookAccount
+class as a string. There are various OAuth packages out there: (pip install) oauth2, python-oauth2, requests_oauthlib, etc
+that can faciliate the process.</p>
+</div>
+<div class="section" id="contents">
+<h2>Contents:<a class="headerlink" href="#contents" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#pip">pip</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html#source">Source</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">pyOutlook</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyOutlook.html">Outlook Account</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pyOutlook.html#message">Message</a></li>
@@ -139,6 +167,7 @@
 </ul>
 </li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -156,7 +185,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="modules.html" class="btn btn-neutral float-right" title="pyOutlook" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="installation.html" class="btn btn-neutral float-right" title="Installation" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

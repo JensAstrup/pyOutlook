@@ -480,7 +480,29 @@
 </tr>
 </tbody>
 </table>
-<p>References:</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyOutlook.core.main.OutlookAccount.send_email">
+<code class="descname">send_email</code><span class="sig-paren">(</span><em>body=None</em>, <em>subject=None</em>, <em>to=None</em>, <em>cc=None</em>, <em>bcc=None</em>, <em>send_as=None</em>, <em>attachment=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyOutlook.core.main.OutlookAccount.send_email" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sends an email in one method using variables to set the various pieces of the email.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>body</strong> (<em>str</em>) &#8211; The body of the email</li>
+<li><strong>subject</strong> (<em>str</em>) &#8211; The subject of the email</li>
+<li><strong>to</strong> (<em>list</em>) &#8211; A list of email addresses</li>
+<li><strong>cc</strong> (<em>list</em>) &#8211; A list of email addresses which will be added to the &#8216;Carbon Copy&#8217; line</li>
+<li><strong>bcc</strong> (<em>list</em>) &#8211; A list of email addresses while be blindly added to the email</li>
+<li><strong>send_as</strong> (<em>str</em>) &#8211; A string email address which the OutlookAccount has access to</li>
+<li><strong>attachment</strong> (<em>dict</em>) &#8211; A dictionary with three parts [1] &#8216;name&#8217; - a string which will become the file&#8217;s name             [2] &#8216;ext&#8217; - a string which will become the file extension [3] &#8216;bytes&#8217; - the bytes of the file.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
