@@ -103,6 +103,40 @@ class OutlookAccount(object):
         """
         return NewMessage(self.access_token)
 
+    def send_email(self, body: str=None, subject: str=None, to: list=None, cc: list=None, bcc: list=None,
+                   send_as: str=None, attachment: dict=None):
+        """Sends an email in one method using variables to set the various pieces of the email.
+
+        Args:
+            body (str): The body of the email
+            subject (str): The subject of the email
+            to (list): A list of email addresses
+            cc (list): A list of email addresses which will be added to the 'Carbon Copy' line
+            bcc (list): A list of email addresses while be blindly added to the email
+            send_as (str): A string email address which the OutlookAccount has access to
+            attachment (dict): A dictionary with three parts. [1] 'name' - a string which will become the file's name.
+            [2] 'ext' - a string which will become the file extension. [3] 'bytes' - the bytes of the file.
+
+        """
+        email = NewMessage(self.access_token)
+        if body is not None:
+            email.set_body(body)
+        if subject is not None:
+            email.set_subject(subject)
+        if to is not None:
+            email.to(to)
+        if cc is not None:
+            email.cc(cc)
+        if bcc is not None:
+            email.bcc(bcc)
+        if send_as is not None:
+            email.send_as(send_as)
+        if attachment is not None:
+            if 'bytes' not in attachment or 'name' not in attachment or 'ext' not in attachment:
+                raise KeyError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
+            email.add_attachment(attachment['bytes'], attachment['name'], attachment['ext'])
+        email.send()
+
     def get_sent_messages(self):
         """Retrieves last ten sent messages.
 
