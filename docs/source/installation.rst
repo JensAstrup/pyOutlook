@@ -1,7 +1,9 @@
 Installation
 ============
-pip
-^^^
+
+Pip
+^^^^
+
 ::
 
     pip install pyOutlook

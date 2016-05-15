@@ -66,7 +66,7 @@ class Message(object):
             raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
 
         else:
-            print('Message Forwarded. Received the following status code from Outlook: ', end=' ')
+            print('Message Forwarded. Received the following status code from Outlook: ', end='')
             print(r.status_code)
 
     def reply(self, reply_comment):

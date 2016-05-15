@@ -1,3 +1,6 @@
+import json
+import re
+
 from pyOutlook.internal.errors import SendError, MiscError
 from pyOutlook.internal.internalMethods import jsonify_receps
 import requests
@@ -21,9 +24,6 @@ class NewMessage(object):
         self.__file_name = None
         self.__file_extension = None
 
-    ###
-    # Send Email Function
-    ###
     def __send_email(self):
         json_send = '{ "Message": {"'
         json_cc = None
@@ -49,10 +49,10 @@ class NewMessage(object):
         # now we can set the body
         if self.__body is None:
             self.__body = ''
+
         json_send += '"Body": { "ContentType": "HTML", "Content": "' + self.__body + '"}'
         # set the recipients
         json_send += ',' + json_to + ']'
-
         if json_cc is not None:
             json_send += ',' + json_cc + ']'
 
@@ -64,15 +64,16 @@ class NewMessage(object):
 
         if type(self.__file_bytes) is not None:
             if self.__file_name is not None and self.__file_extension is not None:
-                full_file_name = str(self.__file_name).replace('/', '-').replace('.', '-') + '.' + \
-                                 '.' + str(self.__file_extension)
+                file_name = str(self.__file_name).replace('/', '-').replace('.', '-')
+                full_file_name = '{}.{}'.format(file_name, str(self.__file_extension))
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
-                             '"Name": "' + full_file_name + '", "ContentBytes": "' + str(self.__file_bytes, 'UTF8') + \
-                             '" } ]'
+                             '"Name": "{}", "ContentBytes": "{}" } ]'.format(full_file_name, str(self.__file_bytes,
+                                                                                                 'UTF8'))
 
         json_send += '}}'
 
         headers = {"Authorization": "Bearer " + self.__access_token, "Content-Type": "application/json"}
+        print(json_send)
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
         if r.status_code != 202:
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
@@ -117,7 +118,7 @@ class NewMessage(object):
             >>> email.to('john@domain.com, jane@domain.com')
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage
@@ -126,10 +127,7 @@ class NewMessage(object):
         if isinstance(recipients, str):
             self.__to_line = recipients
         elif isinstance(recipients, list):
-            list2str = ''
-            for x in recipients:
-                list2str += x
-            self.__to_line = list2str
+            self.__to_line = ', '.join(recipients)
         else:
             raise ValueError('The recipients argument must be of type str or list')
         return self
@@ -138,7 +136,7 @@ class NewMessage(object):
         """The list of email addresses that should be copied on this email.
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage
@@ -147,10 +145,7 @@ class NewMessage(object):
         if isinstance(recipients, str):
             self.__cc_line = recipients
         elif isinstance(recipients, list):
-            list2str = ''
-            for x in recipients:
-                list2str += x
-            self.__cc_line = list2str
+            self.__cc_line = ', '.join(recipients)
         else:
             raise ValueError('The recipients argument must be of type str or list')
         return self
@@ -159,7 +154,7 @@ class NewMessage(object):
         """The list of email addresses that should be 'blind' copied on this email.
 
         Args:
-            recipients: A comma separated list, represented as a string, of email addresses.
+            recipients: A comma separated string of email addresses, or a list of strings.
 
         Returns:
             NewMessage
@@ -168,10 +163,7 @@ class NewMessage(object):
         if isinstance(recipients, str):
             self.__bcc_line = recipients
         elif isinstance(recipients, list):
-            list2str = ''
-            for x in recipients:
-                list2str += x
-            self.__bcc_line = list2str
+            self.__bcc_line = ', '.join(recipients)
         else:
             raise ValueError('The recipients argument must be of type str or list')
         return self

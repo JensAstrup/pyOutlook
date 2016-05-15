@@ -182,9 +182,12 @@ class Folder(object):
                           return_folder['TotalItemCount'])
 
     def create_child_folder(self, folder_name):
-        """Creates a child folder within the Folder it is called from and returns the new Folder object
-        :param folder_name: The name of the folder to create
-        :return: Folder
+        """Creates a child folder within the Folder it is called from and returns the new Folder object.
+
+        Args:
+            folder_name: The name of the folder to create
+
+        Returns: Folder
         """
         access_token = internalMethods.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}

@@ -4,6 +4,7 @@ Outlook Account
 .. autoclass:: pyOutlook.core.main.OutlookAccount
     :members:
 
+.. _MessageAnchor:
 
 Message
 -------
@@ -12,6 +13,7 @@ Message
     :members:
     :undoc-members:
 
+.. _NewMessageAnchor:
 
 NewMessage
 ----------

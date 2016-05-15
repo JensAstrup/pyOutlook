@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='pyOutlook',
-    version='3.1.0b0',
+    version='3.2.0b0',
     packages=['pyOutlook', 'pyOutlook.internal', 'pyOutlook.core'],
     url='https://pypi.python.org/pypi/pyOutlook',
     license='MIT',
@@ -10,7 +10,6 @@ setuptools.setup(
     author_email='jensaiden@gmail.com',
     description='A Python module for connecting to the Outlook REST API, without the hassle of dealing with the '
                 'JSON formatting for requests/responses and the REST endpoints and their varying requirements',
-    long_description=open('README.md', 'rt').read(),
     install_requires=['requests'],
     keywords='outlook office365 microsoft email',
     classifiers=[
