@@ -3,29 +3,29 @@ from .errors import MiscError
 token = 0
 
 
-def jsonify_receps(recep_input, recep_type, silent):
+def jsonify_recipients(recipient_input, recipient_type, silent):
 
     json_return = ''
     if not silent:
-        if recep_type == "cc":
+        if recipient_type == "cc":
             json_return = '"CcRecipients":['
-        elif recep_type == "to":
+        elif recipient_type == "to":
             json_return = '"ToRecipients":['
-        elif recep_type == "bcc":
+        elif recipient_type == "bcc":
             json_return = '"BccRecipients":['
         else:
             raise MiscError('To or CC recipients not provided')
 
-    receps = recep_input.split(',')
-    for num in range(len(receps)):
-        receps[num] = receps[num].strip()
+    recipients = recipient_input.split(',')
+    for num in range(len(recipients)):
+        recipients[num] = recipients[num].strip()
 
-    for m in range(0, len(receps)):
-        if len(receps) - m == 1:
-            insert = receps[m].replace('"', "'")
+    for m in range(0, len(recipients)):
+        if len(recipients) - m == 1:
+            insert = recipients[m].replace('"', "'")
             json_return += '{ "EmailAddress": { "Address": "' + insert + '" } }'
         else:
-            insert = receps[m].replace('"', "'")
+            insert = recipients[m].replace('"', "'")
             json_return += '{ "EmailAddress": { "Address": "' + insert + '" } },'
 
     return json_return

@@ -1,8 +1,8 @@
 # Functions used by other files, but not used directly in parent code
 import requests
 
-from ..internal.errors import AuthError, MiscError
-from ..internal.internalMethods import jsonify_receps, get_global_token
+from pyOutlook.internal.errors import AuthError, MiscError
+from pyOutlook.internal.internalMethods import jsonify_recipients, get_global_token
 
 
 # noinspection PyUnresolvedReferences
@@ -18,8 +18,9 @@ class Message(object):
             toRecipients: A comma separated string of emails who were sent this email in the 'To' field
 
         """
-    def __init__(self, message_id, body, subject, sender_email, sender_name, to_recipients):
-        # type: (str, str, str, str, str, str) -> object
+
+    def __init__(self, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
+                 to_recipients: list):
         self.message_id = message_id
         self.body = body
         self.subject = subject
@@ -32,7 +33,7 @@ class Message(object):
 
     def __repr__(self):
         return self.__getattribute__('subject')
-        
+
     def forward_message(self, to_recipients, forward_comment):
         """Forward Message to recipients with an optional comment.
 
@@ -57,17 +58,13 @@ class Message(object):
         if type(to_recipients) is None:
             raise MiscError('To Recipients is not defined. Can not forward message.')
 
-        payload += '"ToRecipients" : [' + jsonify_receps(to_recipients, 'to', True) + ']}'
+        payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'
 
         r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/forward',
                           headers=headers, data=payload)
 
         if r.status_code == 401:
             raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-
-        else:
-            print('Message Forwarded. Received the following status code from Outlook: ', end='')
-            print(r.status_code)
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -89,10 +86,6 @@ class Message(object):
         if r.status_code == 401:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-        else:
-            print('Replied to Message. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
-
     def reply_all(self, reply_comment):
         """Replies to everyone on the email, including those on the CC line.
 
@@ -112,10 +105,6 @@ class Message(object):
         if r.status_code == 401:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-        else:
-            print('Replied to Message. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
-
     def delete_message(self):
         """Deletes the email"""
         access_token = get_global_token()
@@ -127,10 +116,6 @@ class Message(object):
         if 399 < r.status_code < 452:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-        else:
-            print('Deleted Message. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
-
     def __move_to(self, destination):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
@@ -141,10 +126,6 @@ class Message(object):
 
         if 399 < r.status_code < 452:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
-            print('Moved Message to ' + destination + '. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
@@ -180,10 +161,6 @@ class Message(object):
         if 399 < r.status_code < 452:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-        else:
-            print('Copied Message to ' + destination + '. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
-
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
         self.__copy_to('Inbox')
@@ -206,7 +183,3 @@ class Message(object):
 
         """
         self.__copy_to(folder_id)
-
-
-
-

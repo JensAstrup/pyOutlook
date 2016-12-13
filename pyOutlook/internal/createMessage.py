@@ -1,8 +1,5 @@
-import json
-import re
-
 from pyOutlook.internal.errors import SendError, MiscError
-from pyOutlook.internal.internalMethods import jsonify_receps
+from pyOutlook.internal.internalMethods import jsonify_recipients
 import requests
 
 
@@ -15,7 +12,7 @@ class NewMessage(object):
     def __init__(self, token):
         self.__access_token = token
         self.__subject = None
-        self.__body = None
+        self.__body = ''
         self.__to_line = None
         self.__cc_line = None
         self.__bcc_line = None
@@ -30,25 +27,21 @@ class NewMessage(object):
         json_bcc = None
 
         if self.__to_line is not None:
-            json_to = jsonify_receps(self.__to_line, "to", False)
+            json_to = jsonify_recipients(self.__to_line, "to", False)
 
         else:
             raise SendError('Error, to must be specified.')
 
         if self.__cc_line is not None:
-            json_cc = jsonify_receps(self.__cc_line, "cc", False)
+            json_cc = jsonify_recipients(self.__cc_line, "cc", False)
 
         if self.__bcc_line is not None:
-            json_bcc = jsonify_receps(self.__bcc_line, "bcc", False)
+            json_bcc = jsonify_recipients(self.__bcc_line, "bcc", False)
 
         if self.__subject is not None:
             json_send += 'Subject": "' + self.__subject + '",'
         else:
             raise SendError('Error, subject must be specified.')
-
-        # now we can set the body
-        if self.__body is None:
-            self.__body = ''
 
         json_send += '"Body": { "ContentType": "HTML", "Content": "' + self.__body + '"}'
         # set the recipients
@@ -67,13 +60,11 @@ class NewMessage(object):
                 file_name = str(self.__file_name).replace('/', '-').replace('.', '-')
                 full_file_name = '{}.{}'.format(file_name, str(self.__file_extension))
                 json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
-                             '"Name": "{}", "ContentBytes": "{}" } ]'.format(full_file_name, str(self.__file_bytes,
-                                                                                                 'UTF8'))
+                             '"Name": "{}", "ContentBytes": "{}" } ]'.format(full_file_name, str(self.__file_bytes, 'UTF8'))
 
         json_send += '}}'
 
         headers = {"Authorization": "Bearer " + self.__access_token, "Content-Type": "application/json"}
-        print(json_send)
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
         if r.status_code != 202:
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '

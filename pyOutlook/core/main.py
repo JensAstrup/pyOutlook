@@ -1,8 +1,8 @@
 # Authorization and misc functions
-from ..internal import retrieve
-from ..internal.errors import MiscError, AuthError
+from pyOutlook.core.folders import get_folders, get_folder
+from pyOutlook.internal import retrieve, internalMethods
+from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
-from .folders import *
 
 
 class OutlookAccount(object):
@@ -77,10 +77,7 @@ class OutlookAccount(object):
 
         """
         if not isinstance(page, int):
-            print(type(page))
             raise MiscError('page parameter must be of type integer')
-        if page == 1:
-            print('Note that pulling the first page is equivalent to calling get_messages()')
         return retrieve.get_messages(self, page)
 
     def get_inbox(self):
@@ -131,7 +128,7 @@ class OutlookAccount(object):
             email.send_as(send_as)
         if attachment is not None:
             if 'bytes' not in attachment or 'name' not in attachment or 'ext' not in attachment:
-                raise KeyError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
+                raise TypeError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
             email.add_attachment(attachment['bytes'], attachment['name'], attachment['ext'])
         email.send()
 
