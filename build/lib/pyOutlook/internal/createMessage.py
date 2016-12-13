@@ -2,7 +2,7 @@ import json
 import re
 
 from pyOutlook.internal.errors import SendError, MiscError
-from pyOutlook.internal.internalMethods import jsonify_receps
+from pyOutlook.internal.internalMethods import jsonify_recipients
 import requests
 
 
@@ -30,16 +30,16 @@ class NewMessage(object):
         json_bcc = None
 
         if self.__to_line is not None:
-            json_to = jsonify_receps(self.__to_line, "to", False)
+            json_to = jsonify_recipients(self.__to_line, "to", False)
 
         else:
             raise SendError('Error, to must be specified.')
 
         if self.__cc_line is not None:
-            json_cc = jsonify_receps(self.__cc_line, "cc", False)
+            json_cc = jsonify_recipients(self.__cc_line, "cc", False)
 
         if self.__bcc_line is not None:
-            json_bcc = jsonify_receps(self.__bcc_line, "bcc", False)
+            json_bcc = jsonify_recipients(self.__bcc_line, "bcc", False)
 
         if self.__subject is not None:
             json_send += 'Subject": "' + self.__subject + '",'

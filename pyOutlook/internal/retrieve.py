@@ -12,7 +12,7 @@ def clean_return_multiple(json):
     """
     return_list = []
     for key in json['value']:
-        if key['Sender'] is not None:
+        if 'Sender' in key:
             uid = key['Id']
             subject = key['Subject']
             sender_email = key['Sender']['EmailAddress']['Address']
@@ -82,7 +82,6 @@ def get_messages_from_folder_id(self, folder_id):
     """
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id + '/messages', headers=headers)
-    print(r.status_code)
     if r.status_code == 401:
         raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
     return clean_return_multiple(r.json())
@@ -102,5 +101,4 @@ def get_messages_from_folder_name(self, folder_name):
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages', headers=headers)
     if r.status_code == 401:
         raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-    print(r.json())
     return clean_return_multiple(r.json())
