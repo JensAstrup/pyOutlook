@@ -9,8 +9,9 @@ to the other methods available, and stores the access token associated with an a
 
 Instantiation Example::
 
-    account_one = pyOutlook.OutlookAccount('token 1')
-    account_two = pyOutlook.OutlookAccount('token 2')
+    from pyOutlook import OutlookAccount
+    account_one = OutlookAccount('token 1')
+    account_two = OutlookAccount('token 2')
 
 From here you can access any of the methods as documented in the 'pyOutlook' section. Here are two examples of accessing
 an inbox and sending a new email.

@@ -62,9 +62,6 @@ class Folder(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print('Renamed folder to: ' + new_folder_name + '. Received the following status code from Outlook: ',
-                  end=' ')
-            print(r.status_code)
             return_folder = r.json()
             return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
                           return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
@@ -89,8 +86,6 @@ class Folder(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print('Retrieved folders. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
             return clean_return_multiple(r.json())
 
     def delete_folder(self):
@@ -112,9 +107,6 @@ class Folder(object):
         if 399 < r.status_code < 452:
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
-        else:
-            print('Deleted folder: ' + self.name + '. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
 
     def move_folder(self, destination_folder):
         """Move the Folder into a different folder.
@@ -142,8 +134,6 @@ class Folder(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print('Moved folder. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
             return_folder = r.json()
             return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
                           return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
@@ -174,8 +164,6 @@ class Folder(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print('Copied folder. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
             return_folder = r.json()
             return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
                           return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],
@@ -200,8 +188,6 @@ class Folder(object):
             raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
 
         else:
-            print('Created folder: ' + folder_name + '. Received the following status code from Outlook: ', end=' ')
-            print(r.status_code)
             return_folder = r.json()
             return Folder(return_folder['Id'], return_folder['DisplayName'], return_folder['ParentFolderId'],
                           return_folder['ChildFolderCount'], return_folder['UnreadItemCount'],

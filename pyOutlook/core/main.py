@@ -77,10 +77,7 @@ class OutlookAccount(object):
 
         """
         if not isinstance(page, int):
-            print(type(page))
             raise MiscError('page parameter must be of type integer')
-        if page == 1:
-            print('Note that pulling the first page is equivalent to calling get_messages()')
         return retrieve.get_messages(self, page)
 
     def get_inbox(self):
