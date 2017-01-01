@@ -38,13 +38,29 @@ def clean_return_multiple(json):
     return return_list
 
 
+# TODO: this can be reduced to one function
 def clean_return_single(json):
     uid = json['Id']
-    subject = json['Subject']
-    sender_email = json['Sender']['EmailAddress']['Address']
-    sender_name = json['Sender']['EmailAddress']['Name']
-    body = json['Body']['Content']
-    to_recipients = json['ToRecipients']
+    try:
+        subject = json['Subject']
+    except KeyError:
+        subject = ''
+    try:
+        sender_email = json['Sender']['EmailAddress']['Address']
+    except KeyError:
+        sender_email = 'N/A'
+    try:
+        sender_name = json['Sender']['EmailAddress']['Name']
+    except KeyError:
+        sender_name = 'N/A'
+    try:
+        body = json['Body']['Content']
+    except KeyError:
+        body = ''
+    try:
+        to_recipients = json['ToRecipients']
+    except KeyError:
+        to_recipients = []
     return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
     return return_message
 
