@@ -2,7 +2,7 @@
 import requests
 
 from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.internalMethods import jsonify_recipients, get_global_token
+from pyOutlook.internal.utils import jsonify_recipients, get_global_token
 
 
 # noinspection PyUnresolvedReferences
@@ -29,9 +29,6 @@ class Message(object):
         self.to_recipients = to_recipients
 
     def __str__(self):
-        return self.__getattribute__('message_id')
-
-    def __repr__(self):
         return self.__getattribute__('subject')
 
     def forward_message(self, to_recipients, forward_comment):

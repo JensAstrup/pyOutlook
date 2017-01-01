@@ -14,22 +14,53 @@ def clean_return_multiple(json):
     for key in json['value']:
         if 'Sender' in key:
             uid = key['Id']
-            subject = key['Subject']
-            sender_email = key['Sender']['EmailAddress']['Address']
-            sender_name = key['Sender']['EmailAddress']['Name']
-            body = key['Body']['Content']
-            to_recipients = key['ToRecipients']
+            try:
+                subject = key['Subject']
+            except KeyError:
+                subject = 'N/A'
+            try:
+                sender_email = key['Sender']['EmailAddress']['Address']
+            except KeyError:
+                sender_email = 'N/A'
+            try:
+                sender_name = key['Sender']['EmailAddress']['Name']
+            except KeyError:
+                sender_name = 'N/A'
+            try:
+                body = key['Body']['Content']
+            except KeyError:
+                body = ''
+            try:
+                to_recipients = key['ToRecipients']
+            except KeyError:
+                to_recipients = []
             return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
     return return_list
 
 
+# TODO: this can be reduced to one function
 def clean_return_single(json):
     uid = json['Id']
-    subject = json['Subject']
-    sender_email = json['Sender']['EmailAddress']['Address']
-    sender_name = json['Sender']['EmailAddress']['Name']
-    body = json['Body']['Content']
-    to_recipients = json['ToRecipients']
+    try:
+        subject = json['Subject']
+    except KeyError:
+        subject = ''
+    try:
+        sender_email = json['Sender']['EmailAddress']['Address']
+    except KeyError:
+        sender_email = 'N/A'
+    try:
+        sender_name = json['Sender']['EmailAddress']['Name']
+    except KeyError:
+        sender_name = 'N/A'
+    try:
+        body = json['Body']['Content']
+    except KeyError:
+        body = ''
+    try:
+        to_recipients = json['ToRecipients']
+    except KeyError:
+        to_recipients = []
     return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
     return return_message
 

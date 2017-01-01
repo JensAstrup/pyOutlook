@@ -1,0 +1,12 @@
+[run]
+omit =
+    build/
+    docs/
+    pyOutlook.egg-info/
+    setup.py
+[report]
+omit =
+    build/
+    docs/
+    pyOutlook.egg-info/
+    setup.py

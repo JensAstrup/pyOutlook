@@ -1,6 +1,5 @@
 setup.py
 pyOutlook/__init__.py
-pyOutlook/setup.py
 pyOutlook.egg-info/PKG-INFO
 pyOutlook.egg-info/SOURCES.txt
 pyOutlook.egg-info/dependency_links.txt
@@ -13,6 +12,6 @@ pyOutlook/core/message.py
 pyOutlook/internal/__init__.py
 pyOutlook/internal/createMessage.py
 pyOutlook/internal/errors.py
-pyOutlook/internal/internalMethods.py
 pyOutlook/internal/messageActions.py
 pyOutlook/internal/retrieve.py
+pyOutlook/internal/utils.py

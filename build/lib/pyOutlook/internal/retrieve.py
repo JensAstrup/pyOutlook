@@ -12,24 +12,55 @@ def clean_return_multiple(json):
     """
     return_list = []
     for key in json['value']:
-        if key['Sender'] is not None:
+        if 'Sender' in key:
             uid = key['Id']
-            subject = key['Subject']
-            sender_email = key['Sender']['EmailAddress']['Address']
-            sender_name = key['Sender']['EmailAddress']['Name']
-            body = key['Body']['Content']
-            to_recipients = key['ToRecipients']
+            try:
+                subject = key['Subject']
+            except KeyError:
+                subject = 'N/A'
+            try:
+                sender_email = key['Sender']['EmailAddress']['Address']
+            except KeyError:
+                sender_email = 'N/A'
+            try:
+                sender_name = key['Sender']['EmailAddress']['Name']
+            except KeyError:
+                sender_name = 'N/A'
+            try:
+                body = key['Body']['Content']
+            except KeyError:
+                body = ''
+            try:
+                to_recipients = key['ToRecipients']
+            except KeyError:
+                to_recipients = []
             return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
     return return_list
 
 
+# TODO: this can be reduced to one function
 def clean_return_single(json):
     uid = json['Id']
-    subject = json['Subject']
-    sender_email = json['Sender']['EmailAddress']['Address']
-    sender_name = json['Sender']['EmailAddress']['Name']
-    body = json['Body']['Content']
-    to_recipients = json['ToRecipients']
+    try:
+        subject = json['Subject']
+    except KeyError:
+        subject = ''
+    try:
+        sender_email = json['Sender']['EmailAddress']['Address']
+    except KeyError:
+        sender_email = 'N/A'
+    try:
+        sender_name = json['Sender']['EmailAddress']['Name']
+    except KeyError:
+        sender_name = 'N/A'
+    try:
+        body = json['Body']['Content']
+    except KeyError:
+        body = ''
+    try:
+        to_recipients = json['ToRecipients']
+    except KeyError:
+        to_recipients = []
     return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
     return return_message
 
@@ -82,7 +113,6 @@ def get_messages_from_folder_id(self, folder_id):
     """
     headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id + '/messages', headers=headers)
-    print(r.status_code)
     if r.status_code == 401:
         raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
     return clean_return_multiple(r.json())
@@ -102,5 +132,4 @@ def get_messages_from_folder_name(self, folder_name):
     r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages', headers=headers)
     if r.status_code == 401:
         raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-    print(r.json())
     return clean_return_multiple(r.json())
