@@ -1,5 +1,7 @@
+import base64
 import unittest
 import time
+from pyOutlook.internal.errors import AuthError
 from pyOutlook.tests.config import AUTH_TOKEN, EMAIL_ACCOUNT
 from pyOutlook.core.main import OutlookAccount
 from pyOutlook.core.message import Message
@@ -121,7 +123,7 @@ class Write(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.account.send_email('Test body', 'test subject', EMAIL_ACCOUNT, bcc=2)
 
-    def test_send_attachment(self):
+    def test_send_attachment_new_email(self):
         email = self.account.new_email()
 
         email.to(EMAIL_ACCOUNT)
@@ -132,7 +134,36 @@ class Write(unittest.TestCase):
 
         email.send()
 
+    def test_attachment_parameters_required_new_email(self):
+        email = self.account.new_email()
 
+        email.to(EMAIL_ACCOUNT)
+        email.set_subject('Attachment test')
+        email.set_body('Attachment body')
+
+        with self.assertRaises(TypeError):
+            email.attach('testattachment', 'txt').send()
+
+    def test_attachment_send_email(self):
+        with self.assertRaises(TypeError):
+            self.account.send_email('Attachment body', 'Attachment test', EMAIL_ACCOUNT,
+                                    attachment={'bytes': b'bytes'})
+
+    def test_attachment_parameters_required_send_email(self):
+        with open('.gitignore', 'rb') as file:
+            self.account.send_email('Attachment body', 'Attachment test', EMAIL_ACCOUNT,
+                                    attachment=dict(bytes=base64.b64encode(file.read()),
+                                                    name='testattachment', ext='txt'))
+
+
+class Exceptions(unittest.TestCase):
+    def test_auth_error(self):
+        """
+        Test that an invalid auth token raises an AuthError
+        """
+        account = OutlookAccount('NOT A TOKEN')
+        with self.assertRaises(AuthError):
+            account.inbox()
 
 if __name__ == '__main__':
     unittest.main()
