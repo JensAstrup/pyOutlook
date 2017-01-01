@@ -141,7 +141,7 @@ class OutlookAccount(object):
         if attachment is not None:
             if 'bytes' not in attachment or 'name' not in attachment or 'ext' not in attachment:
                 raise TypeError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
-            email.add_attachment(attachment['bytes'], attachment['name'], attachment['ext'])
+            email.attach(attachment['bytes'], attachment['name'], attachment['ext'])
         email.send()
 
     @Deprecated('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.')
