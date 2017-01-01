@@ -1,6 +1,6 @@
 import requests
 from .errors import AuthError, MiscError
-from ..internal.internalMethods import jsonify_recipients
+from .utils import jsonify_recipients
 
 
 def forward_message(self, message_id, to_recipients, forward_comment):

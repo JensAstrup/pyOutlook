@@ -15,8 +15,14 @@ def clean_return_multiple(json):
         if 'Sender' in key:
             uid = key['Id']
             subject = key['Subject']
-            sender_email = key['Sender']['EmailAddress']['Address']
-            sender_name = key['Sender']['EmailAddress']['Name']
+            try:
+                sender_email = key['Sender']['EmailAddress']['Address']
+            except KeyError:
+                sender_email = 'N/A'
+            try:
+                sender_name = key['Sender']['EmailAddress']['Name']
+            except KeyError:
+                sender_name = 'N/A'
             body = key['Body']['Content']
             to_recipients = key['ToRecipients']
             return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
