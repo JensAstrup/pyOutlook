@@ -1,0 +1,11 @@
+image: python:3.6
+stages:
+  - test
+
+testing:
+  type: test
+  stage: test
+  before_script:
+    - pip install -Ur requirements.txt
+  script:
+   - nosetest
