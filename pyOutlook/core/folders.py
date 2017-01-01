@@ -1,6 +1,6 @@
 import requests
 
-from pyOutlook.internal import internalMethods
+from pyOutlook.internal import utils
 from pyOutlook.internal.errors import AuthError
 
 
@@ -51,7 +51,7 @@ class Folder(object):
             A new Folder representing the folder with the new name on Outlook.
 
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
         payload = '{ "DisplayName": "' + new_folder_name + '"}'
@@ -76,7 +76,7 @@ class Folder(object):
         Returns:
             List[Folder]
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
 
@@ -98,7 +98,7 @@ class Folder(object):
             AuthError: Raised if Outlook returns a 401, generally caused by an invalid or expired access token.
 
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
 
@@ -123,7 +123,7 @@ class Folder(object):
             A new Folder object representing the folder that is now inside of the destination_folder.
 
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/move'
         payload = '{ "DestinationId": "' + destination_folder + '"}'
@@ -153,7 +153,7 @@ class Folder(object):
             A new Folder representing the newly created folder.
 
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/copy'
         payload = '{ "DestinationId": "' + destination_folder + '"}'
@@ -177,7 +177,7 @@ class Folder(object):
 
         Returns: Folder
         """
-        access_token = internalMethods.get_global_token()
+        access_token = utils.get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
         payload = '{ "DisplayName": "' + folder_name + '"}'

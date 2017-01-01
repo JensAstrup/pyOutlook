@@ -1,8 +1,10 @@
 # Authorization and misc functions
 from pyOutlook.core.folders import get_folders, get_folder
-from pyOutlook.internal import retrieve, internalMethods
+from pyOutlook.internal import retrieve
+from pyOutlook.internal.utils import Deprecated, set_global_token__
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
+from pyOutlook.core.message import Message
 
 
 class OutlookAccount(object):
@@ -21,7 +23,7 @@ class OutlookAccount(object):
         if type(access_token) is None:
             raise AuthError('No access token provided with object instantiation.')
         self.access_token = access_token
-        internalMethods.set_global_token__(access_token)
+        set_global_token__(access_token)
 
     def set_access_token(self, access_token):
         """Sets access token.
@@ -36,14 +38,14 @@ class OutlookAccount(object):
 
         """
         self.access_token = access_token
-        internalMethods.set_global_token__(access_token)
+        set_global_token__(access_token)
 
     def __get_access_token(self):
         return self.access_token
 
     token = property(__get_access_token)
 
-    def get_message(self, message_id):
+    def get_message(self, message_id) -> Message:
         """Gets message matching provided id.
 
         Retrieves the Outlook email matching the provided message_id.
@@ -80,7 +82,17 @@ class OutlookAccount(object):
             raise MiscError('page parameter must be of type integer')
         return retrieve.get_messages(self, page)
 
+    @Deprecated('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.')
     def get_inbox(self):
+        """Retrieves first ten messages in account's inbox.
+
+        Returns:
+            List[Message]
+
+        """
+        return self.inbox()
+
+    def inbox(self):
         """Retrieves first ten messages in account's inbox.
 
         Returns:
@@ -132,7 +144,17 @@ class OutlookAccount(object):
             email.add_attachment(attachment['bytes'], attachment['name'], attachment['ext'])
         email.send()
 
+    @Deprecated('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.')
     def get_sent_messages(self):
+        """Retrieves last ten sent messages.
+
+        Returns:
+            list[Message]
+
+        """
+        return self.sent_messages()
+
+    def sent_messages(self):
         """Retrieves last ten sent messages.
 
         Returns:
@@ -141,7 +163,17 @@ class OutlookAccount(object):
         """
         return retrieve.get_messages_from_folder_name(self, 'SentItems')
 
+    @Deprecated('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.')
     def get_deleted_messages(self):
+        """Retrieves last ten deleted messages.
+
+        Returns:
+            list[Message]
+
+        """
+        return self.deleted_messages()
+
+    def deleted_messages(self):
         """Retrieves last ten deleted messages.
 
         Returns:
@@ -150,7 +182,17 @@ class OutlookAccount(object):
         """
         return retrieve.get_messages_from_folder_name(self, 'DeletedItems')
 
+    @Deprecated('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.')
     def get_draft_messages(self):
+        """Retrieves last ten draft messages.
+
+        Returns:
+            list[Message]
+
+        """
+        return self.draft_messages()
+
+    def draft_messages(self):
         """Retrieves last ten draft messages.
 
         Returns:
@@ -159,6 +201,7 @@ class OutlookAccount(object):
         """
         return retrieve.get_messages_from_folder_name(self, 'Drafts')
 
+    # TODO: keep as get_x or rename?
     def get_folder_messages(self, folder):
         """Retrieve first ten messages from provided folder.
 
@@ -171,7 +214,7 @@ class OutlookAccount(object):
         """
         return retrieve.get_messages_from_folder_name(self, folder)
 
-    # folders
+    # TODO: keep as get_x or rename?
     def get_folders(self):
         """Retrieves a list of folders in the account.
 
@@ -181,6 +224,7 @@ class OutlookAccount(object):
         """
         return get_folders(self)
 
+    # TODO: keep as get_x or rename?
     def get_folder(self, folder_id):
         """Retrieve a Folder object matching the folder ID provided.
 

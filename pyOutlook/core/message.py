@@ -2,7 +2,7 @@
 import requests
 
 from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.internalMethods import jsonify_recipients, get_global_token
+from pyOutlook.internal.utils import jsonify_recipients, get_global_token
 
 
 # noinspection PyUnresolvedReferences
