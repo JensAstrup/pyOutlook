@@ -29,9 +29,6 @@ class Message(object):
         self.to_recipients = to_recipients
 
     def __str__(self):
-        return self.__getattribute__('message_id')
-
-    def __repr__(self):
         return self.__getattribute__('subject')
 
     def forward_message(self, to_recipients, forward_comment):
