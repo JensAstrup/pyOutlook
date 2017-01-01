@@ -6,6 +6,6 @@ testing:
   type: test
   stage: test
   before_script:
-    - pip install -Ur requirements.txt
+    - pip install -r requirements.txt
   script:
-   - nosetest
+   - nosetests
