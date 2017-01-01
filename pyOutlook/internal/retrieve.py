@@ -17,7 +17,7 @@ def clean_return_multiple(json):
             try:
                 subject = key['Subject']
             except KeyError:
-                subject= 'N/A'
+                subject = 'N/A'
             try:
                 sender_email = key['Sender']['EmailAddress']['Address']
             except KeyError:
