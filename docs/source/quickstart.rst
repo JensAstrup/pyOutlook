@@ -13,7 +13,7 @@ Instantiation Example::
     account_one = OutlookAccount('token 1')
     account_two = OutlookAccount('token 2')
 
-From here you can access any of the methods as documented in the 'pyOutlook' section. Here are two examples of accessing
+From here you can access any of the methods as documented in the :ref:`pyOutlook <pyOutlook>` section. Here are two examples of accessing
 an inbox and sending a new email.
 
 Examples
@@ -21,10 +21,10 @@ Examples
 
 Retrieving Emails
 ^^^^^^^^^^^^^^^^^
-Through the OutlookAccount class you can call one of many methods - get_messages(), get_inbox(), etc.
+Through the OutlookAccount class you can call one of many methods - :code:`get_messages()`, :code:`get_inbox()`, etc.
 These methods return a list of :ref:`MessageAnchor` objects, allowing you to access the atrributes therein.
 ::
-    inbox = account_one.get_inbox()
+    inbox = account_one.inbox()
     print(inbox[0].body)
 
 Sending Emails

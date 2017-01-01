@@ -1,3 +1,5 @@
+.. _pyOutlook:
+
 Outlook Account
 ---------------
 

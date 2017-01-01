@@ -89,6 +89,9 @@ class OutlookAccount(object):
         Returns:
             List[Message]
 
+        Warnings:
+            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.inbox` instead
+
         """
         return self.inbox()
 
@@ -151,6 +154,10 @@ class OutlookAccount(object):
         Returns:
             list[Message]
 
+        Warnings:
+            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.sent_messages` instead
+
+
         """
         return self.sent_messages()
 
@@ -170,6 +177,9 @@ class OutlookAccount(object):
         Returns:
             list[Message]
 
+        Warnings:
+            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.deleted_messages` instead
+
         """
         return self.deleted_messages()
 
@@ -188,6 +198,9 @@ class OutlookAccount(object):
 
         Returns:
             list[Message]
+
+        Warnings:
+            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.draft_messages` instead
 
         """
         return self.draft_messages()

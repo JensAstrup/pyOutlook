@@ -1,8 +1,7 @@
-import json
-import re
+import base64
 
 from pyOutlook.internal.errors import SendError, MiscError
-from pyOutlook.internal.internalMethods import jsonify_recipients
+from pyOutlook.internal.utils import jsonify_recipients, Deprecated
 import requests
 
 
@@ -12,10 +11,11 @@ class NewMessage(object):
     Each method, excluding send(), returns the NewMessage object allowing chaining of methods.
 
     """
+
     def __init__(self, token):
         self.__access_token = token
         self.__subject = None
-        self.__body = None
+        self.__body = ''
         self.__to_line = None
         self.__cc_line = None
         self.__bcc_line = None
@@ -46,10 +46,6 @@ class NewMessage(object):
         else:
             raise SendError('Error, subject must be specified.')
 
-        # now we can set the body
-        if self.__body is None:
-            self.__body = ''
-
         json_send += '"Body": { "ContentType": "HTML", "Content": "' + self.__body + '"}'
         # set the recipients
         json_send += ',' + json_to + ']'
@@ -66,14 +62,13 @@ class NewMessage(object):
             if self.__file_name is not None and self.__file_extension is not None:
                 file_name = str(self.__file_name).replace('/', '-').replace('.', '-')
                 full_file_name = '{}.{}'.format(file_name, str(self.__file_extension))
-                json_send += ',"Attachments": [ { "@odata.type": "#Microsoft.OutlookServices.FileAttachment", ' \
-                             '"Name": "{}", "ContentBytes": "{}" } ]'.format(full_file_name, str(self.__file_bytes,
-                                                                                                 'UTF8'))
+                json_send += (',"Attachments": [ {{ "@odata.type": "#Microsoft.OutlookServices.FileAttachment", '
+                              '"Name": "{}", "ContentBytes": "{}" }} ]'.
+                              format(full_file_name, str(self.__file_bytes, 'UTF8')))
 
         json_send += '}}'
 
         headers = {"Authorization": "Bearer " + self.__access_token, "Content-Type": "application/json"}
-        print(json_send)
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
         if r.status_code != 202:
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
@@ -181,7 +176,21 @@ class NewMessage(object):
         self.__send_as = email
         return self
 
+    @Deprecated('NewMessage.add_attachment is deprecated. Use NewMessage.attach() instead')
     def add_attachment(self, file_bytes, file_name, file_extension):
+        """Adds an attachment to the email.
+
+        Warnings:
+            This method is deprecated, use NewMessage.attach() instead. If using this method, you must base64 encode the
+            file_bytes.
+
+        """
+        self.__file_bytes = file_bytes
+        self.__file_name = file_name
+        self.__file_extension = file_extension
+        return self
+
+    def attach(self, file_bytes, file_name, file_extension):
         """Adds an attachment to the email.
 
         Warnings:
@@ -205,7 +214,7 @@ class NewMessage(object):
             NewMessage
 
         """
-        self.__file_bytes = file_bytes
+        self.__file_bytes = base64.b64encode(file_bytes)
         self.__file_name = file_name
         self.__file_extension = file_extension
         return self
