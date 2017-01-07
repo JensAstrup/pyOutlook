@@ -1,5 +1,5 @@
 # Authorization and misc functions
-from internal.retrieve import get_message, get_messages, get_inbox, get_messages_from_folder_name
+from pyOutlook.internal.retrieve import get_message, get_messages, get_inbox, get_messages_from_folder_name
 from pyOutlook.core.folders import get_folders, get_folder
 from pyOutlook.internal.utils import Deprecated, set_global_token__
 from pyOutlook.internal.errors import MiscError, AuthError

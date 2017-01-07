@@ -2,7 +2,7 @@ import logging
 
 import requests
 
-from core.message import clean_return_multiple, clean_return_single
+from pyOutlook.core.message import clean_return_multiple, clean_return_single
 from pyOutlook.internal.errors import AuthError, MiscError
 
 log = logging.getLogger('pyOutlook')
