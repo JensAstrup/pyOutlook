@@ -1,11 +1,13 @@
-# Functions used by other files, but not used directly in parent code
+import logging
+
 import requests
 
 from pyOutlook.internal.errors import AuthError, MiscError
 from pyOutlook.internal.utils import jsonify_recipients, get_global_token
 
+log = logging.getLogger('pyOutlook')
 
-# noinspection PyUnresolvedReferences
+
 class Message(object):
     """An object representing an email inside of the OutlookAccount.
 
@@ -13,9 +15,9 @@ class Message(object):
             message_id: A string provided by Outlook identifying this specific email
             body: The body content of the email, including HTML formatting
             subject: The subject of the email
-            senderEmail: The email of the person who sent this email
-            senderName: The name of the person who sent this email, as provided by Outlook
-            toRecipients: A comma separated string of emails who were sent this email in the 'To' field
+            sender_email: The email of the person who sent this email
+            sender_name: The name of the person who sent this email, as provided by Outlook
+            to_recipients: A comma separated string of emails who were sent this email in the 'To' field
 
         """
 
@@ -31,6 +33,39 @@ class Message(object):
     def __str__(self):
         return self.__getattribute__('subject')
 
+    def _make_api_call(self, http_type: str, endpoint: str, headers: dict=None, data=None):
+        """
+        Internal method to handle making calls to the Outlook API and logging both the request and response
+        Args:
+            http_type: (str) 'post' or 'delete'
+            endpoint: (str) The endpoint the request will be made to
+            headers: A dict of headers to send to the requests module
+            data: The data to provide to the requests module
+
+        Raises:
+            MiscError: For errors that aren't a 401
+            AuthError: For 401 errors
+
+        """
+        log.debug('Making Outlook API request for message (ID: {}) with Headers: {} Data: {}'
+                  .format(self.message_id, headers, data))
+
+        if http_type == 'post':
+            r = requests.post(endpoint, headers=headers, data=data)
+        elif http_type == 'delete':
+            r = requests.delete(endpoint, headers=headers)
+        else:
+            raise NotImplemented
+
+        if r.status_code == 401:
+            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
+            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        elif r.status_code > 299:
+            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
+            raise MiscError('Unhandled error received from Outlook. Check logging output.')
+        else:
+            log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.json()))
+
     def forward_message(self, to_recipients, forward_comment):
         """Forward Message to recipients with an optional comment.
 
@@ -39,6 +74,7 @@ class Message(object):
             forward_comment: String comment to append to forwarded email.
 
         Examples:
+            >>> email = Message()
             >>> email.forward_message('john.doe@domain.com, betsy.donalds@domain.com')
             >>> email.forward_message('john.doe@domain.com', 'Hey Joe')
 
@@ -57,11 +93,11 @@ class Message(object):
 
         payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'
 
-        r = requests.post('https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/forward',
-                          headers=headers, data=payload)
+        log.debug('Forwarding message (ID: {}) with Headers: {} Body: {}'.format(self.message_id, headers, payload))
 
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/forward'.format(self.message_id)
+
+        self._make_api_call('post', endpoint=endpoint, headers=headers, data=payload)
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -78,10 +114,7 @@ class Message(object):
         payload = '{ "Comment": "' + reply_comment + '"}'
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/reply'
 
-        r = requests.post(endpoint, headers=headers, data=payload)
-
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        self._make_api_call('post', endpoint, headers=headers, data=payload)
 
     def reply_all(self, reply_comment):
         """Replies to everyone on the email, including those on the CC line.
@@ -97,10 +130,7 @@ class Message(object):
         payload = '{ "Comment": "' + reply_comment + '"}'
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/replyall'
 
-        r = requests.post(endpoint, headers=headers, data=payload)
-
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        self._make_api_call('post', endpoint, headers=headers, data=payload)
 
     def delete_message(self):
         """Deletes the email"""
@@ -108,10 +138,7 @@ class Message(object):
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
 
-        r = requests.delete(endpoint, headers=headers)
-
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        self._make_api_call('delete', endpoint, headers=headers)
 
     def __move_to(self, destination):
         access_token = get_global_token()
@@ -119,10 +146,7 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
 
-        r = requests.post(endpoint, headers=headers, data=payload)
-
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        self._make_api_call('post', endpoint, headers=headers, data=payload)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
@@ -153,10 +177,7 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
         payload = '{ "DestinationId": "' + destination + '"}'
 
-        r = requests.post(endpoint, headers=headers, data=payload)
-
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        self._make_api_call('post', endpoint, headers=headers, data=payload)
 
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
@@ -180,3 +201,65 @@ class Message(object):
 
         """
         self.__copy_to(folder_id)
+
+
+# TODO: this can be reduced to one function
+def clean_return_multiple(json):
+    """
+    :param json:
+    :return: List of messages
+    :rtype: list of Message
+    """
+    return_list = []
+    for key in json['value']:
+        if 'Sender' in key:
+            uid = key['Id']
+            try:
+                subject = key['Subject']
+            except KeyError:
+                subject = 'N/A'
+            try:
+                sender_email = key['Sender']['EmailAddress']['Address']
+            except KeyError:
+                sender_email = 'N/A'
+            try:
+                sender_name = key['Sender']['EmailAddress']['Name']
+            except KeyError:
+                sender_name = 'N/A'
+            try:
+                body = key['Body']['Content']
+            except KeyError:
+                body = ''
+            try:
+                to_recipients = key['ToRecipients']
+            except KeyError:
+                to_recipients = []
+            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
+    return return_list
+
+
+# TODO: this can be reduced to one function
+def clean_return_single(json):
+    uid = json['Id']
+    try:
+        subject = json['Subject']
+    except KeyError:
+        subject = ''
+    try:
+        sender_email = json['Sender']['EmailAddress']['Address']
+    except KeyError:
+        sender_email = 'N/A'
+    try:
+        sender_name = json['Sender']['EmailAddress']['Name']
+    except KeyError:
+        sender_name = 'N/A'
+    try:
+        body = json['Body']['Content']
+    except KeyError:
+        body = ''
+    try:
+        to_recipients = json['ToRecipients']
+    except KeyError:
+        to_recipients = []
+    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
+    return return_message
