@@ -8,7 +8,7 @@ python3.5:
   before_script:
     - pip install -r requirements.txt
   script:
-   - nosetests --with-coverage --cover-package=
+   - nosetests --with-coverage --cover-package=pyOutlook
 
 python3.6:
   type: test
@@ -17,4 +17,4 @@ python3.6:
   before_script:
     - pip install -r requirements.txt
   script:
-   - nosetests
+   - nosetests --with-coverage --cover-package=pyOutlook
