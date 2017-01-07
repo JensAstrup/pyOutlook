@@ -1,7 +1,9 @@
-from .errors import MiscError
 import functools
 import inspect
 import warnings
+
+from .errors import MiscError
+
 token = 0
 
 
