@@ -1,10 +1,20 @@
-image: python:3.6
 stages:
-  - test
+  - test_python3.5
+  - test_python3.6
 
-testing:
+python3.5:
   type: test
-  stage: test
+  stage: test_python3.5
+  image: python3.5
+  before_script:
+    - pip install -r requirements.txt
+  script:
+   - nosetests --with-coverage --cover-package=
+
+python3.6:
+  type: test
+  stage: test_python3.6
+  image: python3.6
   before_script:
     - pip install -r requirements.txt
   script:
