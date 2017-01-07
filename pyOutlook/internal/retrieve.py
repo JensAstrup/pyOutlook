@@ -3,7 +3,7 @@ import logging
 import requests
 
 from core.message import clean_return_multiple, clean_return_single
-from .errors import AuthError, MiscError
+from pyOutlook.internal.errors import AuthError, MiscError
 
 log = logging.getLogger('pyOutlook')
 
@@ -38,7 +38,10 @@ def get_messages(self, skip):
 
 
 def get_inbox(self):
-    return get_messages_from_folder_name(self, 'Inbox')
+    try:
+        return get_messages_from_folder_name(self, 'Inbox')
+    except AuthError:
+        raise AuthError('x')
 
 
 def get_message(self, message_id):

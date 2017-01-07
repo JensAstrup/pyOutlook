@@ -157,6 +157,7 @@ class Write(unittest.TestCase):
 
 
 class Exceptions(unittest.TestCase):
+
     def test_auth_error(self):
         """
         Test that an invalid auth token raises an AuthError
