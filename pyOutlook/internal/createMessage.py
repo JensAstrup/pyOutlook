@@ -1,8 +1,12 @@
 import base64
+import logging
+
+import requests
 
 from pyOutlook.internal.errors import SendError, MiscError
 from pyOutlook.internal.utils import jsonify_recipients, Deprecated
-import requests
+
+log = logging.getLogger('pyOutlook')
 
 
 class NewMessage(object):
@@ -70,7 +74,9 @@ class NewMessage(object):
 
         headers = {"Authorization": "Bearer " + self.__access_token, "Content-Type": "application/json"}
         r = requests.post('https://outlook.office.com/api/v1.0/me/sendmail', headers=headers, data=json_send)
+        log.debug('sendmail request sent to Outlook API. Headers: {} Data: {}'.format(headers, json_send))
         if r.status_code != 202:
+            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
             raise MiscError('Did not receive status code 202 from Outlook REST Endpoint. Ensure that your access token '
                             'is current. STATUS CODE: ' + str(r.status_code) + '. RESPONSE: ' + str(r.content))
 
