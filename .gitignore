@@ -2,3 +2,6 @@
 .idea/*
 *.pypirc
 .coverage
+build/*
+dist/*
+docs/*
