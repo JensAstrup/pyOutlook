@@ -129,7 +129,7 @@ class Write(unittest.TestCase):
         email.to(EMAIL_ACCOUNT)
         email.set_subject('Attachment test')
         email.set_body('Attachment body')
-        with open('README.rst', 'rb') as file:
+        with open('.gitignore', 'rb') as file:
             email.attach(file.read(), 'testattachment', 'txt')
 
         email.send()
@@ -150,7 +150,7 @@ class Write(unittest.TestCase):
                                     attachment={'bytes': b'bytes'})
 
     def test_attachment_parameters_required_send_email(self):
-        with open('README.rst', 'rb') as file:
+        with open('.gitignore', 'rb') as file:
             self.account.send_email('Attachment body', 'Attachment test', EMAIL_ACCOUNT,
                                     attachment=dict(bytes=base64.b64encode(file.read()),
                                                     name='testattachment', ext='txt'))
