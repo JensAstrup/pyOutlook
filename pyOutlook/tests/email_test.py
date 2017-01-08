@@ -78,10 +78,39 @@ class Read(unittest.TestCase):
         self.assertEqual(retrieved_email.subject, self.email_one_subject)
 
 
+class Delete(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        account = OutlookAccount(AUTH_TOKEN)
+        # Send a test email that we can refer to
+        cls.email_one_subject = 'Test Subject5'
+        account.send_email('Test Body', cls.email_one_subject, EMAIL_ACCOUNT)
+        cls.account = account
+
+        # Delay for a bit so that the email is in the inbox for our tests
+        time.sleep(8)
+
+    def test_delete_email(self):
+        """
+        Test that an email can be deleted successfully
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+
+        email = email[0]
+        email.delete_message()
+
+
 class Write(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.account = OutlookAccount(AUTH_TOKEN)
+        # Send a test email that we can refer to
+        cls.email_one_subject = 'Test Subject5'
+        cls.account.send_email('Test Body', cls.email_one_subject, EMAIL_ACCOUNT)
+
+        # Delay for a bit so that the email is in the inbox for our tests
+        time.sleep(8)
 
     def test_to_field_str_or_list(self):
         """
@@ -154,6 +183,42 @@ class Write(unittest.TestCase):
             self.account.send_email('Attachment body', 'Attachment test', EMAIL_ACCOUNT,
                                     attachment=dict(bytes=base64.b64encode(file.read()),
                                                     name='testattachment', ext='txt'))
+
+    def test_reply_to_all(self):
+        """
+        Test that an email can replied to all
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+        email = email[0]  # type: Message
+        email.reply_all('test response')
+
+    def test_reply(self):
+        """
+        Test that an email can replied to
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+        email = email[0]  # type: Message
+        email.reply('test response')
+
+    def test_forward(self):
+        """
+        Test that an email can forwarded
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+        email = email[0]  # type: Message
+        email.forward_message([EMAIL_ACCOUNT])
+
+    def test_forward_with_comment(self):
+        """
+        Test that an email can forwarded
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+        email = email[0]  # type: Message
+        email.forward_message([EMAIL_ACCOUNT], 'Test comment')
 
 
 class Exceptions(unittest.TestCase):

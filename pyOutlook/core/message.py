@@ -64,7 +64,8 @@ class Message(object):
             log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
             raise MiscError('Unhandled error received from Outlook. Check logging output.')
         else:
-            log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.json()))
+            # If we try  to log r.json() when there is nothing our tests will fail (even though it's successful...)
+            log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.content))
 
     def forward_message(self, to_recipients, forward_comment=None):
         """Forward Message to recipients with an optional comment.
