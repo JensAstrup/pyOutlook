@@ -66,11 +66,11 @@ class Message(object):
         else:
             log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.json()))
 
-    def forward_message(self, to_recipients, forward_comment):
+    def forward_message(self, to_recipients, forward_comment=None):
         """Forward Message to recipients with an optional comment.
 
         Args:
-            to_recipients: Comma separated string list of recipients to send email to.
+            to_recipients: Comma separated string or list of recipients to send email to.
             forward_comment: String comment to append to forwarded email.
 
         Examples:
@@ -86,9 +86,9 @@ class Message(object):
         access_token = get_global_token()
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{'
-        if type(forward_comment) is not None:
+        if forward_comment is not None:
             payload += '"Comment" : "' + str(forward_comment) + '",'
-        if type(to_recipients) is None:
+        if to_recipients is None:
             raise MiscError('To Recipients is not defined. Can not forward message.')
 
         payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'

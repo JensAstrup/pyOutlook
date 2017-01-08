@@ -20,6 +20,9 @@ def jsonify_recipients(recipient_input, recipient_type, silent):
         else:
             raise MiscError('To or CC recipients not provided')
 
+    if isinstance(recipient_input, list):
+        recipient_input = ', '.join(recipient_input)
+
     recipients = recipient_input.split(',')
     for num in range(len(recipients)):
         recipients[num] = recipients[num].strip()
