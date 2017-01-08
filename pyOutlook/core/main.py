@@ -83,7 +83,7 @@ class OutlookAccount(object):
         return get_messages(self, page)
 
     @Deprecated('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.')
-    def get_inboxs(self):
+    def get_inbox(self):
         """ first ten messages in account's inbox.
 
         Returns:

@@ -1,4 +1,5 @@
 import logging
+import json
 
 import requests
 
@@ -22,13 +23,14 @@ class Message(object):
         """
 
     def __init__(self, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
-                 to_recipients: list):
+                 to_recipients: list, **kwargs):
         self.message_id = message_id
         self.body = body
         self.subject = subject
         self.sender_email = sender_email
         self.sender_name = sender_name
         self.to_recipients = to_recipients
+        self.read = kwargs['is_read']
 
     def __str__(self):
         return self.__getattribute__('subject')
@@ -54,6 +56,8 @@ class Message(object):
             r = requests.post(endpoint, headers=headers, data=data)
         elif http_type == 'delete':
             r = requests.delete(endpoint, headers=headers)
+        elif http_type == 'patch':
+            r = requests.patch(endpoint, headers=headers, data=data)
         else:
             raise NotImplemented
 
@@ -203,16 +207,33 @@ class Message(object):
         """
         self.__copy_to(folder_id)
 
+    def is_read(self, boolean=None):
+        """
+        Set the 'Read' status of an email
+        Args:
+            boolean: True if the email has been read, False otherwise
+        """
+        if boolean is None:
+            return self.read
+        else:
+            access_token = get_global_token()
+            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
+            endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
+            payload = dict(IsRead=boolean)
+
+            self._make_api_call('patch', endpoint, headers=headers, data=json.dumps(payload))
+            self.read = boolean
+
 
 # TODO: this can be reduced to one function
-def clean_return_multiple(json):
+def clean_return_multiple(api_json):
     """
-    :param json:
+    :param api_json:
     :return: List of messages
     :rtype: list of Message
     """
     return_list = []
-    for key in json['value']:
+    for key in api_json['value']:
         if 'Sender' in key:
             uid = key['Id']
             try:
@@ -235,32 +256,35 @@ def clean_return_multiple(json):
                 to_recipients = key['ToRecipients']
             except KeyError:
                 to_recipients = []
-            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients))
+            is_read = key['IsRead']
+
+            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read))
     return return_list
 
 
 # TODO: this can be reduced to one function
-def clean_return_single(json):
-    uid = json['Id']
+def clean_return_single(api_json):
+    uid = api_json['Id']
     try:
-        subject = json['Subject']
+        subject = api_json['Subject']
     except KeyError:
         subject = ''
     try:
-        sender_email = json['Sender']['EmailAddress']['Address']
+        sender_email = api_json['Sender']['EmailAddress']['Address']
     except KeyError:
         sender_email = 'N/A'
     try:
-        sender_name = json['Sender']['EmailAddress']['Name']
+        sender_name = api_json['Sender']['EmailAddress']['Name']
     except KeyError:
         sender_name = 'N/A'
     try:
-        body = json['Body']['Content']
+        body = api_json['Body']['Content']
     except KeyError:
         body = ''
     try:
-        to_recipients = json['ToRecipients']
+        to_recipients = api_json['ToRecipients']
     except KeyError:
         to_recipients = []
-    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients)
+    is_read = api_json['IsRead']
+    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
     return return_message
