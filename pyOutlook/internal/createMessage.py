@@ -1,10 +1,11 @@
 import base64
 import logging
+import warnings
 
 import requests
 
 from pyOutlook.internal.errors import SendError, MiscError
-from pyOutlook.internal.utils import jsonify_recipients, Deprecated
+from pyOutlook.internal.utils import jsonify_recipients
 
 log = logging.getLogger('pyOutlook')
 
@@ -182,7 +183,6 @@ class NewMessage(object):
         self.__send_as = email
         return self
 
-    @Deprecated('NewMessage.add_attachment is deprecated. Use NewMessage.attach() instead')
     def add_attachment(self, file_bytes, file_name, file_extension):
         """Adds an attachment to the email.
 
@@ -194,6 +194,7 @@ class NewMessage(object):
         self.__file_bytes = file_bytes
         self.__file_name = file_name
         self.__file_extension = file_extension
+        warnings.warn('NewMessage.add_attachment is deprecated. Use NewMessage.attach() instead', DeprecationWarning)
         return self
 
     def attach(self, file_bytes, file_name, file_extension):

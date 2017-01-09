@@ -1,7 +1,9 @@
 # Authorization and misc functions
+import warnings
+
 from pyOutlook.internal.retrieve import get_message, get_messages, get_inbox, get_messages_from_folder_name
 from pyOutlook.core.folders import get_folders, get_folder
-from pyOutlook.internal.utils import Deprecated, set_global_token__
+from pyOutlook.internal.utils import set_global_token__
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
@@ -82,7 +84,6 @@ class OutlookAccount(object):
             raise MiscError('page parameter must be of type integer')
         return get_messages(self, page)
 
-    @Deprecated('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.')
     def get_inbox(self):
         """ first ten messages in account's inbox.
 
@@ -93,6 +94,7 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.inbox` instead
 
         """
+        warnings.warn('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.', DeprecationWarning)
         return self.inbox()
 
     def inbox(self):
@@ -147,7 +149,6 @@ class OutlookAccount(object):
             email.attach(attachment['bytes'], attachment['name'], attachment['ext'])
         email.send()
 
-    @Deprecated('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.')
     def get_sent_messages(self):
         """ last ten sent messages.
 
@@ -156,9 +157,9 @@ class OutlookAccount(object):
 
         Warnings:
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.sent_messages` instead
-
-
         """
+        warnings.warn('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.',
+                      DeprecationWarning)
         return self.sent_messages()
 
     def sent_messages(self):
@@ -170,7 +171,6 @@ class OutlookAccount(object):
         """
         return get_messages_from_folder_name(self, 'SentItems')
 
-    @Deprecated('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.')
     def get_deleted_messages(self):
         """ last ten deleted messages.
 
@@ -181,6 +181,8 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.deleted_messages` instead
 
         """
+        warnings.warn('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.',
+                      DeprecationWarning)
         return self.deleted_messages()
 
     def deleted_messages(self):
@@ -192,7 +194,6 @@ class OutlookAccount(object):
         """
         return get_messages_from_folder_name(self, 'DeletedItems')
 
-    @Deprecated('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.')
     def get_draft_messages(self):
         """ last ten draft messages.
 
@@ -203,6 +204,8 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.draft_messages` instead
 
         """
+        warnings.warn('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.',
+                      DeprecationWarning)
         return self.draft_messages()
 
     def draft_messages(self):

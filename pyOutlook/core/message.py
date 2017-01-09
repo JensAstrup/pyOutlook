@@ -1,5 +1,6 @@
 import logging
 import json
+import warnings
 
 import requests
 
@@ -33,15 +34,15 @@ class Message(object):
         self.read = kwargs['is_read']
 
     def __str__(self):
-        return self.__getattribute__('subject')
+        return self.subject
 
-    def _make_api_call(self, http_type: str, endpoint: str, headers: dict=None, data=None):
+    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict=None, data=None):
         """
         Internal method to handle making calls to the Outlook API and logging both the request and response
         Args:
             http_type: (str) 'post' or 'delete'
             endpoint: (str) The endpoint the request will be made to
-            headers: A dict of headers to send to the requests module
+            headers: A dict of headers to send to the requests module in addition to Authorization and Content-Type
             data: The data to provide to the requests module
 
         Raises:
@@ -49,6 +50,12 @@ class Message(object):
             AuthError: For 401 errors
 
         """
+
+        headers = {"Authorization": "Bearer " + get_global_token(), "Content-Type": "application/json"}
+
+        if extra_headers is not None:
+            headers.update(extra_headers)
+
         log.debug('Making Outlook API request for message (ID: {}) with Headers: {} Data: {}'
                   .format(self.message_id, headers, data))
 
@@ -88,8 +95,6 @@ class Message(object):
             AuthError: Raised if Outlook returns a 401, generally caused by an invalid or expired access token.
 
         """
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{'
         if forward_comment is not None:
             payload += '"Comment" : "' + str(forward_comment) + '",'
@@ -98,11 +103,9 @@ class Message(object):
 
         payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'
 
-        log.debug('Forwarding message (ID: {}) with Headers: {} Body: {}'.format(self.message_id, headers, payload))
-
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/forward'.format(self.message_id)
 
-        self._make_api_call('post', endpoint=endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint=endpoint, data=payload)
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -114,12 +117,10 @@ class Message(object):
             reply_comment: String message to send with email.
 
         """
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{ "Comment": "' + reply_comment + '"}'
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/reply'
 
-        self._make_api_call('post', endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint, data=payload)
 
     def reply_all(self, reply_comment):
         """Replies to everyone on the email, including those on the CC line.
@@ -130,28 +131,26 @@ class Message(object):
             reply_comment: The string comment to send to everyone on the email.
 
         """
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         payload = '{ "Comment": "' + reply_comment + '"}'
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/replyall'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/replyall'.format(self.message_id)
 
-        self._make_api_call('post', endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint, data=payload)
 
     def delete_message(self):
         """Deletes the email"""
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
+        warnings.warn('delete_message() is deprecated and will be removed in v1.0. Use delete() instead.',
+                      DeprecationWarning)
+        self.delete()
 
-        self._make_api_call('delete', endpoint, headers=headers)
+    def delete(self):
+        """Deletes the email"""
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
+        self._make_api_call('delete', endpoint)
 
     def __move_to(self, destination):
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
-
-        self._make_api_call('post', endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint, data=payload)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
@@ -216,12 +215,10 @@ class Message(object):
         if boolean is None:
             return self.read
         else:
-            access_token = get_global_token()
-            headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
-            endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
+            endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
             payload = dict(IsRead=boolean)
 
-            self._make_api_call('patch', endpoint, headers=headers, data=json.dumps(payload))
+            self._make_api_call('patch', endpoint, data=json.dumps(payload))
             self.read = boolean
 
 

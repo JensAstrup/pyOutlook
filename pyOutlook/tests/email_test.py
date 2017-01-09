@@ -1,6 +1,7 @@
 import base64
 import unittest
 import time
+
 from pyOutlook.internal.errors import AuthError
 from pyOutlook.tests.config import AUTH_TOKEN, EMAIL_ACCOUNT
 from pyOutlook.core.main import OutlookAccount
@@ -105,8 +106,19 @@ class Delete(unittest.TestCase):
         inbox = self.account.inbox()
         email = [email for email in inbox if email.subject == self.email_one_subject]
 
-        email = email[0]
-        email.delete_message()
+        email = email[0]  # type: Message
+        email.delete()
+
+    def test_delete_email_deprecation(self):
+        """
+        Test that an email can be deleted successfully, but that a DeprecationWarning is raised
+        """
+        inbox = self.account.inbox()
+        email = [email for email in inbox if email.subject == self.email_one_subject]
+
+        email = email[0]  # type: Message
+        with self.assertWarns(DeprecationWarning):
+            email.delete_message()
 
 
 class Write(unittest.TestCase):
