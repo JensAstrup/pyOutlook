@@ -1,9 +1,10 @@
 stages:
-  - test
+  - test3.5
+  - test3.6
 
 python3.5:
   type: test
-  stage: test
+  stage: test3.5
   image: python:3.5
   before_script:
     - pip install -r requirements.txt
@@ -12,7 +13,7 @@ python3.5:
 
 python3.6:
   type: test
-  stage: test
+  stage: test3.6
   image: python:3.6
   before_script:
     - pip install -r requirements.txt
