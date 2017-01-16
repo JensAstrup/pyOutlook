@@ -183,4 +183,3 @@ new_folder = folder.create_folder('My New Folder')
 new_folder.unread_count
 >>> 0
 ```
-
