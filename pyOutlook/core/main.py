@@ -1,7 +1,9 @@
 # Authorization and misc functions
+import warnings
+
+from pyOutlook.internal.retrieve import get_message, get_messages, get_inbox, get_messages_from_folder_name
 from pyOutlook.core.folders import get_folders, get_folder
-from pyOutlook.internal import retrieve
-from pyOutlook.internal.utils import Deprecated, set_global_token__
+from pyOutlook.internal.utils import set_global_token__
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
@@ -13,7 +15,7 @@ class OutlookAccount(object):
     Access token required for instantiation. Can be refreshed at a later time using .set_access_token().
 
     Warnings:
-        This module does not handle the OAuth process. You must retrieve and refresh tokens separately.
+        This module does not handle the OAuth process. You must and refresh tokens separately.
 
     Attributes:
         access_token: A string OAuth token from Outlook allowing access to a user's account
@@ -48,7 +50,7 @@ class OutlookAccount(object):
     def get_message(self, message_id) -> Message:
         """Gets message matching provided id.
 
-        Retrieves the Outlook email matching the provided message_id.
+         the Outlook email matching the provided message_id.
 
         Args:
             message_id: A string for the intended message, provided by Outlook
@@ -57,7 +59,7 @@ class OutlookAccount(object):
             Message
 
         """
-        return retrieve.get_message(self, message_id)
+        return get_message(self, message_id)
 
     def get_messages(self):
         """Get first 10 messages in account, across all folders.
@@ -66,10 +68,10 @@ class OutlookAccount(object):
             List[Message]
 
         """
-        return retrieve.get_messages(self, 0)
+        return get_messages(self, 0)
 
     def get_more_messages(self, page):
-        """Retrieves additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
+        """ additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
 
         Args:
             page (int): Integer representing the 'page' of results to fetch
@@ -80,11 +82,10 @@ class OutlookAccount(object):
         """
         if not isinstance(page, int):
             raise MiscError('page parameter must be of type integer')
-        return retrieve.get_messages(self, page)
+        return get_messages(self, page)
 
-    @Deprecated('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.')
     def get_inbox(self):
-        """Retrieves first ten messages in account's inbox.
+        """ first ten messages in account's inbox.
 
         Returns:
             List[Message]
@@ -93,16 +94,17 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.inbox` instead
 
         """
+        warnings.warn('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.', DeprecationWarning)
         return self.inbox()
 
     def inbox(self):
-        """Retrieves first ten messages in account's inbox.
+        """ first ten messages in account's inbox.
 
         Returns:
             List[Message]
 
         """
-        return retrieve.get_inbox(self)
+        return get_inbox(self)
 
     def new_email(self):
         """Creates a NewMessage object.
@@ -147,32 +149,30 @@ class OutlookAccount(object):
             email.attach(attachment['bytes'], attachment['name'], attachment['ext'])
         email.send()
 
-    @Deprecated('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.')
     def get_sent_messages(self):
-        """Retrieves last ten sent messages.
+        """ last ten sent messages.
 
         Returns:
             list[Message]
 
         Warnings:
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.sent_messages` instead
-
-
         """
+        warnings.warn('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.',
+                      DeprecationWarning)
         return self.sent_messages()
 
     def sent_messages(self):
-        """Retrieves last ten sent messages.
+        """ last ten sent messages.
 
         Returns:
             list[Message]
 
         """
-        return retrieve.get_messages_from_folder_name(self, 'SentItems')
+        return get_messages_from_folder_name(self, 'SentItems')
 
-    @Deprecated('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.')
     def get_deleted_messages(self):
-        """Retrieves last ten deleted messages.
+        """ last ten deleted messages.
 
         Returns:
             list[Message]
@@ -181,20 +181,21 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.deleted_messages` instead
 
         """
+        warnings.warn('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.',
+                      DeprecationWarning)
         return self.deleted_messages()
 
     def deleted_messages(self):
-        """Retrieves last ten deleted messages.
+        """ last ten deleted messages.
 
         Returns:
             list[Message]
 
         """
-        return retrieve.get_messages_from_folder_name(self, 'DeletedItems')
+        return get_messages_from_folder_name(self, 'DeletedItems')
 
-    @Deprecated('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.')
     def get_draft_messages(self):
-        """Retrieves last ten draft messages.
+        """ last ten draft messages.
 
         Returns:
             list[Message]
@@ -203,33 +204,35 @@ class OutlookAccount(object):
             This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.draft_messages` instead
 
         """
+        warnings.warn('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.',
+                      DeprecationWarning)
         return self.draft_messages()
 
     def draft_messages(self):
-        """Retrieves last ten draft messages.
+        """ last ten draft messages.
 
         Returns:
             list[Message]
 
         """
-        return retrieve.get_messages_from_folder_name(self, 'Drafts')
+        return get_messages_from_folder_name(self, 'Drafts')
 
     # TODO: keep as get_x or rename?
     def get_folder_messages(self, folder):
-        """Retrieve first ten messages from provided folder.
+        """first ten messages from provided folder.
 
         Args:
-            folder: String providing the folder ID, from Outlook, to retrieve messages from
+            folder: String providing the folder ID, from Outlook, to messages from
 
         Returns:
             list[Message]
 
         """
-        return retrieve.get_messages_from_folder_name(self, folder)
+        return get_messages_from_folder_name(self, folder)
 
     # TODO: keep as get_x or rename?
     def get_folders(self):
-        """Retrieves a list of folders in the account.
+        """ a list of folders in the account.
 
         Returns:
             list[Folder]
@@ -239,7 +242,7 @@ class OutlookAccount(object):
 
     # TODO: keep as get_x or rename?
     def get_folder(self, folder_id):
-        """Retrieve a Folder object matching the folder ID provided.
+        """a Folder object matching the folder ID provided.
 
         Args:
             folder_id: String identifying the Outlook folder to return
