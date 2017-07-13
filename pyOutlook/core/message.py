@@ -20,12 +20,11 @@ class Message(object):
             sender_email: The email of the person who sent this email
             sender_name: The name of the person who sent this email, as provided by Outlook
             to_recipients: A comma separated string of emails who were sent this email in the 'To' field
-            date: The date the email was recieved
 
         """
 
     def __init__(self, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
-                 to_recipients: list, date: str, **kwargs):
+                 to_recipients: list, **kwargs):
         self.message_id = message_id
         self.body = body
         self.subject = subject
@@ -33,7 +32,6 @@ class Message(object):
         self.sender_name = sender_name
         self.to_recipients = to_recipients
         self.read = kwargs['is_read']
-        self.date = date
 
     def __str__(self):
         return self.subject
@@ -256,12 +254,8 @@ def clean_return_multiple(api_json):
             except KeyError:
                 to_recipients = []
             is_read = key['IsRead']
-            try:
-                date = key['CreatedDateTime']
-            except KeyError:
-                date = []
 
-            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients, date, is_read=is_read))
+            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read))
     return return_list
 
 
@@ -288,10 +282,6 @@ def clean_return_single(api_json):
         to_recipients = api_json['ToRecipients']
     except KeyError:
         to_recipients = []
-    try:
-        date = api_json['CreatedDateTime']
-    except KeyError:
-        date = []
     is_read = api_json['IsRead']
-    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients, date, is_read=is_read)
+    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
     return return_message
