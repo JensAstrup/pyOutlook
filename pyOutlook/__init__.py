@@ -1,3 +1,5 @@
-from pyOutlook.core.main import OutlookAccount
+from .core import *
 
-__all__ = ['']
+__all__ = ['OutlookAccount']
+__version__ = '1.0.0'
+__release__ = '1.0.0'
