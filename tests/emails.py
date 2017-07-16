@@ -1,11 +1,11 @@
 import base64
-import unittest
 import time
+import unittest
 
-from pyOutlook.internal.errors import AuthError
-from pyOutlook.tests.config import AUTH_TOKEN, EMAIL_ACCOUNT
 from pyOutlook.core.main import OutlookAccount
 from pyOutlook.core.message import Message
+from pyOutlook.internal.errors import AuthError
+from tests.config import AUTH_TOKEN, EMAIL_ACCOUNT
 
 
 class Read(unittest.TestCase):
