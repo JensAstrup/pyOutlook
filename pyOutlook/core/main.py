@@ -1,14 +1,16 @@
 # Authorization and misc functions
 import warnings
+import logging
 
 import requests
 
-from pyOutlook.internal.retrieve import get_message, get_messages, get_inbox
+from pyOutlook.internal.retrieve import get_message
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
 from pyOutlook.core.folders import Folder
 
+log = logging.getLogger('pyOutlook')
 __all__ = ['OutlookAccount']
 
 
@@ -36,28 +38,33 @@ class OutlookAccount(object):
         """
         return get_message(self, message_id)
 
-    def get_messages(self):
+    def get_messages(self, page=0):
         """Get first 10 messages in account, across all folders.
 
-        Returns:
-            List[Message]
-
-        """
-        return get_messages(self, 0)
-
-    def get_more_messages(self, page):
-        """ additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
-
-        Args:
+        Keyword Args:
             page (int): Integer representing the 'page' of results to fetch
 
         Returns:
             List[Message]
 
         """
-        if not isinstance(page, int):
-            raise MiscError('page parameter must be of type integer')
-        return get_messages(self, page)
+        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
+        if page > 0:
+            endpoint = endpoint + '/?%24skip=' + str(page) + '0'
+
+        log.debug('Getting messages with Headers: {}'.format(headers))
+
+        r = requests.get(endpoint, headers=headers)
+
+        if r.status_code == 401:
+            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
+            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        elif r.status_code > 299:
+            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
+            raise MiscError('Unhandled error received from Outlook. Check logging output.')
+
+        return Message._json_to_messages(self, r.json())
 
     def inbox(self):
         """ first ten messages in account's inbox.
