@@ -23,6 +23,10 @@ class OutlookAccount(object):
     def __init__(self, access_token):
         self.access_token = access_token
 
+    @property
+    def headers(self):
+        return {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+
     def get_message(self, message_id) -> Message:
         """Gets message matching provided id.
 
@@ -35,8 +39,7 @@ class OutlookAccount(object):
             Message
 
         """
-        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
-        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=headers)
+        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self.headers)
         if r.status_code == 401:
             raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
         return Message._json_to_message(self, r.json())
@@ -51,14 +54,13 @@ class OutlookAccount(object):
             List[Message]
 
         """
-        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
         if page > 0:
             endpoint = endpoint + '/?%24skip=' + str(page) + '0'
 
-        log.debug('Getting messages with Headers: {}'.format(headers))
+        log.debug('Getting messages from endpoint: {} with Headers: {}'.format(endpoint, self.headers))
 
-        r = requests.get(endpoint, headers=headers)
+        r = requests.get(endpoint, headers=self.headers)
 
         if r.status_code == 401:
             log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
