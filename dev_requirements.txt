@@ -2,3 +2,4 @@
 
 requests_mock
 nose
+coverage
