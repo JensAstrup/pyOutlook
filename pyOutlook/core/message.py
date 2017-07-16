@@ -5,7 +5,7 @@ import warnings
 import requests
 
 from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.utils import jsonify_recipients, get_global_token
+from pyOutlook.internal.utils import jsonify_recipients
 
 log = logging.getLogger('pyOutlook')
 
@@ -23,18 +23,43 @@ class Message(object):
 
         """
 
-    def __init__(self, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
+    def __init__(self, account, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
                  to_recipients: list, **kwargs):
+        self.account = account
         self.message_id = message_id
         self.body = body
         self.subject = subject
         self.sender_email = sender_email
         self.sender_name = sender_name
         self.to_recipients = to_recipients
-        self.read = kwargs['is_read']
+        self.__is_read = kwargs['is_read']
 
     def __str__(self):
         return self.subject
+
+    def __repr__(self):
+        return str(self)
+
+    @classmethod
+    def _json_to_messages(cls, account, json_value):
+        return [cls._json_to_message(account, message) for message in json_value['value']]
+
+    @classmethod
+    def _json_to_message(cls, account, api_json: dict):
+        uid = api_json['Id']
+        subject = api_json.get('Subject', '')
+
+        sender = api_json.get('Sender', {}).get('EmailAddress', {})
+        sender_email = sender.get('Address', '')
+        sender_name = sender.get('Name', '')
+
+        body = api_json.get('Body', {}).get('Content', '')
+
+        to_recipients = api_json.get('ToRecipients', [])
+        is_read = api_json['IsRead']
+
+        return_message = Message(account, uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
+        return return_message
 
     def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict=None, data=None):
         """
@@ -51,7 +76,7 @@ class Message(object):
 
         """
 
-        headers = {"Authorization": "Bearer " + get_global_token(), "Content-Type": "application/json"}
+        headers = {"Authorization": "Bearer " + self.account.access_token, "Content-Type": "application/json"}
 
         if extra_headers is not None:
             headers.update(extra_headers)
@@ -147,22 +172,22 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
         self._make_api_call('delete', endpoint)
 
-    def __move_to(self, destination):
+    def _move_to(self, destination):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
         self._make_api_call('post', endpoint, data=payload)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
-        self.__move_to('Inbox')
+        self._move_to('Inbox')
 
     def move_to_deleted(self):
         """Moves the email to the account's Deleted Items folder"""
-        self.__move_to('DeletedItems')
+        self._move_to('DeletedItems')
 
     def move_to_drafts(self):
         """Moves the email to the account's Drafts folder"""
-        self.__move_to('Drafts')
+        self._move_to('Drafts')
 
     def move_to(self, folder_id):
         """Moves the email to the folder specified by the folder_id.
@@ -173,27 +198,27 @@ class Message(object):
             folder_id: A string containing the folder ID the message should be moved to
 
         """
-        self.__move_to(folder_id)
+        self._move_to(folder_id)
 
-    def __copy_to(self, destination):
-        access_token = get_global_token()
+    def _copy_to(self, destination):
+        access_token = self.account.access_token
         headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
-        payload = '{ "DestinationId": "' + destination + '"}'
+        payload = '{ "DestinationId": "{}"}'.format(destination)
 
-        self._make_api_call('post', endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint, extra_headers=headers, data=payload)
 
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
-        self.__copy_to('Inbox')
+        self._copy_to('Inbox')
 
     def copy_to_deleted(self):
         """Copies Message to account's Deleted Items folder"""
-        self.__copy_to('DeletedItems')
+        self._copy_to('DeletedItems')
 
     def copy_to_drafts(self):
         """Copies Message to account's Drafts folder"""
-        self.__copy_to('Drafts')
+        self._copy_to('Drafts')
 
     def copy_to(self, folder_id):
         """Copies the email to the folder specified by the folder_id.
@@ -204,84 +229,18 @@ class Message(object):
             folder_id: A string containing the folder ID the message should be copied to
 
         """
-        self.__copy_to(folder_id)
+        self._copy_to(folder_id)
 
-    def is_read(self, boolean=None):
-        """
-        Set the 'Read' status of an email
-        Args:
-            boolean: True if the email has been read, False otherwise
-        """
-        if boolean is None:
-            return self.read
-        else:
-            endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
-            payload = dict(IsRead=boolean)
+    @property
+    def is_read(self):
+        """ Set the 'Read' status of an email """
+        return self.__is_read
 
-            self._make_api_call('patch', endpoint, data=json.dumps(payload))
-            self.read = boolean
+    @is_read.setter
+    def is_read(self, boolean):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
+        payload = dict(IsRead=boolean)
 
+        self._make_api_call('patch', endpoint, data=json.dumps(payload))
+        self.__is_read = boolean
 
-# TODO: this can be reduced to one function
-def clean_return_multiple(api_json):
-    """
-    :param api_json:
-    :return: List of messages
-    :rtype: list of Message
-    """
-    return_list = []
-    for key in api_json['value']:
-        if 'Sender' in key:
-            uid = key['Id']
-            try:
-                subject = key['Subject']
-            except KeyError:
-                subject = 'N/A'
-            try:
-                sender_email = key['Sender']['EmailAddress']['Address']
-            except KeyError:
-                sender_email = 'N/A'
-            try:
-                sender_name = key['Sender']['EmailAddress']['Name']
-            except KeyError:
-                sender_name = 'N/A'
-            try:
-                body = key['Body']['Content']
-            except KeyError:
-                body = ''
-            try:
-                to_recipients = key['ToRecipients']
-            except KeyError:
-                to_recipients = []
-            is_read = key['IsRead']
-
-            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read))
-    return return_list
-
-
-# TODO: this can be reduced to one function
-def clean_return_single(api_json):
-    uid = api_json['Id']
-    try:
-        subject = api_json['Subject']
-    except KeyError:
-        subject = ''
-    try:
-        sender_email = api_json['Sender']['EmailAddress']['Address']
-    except KeyError:
-        sender_email = 'N/A'
-    try:
-        sender_name = api_json['Sender']['EmailAddress']['Name']
-    except KeyError:
-        sender_name = 'N/A'
-    try:
-        body = api_json['Body']['Content']
-    except KeyError:
-        body = ''
-    try:
-        to_recipients = api_json['ToRecipients']
-    except KeyError:
-        to_recipients = []
-    is_read = api_json['IsRead']
-    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
-    return return_message
