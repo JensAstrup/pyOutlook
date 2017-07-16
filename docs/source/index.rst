@@ -33,6 +33,10 @@ pyOutlook does not handle OAuth for the access tokens provided by Outlook. These
 class as a string. There are various OAuth packages out there: (pip install) oauth2, python-oauth2, requests_oauthlib, etc
 that can facilitate the process.
 
+Notes:
+------
+All protected & private methods and anything under pyOutlook.internal is subject to change without deprecation warnings
+
 Contents:
 ---------
 .. toctree::

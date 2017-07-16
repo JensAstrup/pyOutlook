@@ -15,13 +15,7 @@ Message
     :members:
     :undoc-members:
 
-.. _NewMessageAnchor:
-
-NewMessage
-----------
-
-.. autoclass:: pyOutlook.internal.createMessage.NewMessage
-    :members:
+.. _FolderAnchor:
 
 
 Folder
@@ -29,4 +23,11 @@ Folder
 
 .. autoclass:: pyOutlook.core.folders.Folder
     :members:
+
+Contact
+-------
+
+.. autoclass:: pyOutlook.core.contact.Contact
+    :members:
+    :undoc-members:
 
