@@ -1,10 +1,4 @@
-import functools
-import inspect
-import warnings
-
 from .errors import MiscError
-
-token = 0
 
 
 def jsonify_recipients(recipient_input, recipient_type, silent):
@@ -36,12 +30,3 @@ def jsonify_recipients(recipient_input, recipient_type, silent):
             json_return += '{ "EmailAddress": { "Address": "' + insert + '" } },'
 
     return json_return
-
-
-def set_global_token__(access_token):
-    global token
-    token = access_token
-
-
-def get_global_token():
-    return token
