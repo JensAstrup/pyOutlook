@@ -1,11 +1,14 @@
+import base64
 import logging
 import json
 import warnings
+from typing import List
 
 import requests
 
+from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.utils import jsonify_recipients
+from pyOutlook.internal.utils import get_valid_filename
 
 log = logging.getLogger('pyOutlook')
 
@@ -23,16 +26,17 @@ class Message(object):
 
         """
 
-    def __init__(self, account, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
-                 to_recipients: list, **kwargs):
+    def __init__(self, account, body: str, subject: str, to_recipients: List[Contact],
+                 sender: Contact = None, message_id: str = None, **kwargs):
         self.account = account
         self.message_id = message_id
         self.body = body
         self.subject = subject
-        self.sender_email = sender_email
-        self.sender_name = sender_name
+        self.sender = sender
         self.to_recipients = to_recipients
-        self.__is_read = kwargs['is_read']
+        self.__is_read = kwargs.get('is_read', False)
+
+        self._attachments = []
 
     def __str__(self):
         return self.subject
@@ -49,19 +53,32 @@ class Message(object):
         uid = api_json['Id']
         subject = api_json.get('Subject', '')
 
-        sender = api_json.get('Sender', {}).get('EmailAddress', {})
-        sender_email = sender.get('Address', '')
-        sender_name = sender.get('Name', '')
+        sender = api_json.get('Sender', {})
+        sender = Contact._json_to_contact(sender)
 
         body = api_json.get('Body', {}).get('Content', '')
 
         to_recipients = api_json.get('ToRecipients', [])
+        to_recipients = Contact._json_to_contacts(to_recipients)
         is_read = api_json['IsRead']
 
-        return_message = Message(account, uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
+        return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read)
         return return_message
 
-    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict=None, data=None):
+    @property
+    def is_read(self):
+        """ Set the 'Read' status of an email """
+        return self.__is_read
+
+    @is_read.setter
+    def is_read(self, boolean):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
+        payload = dict(IsRead=boolean)
+
+        self._make_api_call('patch', endpoint, data=json.dumps(payload))
+        self.__is_read = boolean
+
+    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict = None, data=None):
         """
         Internal method to handle making calls to the Outlook API and logging both the request and response
         Args:
@@ -100,37 +117,56 @@ class Message(object):
             log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
             raise MiscError('Unhandled error received from Outlook. Check logging output.')
         else:
-            # If we try  to log r.json() when there is nothing our tests will fail (even though it's successful...)
             log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.content))
 
-    def forward_message(self, to_recipients, forward_comment=None):
+    def send(self, content_type='HTML'):
+        """ Takes the recipients, body, and attachments of the Message and sends.
+
+        Args:
+            content_type: Can either be 'HTML' or 'Text', defaults to HTML.
+
+        """
+        payload = dict()
+
+        payload.update(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
+
+        recipients = [contact._api_representation() for contact in self.to_recipients]
+
+        payload.update(ToRecipients=recipients)
+
+        if self._attachments:
+            payload.update(Attachments=self._attachments)
+
+        payload = dict(Message=payload)
+
+        endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
+        self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
+
+    def forward(self, to_recipients, forward_comment=None):
         """Forward Message to recipients with an optional comment.
 
         Args:
-            to_recipients: Comma separated string or list of recipients to send email to.
+            to_recipients: A list of recipients to send the email to.
             forward_comment: String comment to append to forwarded email.
 
         Examples:
             >>> email = Message()
-            >>> email.forward_message('john.doe@domain.com, betsy.donalds@domain.com')
-            >>> email.forward_message('john.doe@domain.com', 'Hey Joe')
-
-        Raises:
-            MiscError: A comma separated string of emails, or one string email, must be provided
-            AuthError: Raised if Outlook returns a 401, generally caused by an invalid or expired access token.
-
+            >>> email.forward(['john.doe@domain.com', 'betsy.donalds@domain.com'])
+            >>> email.forward('john.doe@domain.com', 'Hey Joe')
         """
-        payload = '{'
-        if forward_comment is not None:
-            payload += '"Comment" : "' + str(forward_comment) + '",'
-        if to_recipients is None:
-            raise MiscError('To Recipients is not defined. Can not forward message.')
+        payload = dict()
 
-        payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'
+        if forward_comment is not None:
+            payload.update(Comment=forward_comment)
+
+        # Contact() will handle turning itself into the proper JSON format for the API
+        to_recipients = [Contact(email)._api_representation() for email in to_recipients]
+
+        payload.update(ToRecipients=to_recipients)
 
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/forward'.format(self.message_id)
 
-        self._make_api_call('post', endpoint=endpoint, data=payload)
+        self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -231,16 +267,26 @@ class Message(object):
         """
         self._copy_to(folder_id)
 
-    @property
-    def is_read(self):
-        """ Set the 'Read' status of an email """
-        return self.__is_read
+    def attach(self, file_bytes, file_name):
+        """Adds an attachment to the email. The filename is passed through Django's get_valid_filename which removes
+        invalid characters. From the documentation for that function:
 
-    @is_read.setter
-    def is_read(self, boolean):
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
-        payload = dict(IsRead=boolean)
+        >>> get_valid_filename("john's portrait in 2004.jpg")
+        'johns_portrait_in_2004.jpg'
 
-        self._make_api_call('patch', endpoint, data=json.dumps(payload))
-        self.__is_read = boolean
+        Args:
+            file_bytes: The bytes of the file to send
+            file_name: The name of the file, as a string and leaving out the extension, that should be sent
 
+        Returns:
+            NewMessage
+
+        """
+
+        file_bytes = base64.b64encode(file_bytes)
+        self._attachments.append({
+            '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
+            'Name': get_valid_filename(file_name),
+            'ContentBytes': file_bytes
+        })
+        return self
