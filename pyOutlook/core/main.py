@@ -4,7 +4,6 @@ import logging
 
 import requests
 
-from pyOutlook.internal.retrieve import get_message
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
@@ -36,7 +35,11 @@ class OutlookAccount(object):
             Message
 
         """
-        return get_message(self, message_id)
+        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=headers)
+        if r.status_code == 401:
+            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        return Message._json_to_message(self, r.json())
 
     def get_messages(self, page=0):
         """Get first 10 messages in account, across all folders.
