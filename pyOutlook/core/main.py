@@ -1,11 +1,12 @@
 # Authorization and misc functions
 import warnings
 import logging
+from typing import List
 
 import requests
 
+from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import MiscError, AuthError
-from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
 from pyOutlook.core.folders import Folder
 
@@ -20,6 +21,7 @@ class OutlookAccount(object):
         access_token: A string OAuth token from Outlook allowing access to a user's account
 
     """
+
     def __init__(self, access_token):
         self.access_token = access_token
 
@@ -80,17 +82,17 @@ class OutlookAccount(object):
         """
         return self._get_messages_from_folder_name('Inbox')
 
-    def new_email(self):
+    def new_email(self, body='', subject='', to: List[Contact] = list):
         """Creates a NewMessage object.
 
         Returns:
-            NewMessage
+            Message
 
         """
-        return NewMessage(self.access_token)
+        return Message(self.access_token, body, subject, to)
 
-    def send_email(self, body=None, subject=None, to=None, cc=None, bcc=None,
-                   send_as=None, attachment=None):
+    def send_email(self, body=None, subject=None, to: List[Contact] = list, cc=None, bcc=None,
+                   send_as=None, attachments=list):
         """Sends an email in one method using variables to set the various pieces of the email.
 
         Args:
@@ -100,27 +102,16 @@ class OutlookAccount(object):
             cc (list): A list of email addresses which will be added to the 'Carbon Copy' line
             bcc (list): A list of email addresses while be blindly added to the email
             send_as (str): A string email address which the OutlookAccount has access to
-            attachment (dict): A dictionary with three parts [1] 'name' - a string which will become the file's name \
-            [2] 'ext' - a string which will become the file extension [3] 'bytes' - the bytes of the file.
+            attachments (list): A list of dictionaries with two parts
+                [1] 'name' - a string which will become the file's name
+                [2] 'bytes' - the bytes of the file.
 
         """
-        email = NewMessage(self.access_token)
-        if body is not None:
-            email.set_body(body)
-        if subject is not None:
-            email.set_subject(subject)
-        if to is not None:
-            email.to(to)
-        if cc is not None:
-            email.cc(cc)
-        if bcc is not None:
-            email.bcc(bcc)
-        if send_as is not None:
-            email.send_as(send_as)
-        if attachment is not None:
-            if 'bytes' not in attachment or 'name' not in attachment or 'ext' not in attachment:
-                raise TypeError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
-            email.attach(attachment['bytes'], attachment['name'], attachment['ext'])
+        email = Message(self.access_token, body, subject, to)
+
+        for attachment in attachments:
+            email.attach(attachment.get('bytes'), attachment.get('name'))
+
         email.send()
 
     def sent_messages(self):
