@@ -24,7 +24,7 @@ class Contact(object):
     @classmethod
     def _json_to_contact(cls, json_value):
         contact = json_value.get('EmailAddress')
-        email = contact.get('EmailAddress')
+        email = contact.get('Address')
         name = contact.get('Name', None)
         return Contact(email, name)
 
