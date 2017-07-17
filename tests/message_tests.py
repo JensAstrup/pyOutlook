@@ -13,6 +13,9 @@ class TestMessage(TestCase):
         cls.mock_get_patcher = patch('pyOutlook.core.message.requests.get')
         cls.mock_get = cls.mock_get_patcher.start()
 
+        cls.mock_patch_patcher = patch('pyOutlook.core.message.requests.patch')
+        cls.mock_patch = cls.mock_patch_patcher.start()
+
         cls.account = OutlookAccount('token')
 
     def test_json_to_message_format(self):
@@ -70,3 +73,15 @@ class TestMessage(TestCase):
             "IsRead": False,
         }
         Message._json_to_message(self.account, json_message)
+
+    def test_is_read_status(self):
+        """ Test that the correct value is returned after changing the is_read status """
+        mock_patch = Mock()
+        mock_patch.status_code = 200
+
+        self.mock_patch.return_value = mock_patch
+
+        message = Message(self.account, 'test body', 'test subject', [], is_read=False)
+        message.is_read = True
+
+        self.assertTrue(message.is_read)
