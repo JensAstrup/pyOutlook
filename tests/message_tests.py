@@ -1,3 +1,4 @@
+import base64
 from unittest import TestCase
 from unittest.mock import patch, Mock
 
@@ -85,3 +86,20 @@ class TestMessage(TestCase):
         message.is_read = True
 
         self.assertTrue(message.is_read)
+
+    def test_attachments_added(self):
+        """ Test that attachments are added to Message in the correct format """
+        message = Message(self.account, '', '', [])
+
+        message.attach(bytes('abc', 'UTF-8'), 'Test/Attachment.csv')
+        message.attach(bytes('some bytes', 'UTF-8'), 'attached.pdf')
+
+        self.assertEqual(len(message._attachments), 2)
+        file_bytes = [attachment['ContentBytes'] for attachment in message._attachments]
+        file_names = [attachment['Name'] for attachment in message._attachments]
+
+        # The files are base64'd for the API
+        abc = base64.b64encode(bytes('abc', 'UTF-8'))
+
+        self.assertIn(abc, file_bytes)
+        self.assertIn('TestAttachment.csv', file_names)
