@@ -1,9 +1,9 @@
 import base64
 import logging
 import json
-import warnings
 from typing import List
 
+import dateutil.parser
 import requests
 
 from pyOutlook.core.contact import Contact
@@ -22,19 +22,26 @@ class Message(object):
             subject: The subject of the email
             sender_email: The email of the person who sent this email
             sender_name: The name of the person who sent this email, as provided by Outlook
-            to_recipients: A comma separated string of emails who were sent this email in the 'To' field
+            to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`
 
         """
 
     def __init__(self, account, body: str, subject: str, to_recipients: List[Contact],
-                 sender: Contact = None, message_id: str = None, **kwargs):
+                 sender: Contact = None, cc: List[Contact] = list, bcc: List[Contact]=list,
+                 message_id: str = None, **kwargs):
         self.account = account
         self.message_id = message_id
+
         self.body = body
         self.subject = subject
+
         self.sender = sender
-        self.to_recipients = to_recipients
+        self.to = to_recipients
+        self.cc = cc
+        self.bcc = bcc
+
         self.__is_read = kwargs.get('is_read', False)
+        self.time_created = kwargs.get('time_created', None)
 
         self._attachments = []
 
@@ -60,9 +67,16 @@ class Message(object):
 
         to_recipients = api_json.get('ToRecipients', [])
         to_recipients = Contact._json_to_contacts(to_recipients)
+
         is_read = api_json['IsRead']
 
-        return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read)
+        time_created = api_json.get('CreatedDateTime', None)
+
+        if time_created is not None:
+            time_created = dateutil.parser.parse(time_created, ignoretz=True)
+
+        return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
+                                 time_created=time_created)
         return return_message
 
     @property
@@ -130,7 +144,7 @@ class Message(object):
 
         payload.update(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
 
-        recipients = [contact._api_representation() for contact in self.to_recipients]
+        recipients = [contact._api_representation() for contact in self.to]
 
         payload.update(ToRecipients=recipients)
 
@@ -196,12 +210,6 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/replyall'.format(self.message_id)
 
         self._make_api_call('post', endpoint, data=payload)
-
-    def delete_message(self):
-        """Deletes the email"""
-        warnings.warn('delete_message() is deprecated and will be removed in v1.0. Use delete() instead.',
-                      DeprecationWarning)
-        self.delete()
 
     def delete(self):
         """Deletes the email"""
