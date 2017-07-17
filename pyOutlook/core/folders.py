@@ -4,6 +4,8 @@ from pyOutlook.core.message import Message
 from pyOutlook.internal import utils
 from pyOutlook.internal.errors import AuthError
 
+__all__ = ['Folder']
+
 
 class Folder(object):
     """An object representing a Folder in the OutlookAccount provided.

@@ -1,3 +1,4 @@
+__all__ = ['Contact']
 
 
 class Contact(object):

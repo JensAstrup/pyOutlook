@@ -12,6 +12,8 @@ from pyOutlook.internal.utils import get_valid_filename
 
 log = logging.getLogger('pyOutlook')
 
+__all__ = ['Message']
+
 
 class Message(object):
     """An object representing an email inside of the OutlookAccount.
@@ -245,12 +247,10 @@ class Message(object):
         self._move_to(folder_id)
 
     def _copy_to(self, destination):
-        access_token = self.account.access_token
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
         payload = '{ "DestinationId": "{}"}'.format(destination)
 
-        self._make_api_call('post', endpoint, extra_headers=headers, data=payload)
+        self._make_api_call('post', endpoint, data=payload)
 
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
@@ -287,7 +287,7 @@ class Message(object):
             file_name: The name of the file, as a string and leaving out the extension, that should be sent
 
         Returns:
-            NewMessage
+            Message
 
         """
 
