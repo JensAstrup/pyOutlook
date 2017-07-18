@@ -21,7 +21,7 @@ Message
 Folder
 ------
 
-.. autoclass:: pyOutlook.core.folders.Folder
+.. autoclass:: pyOutlook.core.folder.Folder
     :members:
 
 Contact
