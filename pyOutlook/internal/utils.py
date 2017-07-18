@@ -1,47 +1,17 @@
-import functools
-import inspect
-import warnings
-
-from .errors import MiscError
-
-token = 0
+import re
 
 
-def jsonify_recipients(recipient_input, recipient_type, silent):
+def get_valid_filename(s):
+    """
+    Shamelessly taken from Django.
+    https://github.com/django/django/blob/master/django/utils/text.py
 
-    json_return = ''
-    if not silent:
-        if recipient_type == "cc":
-            json_return = '"CcRecipients":['
-        elif recipient_type == "to":
-            json_return = '"ToRecipients":['
-        elif recipient_type == "bcc":
-            json_return = '"BccRecipients":['
-        else:
-            raise MiscError('To or CC recipients not provided')
-
-    if isinstance(recipient_input, list):
-        recipient_input = ', '.join(recipient_input)
-
-    recipients = recipient_input.split(',')
-    for num in range(len(recipients)):
-        recipients[num] = recipients[num].strip()
-
-    for m in range(0, len(recipients)):
-        if len(recipients) - m == 1:
-            insert = recipients[m].replace('"', "'")
-            json_return += '{ "EmailAddress": { "Address": "' + insert + '" } }'
-        else:
-            insert = recipients[m].replace('"', "'")
-            json_return += '{ "EmailAddress": { "Address": "' + insert + '" } },'
-
-    return json_return
-
-
-def set_global_token__(access_token):
-    global token
-    token = access_token
-
-
-def get_global_token():
-    return token
+    Return the given string converted to a string that can be used for a clean
+    filename. Remove leading and trailing spaces; convert other spaces to
+    underscores; and remove anything that is not an alphanumeric, dash,
+    underscore, or dot.
+    >>> get_valid_filename("john's portrait in 2004.jpg")
+    'johns_portrait_in_2004.jpg'
+    """
+    s = str(s).strip().replace(' ', '_')
+    return re.sub(r'(?u)[^-\w.]', '', s)

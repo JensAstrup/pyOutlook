@@ -1,21 +1,20 @@
 stages:
-  - test3.5
-  - test3.6
+  - tests
 
 python3.5:
   type: test
-  stage: test3.5
+  stage: tests
   image: python:3.5
   before_script:
-    - pip install -r requirements.txt
+    - pip install -r dev_requirements.txt
   script:
    - nosetests --with-coverage --cover-package=pyOutlook
 
 python3.6:
   type: test
-  stage: test3.6
+  stage: tests
   image: python:3.6
   before_script:
-    - pip install -r requirements.txt
+    - pip install -r dev_requirements.txt
   script:
    - nosetests --with-coverage --cover-package=pyOutlook

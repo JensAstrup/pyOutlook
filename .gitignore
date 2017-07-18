@@ -4,4 +4,4 @@
 .coverage
 build/*
 dist/*
-docs/*
+docs/build/*
