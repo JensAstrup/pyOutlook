@@ -3,3 +3,6 @@
 requests_mock
 nose
 coverage
+Sphinx
+sphinx_rtd_theme
+recommonmark
