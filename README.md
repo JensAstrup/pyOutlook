@@ -139,11 +139,11 @@ folder.name
 
 ## The Folder Object
 
-### rename_folder(new_folder_name)
+### rename(new_folder_name)
 This method renames the folder object in Outlook, and returns a new Folder object representing that folder.
 ```python 
 folder = my_account.get_folder('My Folder')
-folder = folder.rename_folder('My New Folder v2')
+folder = folder.rename('My New Folder v2')
 folder.name
 >>> 'My New Folder v2'
 ```
@@ -158,21 +158,21 @@ for subfolder in folder.get_subfolders():
 >>> 'Some Other Folder'
 ```
 
-### delete_folder()
+### delete()
 Self-explanatory, deletes the provided folder in Outlook
 ```python
-folder.delete_folder()
+folder.delete()
 # and now it doesn't exist
 ```
 
-### move_folder(destination_folder)
+### move_into(destination_folder)
 Move the Folder provided into a new folder. The new folder parameter can either be a folder id, or a 'well known' folder name. 
 ```python
-folder.move_folder('Drafts')
-folder1.move_folder(folder_id)
+folder.move_into('Drafts')
+folder1.move_into(folder_id)
 ```
 
-### copy_folder(destination_folder)
+### copy(destination_folder)
 Copies the folder and its contents to the designated folder which can be either a folder ID or well known folder name.
 
 ### create_child_folder(new_folder_name)
