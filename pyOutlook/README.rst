@@ -237,7 +237,7 @@ Folder object representing that folder.
 
 .. code:: python
 
-    folder.rename_folder('My New Folder v2')
+    folder.rename('My New Folder v2')
 
 get\_subfolders()
 ^^^^^^^^^^^^^^^^^
@@ -260,7 +260,7 @@ Self-explanatory, deletes the provided folder in Outlook
 
 .. code:: python
 
-    folder.delete_folder()
+    folder.delete()
     # and now it doesn't exist
 
 move\_folder(destination\_folder)
@@ -271,8 +271,8 @@ either be a folder id, or a 'well known' folder name.
 
 .. code:: python
 
-    folder.move_folder('Drafts')
-    folder1.move_folder(folder_id)
+    folder.move_into('Drafts')
+    folder1.move_into(folder_id)
 
 copy\_folder(destination\_folder)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
