@@ -1,5 +1,4 @@
 # Authorization and misc functions
-import warnings
 import logging
 from typing import List
 
@@ -8,7 +7,7 @@ import requests
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.core.message import Message
-from pyOutlook.core.folders import Folder
+from pyOutlook.core.folder import Folder
 
 log = logging.getLogger('pyOutlook')
 __all__ = ['OutlookAccount']

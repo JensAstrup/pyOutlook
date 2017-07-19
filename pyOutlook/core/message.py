@@ -1,14 +1,17 @@
 import base64
 import logging
 import json
-from typing import List
+from typing import List, TYPE_CHECKING
 
-import dateutil.parser
+from dateutil import parser
 import requests
 
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import AuthError, MiscError
 from pyOutlook.internal.utils import get_valid_filename
+
+if TYPE_CHECKING:
+    from pyOutlook import OutlookAccount, Folder
 
 log = logging.getLogger('pyOutlook')
 
@@ -25,8 +28,18 @@ class Message(object):
             sender_email: The email of the person who sent this email
             sender_name: The name of the person who sent this email, as provided by Outlook
             to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`
+            is_draft: Whether or not the email is a draft.
+            importance: The importance level of the email; with 0 indicating low, 1 indicating normal, and 2 indicating
+                high. ``Message.IMPORTANCE_LOW``, ``Message.IMPORTANCE_NORMAL``, & ``Message.IMPORTANCE_HIGH`` can be
+                used to reference the levels.
+            time_created: A datetime representing the time the email was created
+            time_sent: A datetime representing the time the email was sent
 
         """
+
+    IMPORTANCE_LOW = 0
+    IMPORTANCE_NORMAL = 1
+    IMPORTANCE_HIGH = 2
 
     def __init__(self, account, body: str, subject: str, to_recipients: List[Contact],
                  sender: Contact = None, cc: List[Contact] = list, bcc: List[Contact]=list,
@@ -36,16 +49,21 @@ class Message(object):
 
         self.body = body
         self.subject = subject
+        self.is_draft = kwargs.get('is_draft', None)
+        self.importance = kwargs.get('Importance', self.IMPORTANCE_NORMAL)
 
         self.sender = sender
         self.to = to_recipients
         self.cc = cc
         self.bcc = bcc
 
-        self.__is_read = kwargs.get('is_read', False)
         self.time_created = kwargs.get('time_created', None)
+        self.time_sent = kwargs.get('time_sent', None)
 
         self._attachments = []
+
+        self.__is_read = kwargs.get('is_read', False)
+        self.__parent_folder_id = kwargs.get('parent_folder_id', None)
 
     def __str__(self):
         return self.subject
@@ -73,12 +91,20 @@ class Message(object):
         is_read = api_json['IsRead']
 
         time_created = api_json.get('CreatedDateTime', None)
-
         if time_created is not None:
-            time_created = dateutil.parser.parse(time_created, ignoretz=True)
+            time_created = parser.parse(time_created, ignoretz=True)
+
+        time_sent = api_json.get('SentDateTime', None)
+        if time_sent is not None:
+            time_sent = parser.parse(time_sent, ignoretz=True)
+
+        parent_folder_id = api_json.get('ParentFolderId', None)
+        is_draft = api_json.get('IsDraft', None)
+        importance = api_json.get('Importance', cls.IMPORTANCE_NORMAL)
 
         return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
-                                 time_created=time_created)
+                                 time_created=time_created, time_sent=time_sent, parent_folder_id=parent_folder_id,
+                                 is_draft=is_draft, importance=importance)
         return return_message
 
     @property
@@ -93,6 +119,22 @@ class Message(object):
 
         self._make_api_call('patch', endpoint, data=json.dumps(payload))
         self.__is_read = boolean
+
+    @property
+    def parent_folder(self) -> 'Folder':
+        """ Returns the :class:`Folder <pyOutlook.core.folder.Folder>` this message is in
+
+            >>> account = OutlookAccount('')
+            >>> message = account.get_messages()[0]
+            >>> message.parent_folder
+            Inbox
+            >>> message.parent_folder.unread_count
+            19
+
+        Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
+
+        """
+        return self.account.get_folder_by_id(self.__parent_folder_id)
 
     def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict = None, data=None):
         """

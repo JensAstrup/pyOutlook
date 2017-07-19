@@ -24,10 +24,13 @@ class Contact(object):
 
     @classmethod
     def _json_to_contact(cls, json_value):
-        contact = json_value.get('EmailAddress')
-        email = contact.get('Address')
-        name = contact.get('Name', None)
-        return Contact(email, name)
+        contact = json_value.get('EmailAddress', None)
+        if contact is not None:
+            email = contact.get('Address', None)
+            name = contact.get('Name', None)
+            return Contact(email, name)
+        else:
+            return None
 
     @classmethod
     def _json_to_contacts(cls, json_value):
