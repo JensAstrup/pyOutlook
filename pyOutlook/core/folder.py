@@ -1,7 +1,7 @@
 import requests
 
 from pyOutlook.core.message import Message
-from pyOutlook.internal.errors import AuthError
+from pyOutlook.internal.utils import check_response
 
 __all__ = ['Folder']
 
@@ -66,10 +66,7 @@ class Folder(object):
 
         r = requests.patch(endpoint, headers=headers, data=payload)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return_folder = r.json()
             return self._json_to_folder(self.account, return_folder)
 
@@ -87,10 +84,7 @@ class Folder(object):
 
         r = requests.get(endpoint, headers=headers)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return self._json_to_folders(self.account, r.json())
 
     def delete(self):
@@ -105,8 +99,7 @@ class Folder(object):
 
         r = requests.delete(endpoint, headers=headers)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
+        check_response(r)
 
     def move_into(self, destination_folder: 'Folder'):
         """Move the Folder into a different folder.
@@ -130,14 +123,11 @@ class Folder(object):
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return_folder = r.json()
             return self._json_to_folder(self.account, return_folder)
 
-    def copy(self, destination_folder: 'Folder'):
+    def copy_into(self, destination_folder: 'Folder'):
         """Copies the Folder into the provided destination folder.
 
         Raises:
@@ -156,10 +146,7 @@ class Folder(object):
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return_folder = r.json()
             return self._json_to_folder(self.account, return_folder)
 
@@ -177,10 +164,7 @@ class Folder(object):
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return_folder = r.json()
             return self._json_to_folder(self.account, return_folder)
         
@@ -189,8 +173,7 @@ class Folder(object):
         returning a list of :class:`Messages <pyOutlook.core.message.Message>`."""
         headers = self.headers
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        check_response(r)
         return Message._json_to_messages(self.account, r.json())
 
 
