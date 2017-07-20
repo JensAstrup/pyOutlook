@@ -100,13 +100,13 @@ class OutlookAccount(object):
             to (list): A list of email addresses
             cc (list): A list of email addresses which will be added to the 'Carbon Copy' line
             bcc (list): A list of email addresses while be blindly added to the email
-            send_as (str): A string email address which the OutlookAccount has access to
+            send_as Contact: A string email address which the OutlookAccount has access to
             attachments (list): A list of dictionaries with two parts
                 [1] 'name' - a string which will become the file's name
                 [2] 'bytes' - the bytes of the file.
 
         """
-        email = Message(self.access_token, body, subject, to)
+        email = Message(self.access_token, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
 
         for attachment in attachments:
             email.attach(attachment.get('bytes'), attachment.get('name'))
@@ -141,6 +141,7 @@ class OutlookAccount(object):
         return self._get_messages_from_folder_name('Drafts')
 
     def get_folders(self):
+        """ Returns a list of all folders for this account """
         headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
 
@@ -152,7 +153,7 @@ class OutlookAccount(object):
         else:
             return Folder._json_to_folders(self, r.json())
 
-    def get_folder_by_id(self, folder_id):
+    def get_folder_by_id(self, folder_id: str):
         headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
 
@@ -165,14 +166,14 @@ class OutlookAccount(object):
             return_folder = r.json()
             return Folder._json_to_folder(self, return_folder)
 
-    def _get_messages_from_folder_name(self, folder_name):
-        """
+    def _get_messages_from_folder_name(self, folder_name: str):
+        """ Retrieves all messages from a folder, specified by its name. This only works with "Well Known" folders,
+        such as 'Inbox' or 'Drafts'.
 
         Args:
-            self:
-            folder_name:
+            folder_name: The name of the folder to retrieve
 
-        Returns: List[Message]
+        Returns: A list of :class:`Folders <pyOutlook.core.folder.Folder>`
 
         """
         headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
