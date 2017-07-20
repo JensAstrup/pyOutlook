@@ -8,6 +8,7 @@ from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import MiscError, AuthError
 from pyOutlook.core.message import Message
 from pyOutlook.core.folder import Folder
+from pyOutlook.internal.utils import check_response
 
 log = logging.getLogger('pyOutlook')
 __all__ = ['OutlookAccount']
@@ -41,8 +42,7 @@ class OutlookAccount(object):
 
         """
         r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self.headers)
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+        check_response(r)
         return Message._json_to_message(self, r.json())
 
     def get_messages(self, page=0):
@@ -63,12 +63,7 @@ class OutlookAccount(object):
 
         r = requests.get(endpoint, headers=self.headers)
 
-        if r.status_code == 401:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-        elif r.status_code > 299:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise MiscError('Unhandled error received from Outlook. Check logging output.')
+        check_response(r)
 
         return Message._json_to_messages(self, r.json())
 
@@ -142,29 +137,21 @@ class OutlookAccount(object):
 
     def get_folders(self):
         """ Returns a list of all folders for this account """
-        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
 
-        r = requests.get(endpoint, headers=headers)
+        r = requests.get(endpoint, headers=self.headers)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
+        if check_response(r):
             return Folder._json_to_folders(self, r.json())
 
     def get_folder_by_id(self, folder_id: str):
-        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
 
-        r = requests.get(endpoint, headers=headers)
+        r = requests.get(endpoint, headers=self.headers)
 
-        if 399 < r.status_code < 452:
-            raise AuthError('Access Token Error, Received ' + str(r.status_code) + ' from Outlook REST Endpoint')
-
-        else:
-            return_folder = r.json()
-            return Folder._json_to_folder(self, return_folder)
+        check_response(r)
+        return_folder = r.json()
+        return Folder._json_to_folder(self, return_folder)
 
     def _get_messages_from_folder_name(self, folder_name: str):
         """ Retrieves all messages from a folder, specified by its name. This only works with "Well Known" folders,
@@ -176,9 +163,7 @@ class OutlookAccount(object):
         Returns: A list of :class:`Folders <pyOutlook.core.folder.Folder>`
 
         """
-        headers = {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages',
-                         headers=headers)
-        if r.status_code == 401:
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
+                         headers=self.headers)
+        check_response(r)
         return Message._json_to_messages(self, r.json())
