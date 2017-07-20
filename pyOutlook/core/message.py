@@ -7,8 +7,7 @@ from dateutil import parser
 import requests
 
 from pyOutlook.core.contact import Contact
-from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.utils import get_valid_filename
+from pyOutlook.internal.utils import get_valid_filename, check_response
 
 if TYPE_CHECKING:
     from pyOutlook import OutlookAccount, Folder
@@ -42,15 +41,18 @@ class Message(object):
     IMPORTANCE_HIGH = 2
 
     def __init__(self, account, body: str, subject: str, to_recipients: List[Contact],
-                 sender: Contact = None, cc: List[Contact] = list, bcc: List[Contact]=list,
+                 sender: Contact = None, cc: List[Contact] = list, bcc: List[Contact] = list,
                  message_id: str = None, **kwargs):
         self.account = account
         self.message_id = message_id
 
         self.body = body
+        self.body_preview = kwargs.get('body_preview', '')
         self.subject = subject
+
         self.is_draft = kwargs.get('is_draft', None)
         self.importance = kwargs.get('Importance', self.IMPORTANCE_NORMAL)
+        self.categories = kwargs.get('categories', [])
 
         self.sender = sender
         self.to = to_recipients
@@ -84,6 +86,7 @@ class Message(object):
         sender = Contact._json_to_contact(sender)
 
         body = api_json.get('Body', {}).get('Content', '')
+        body_preview = api_json.get('BodyPreview', '')
 
         to_recipients = api_json.get('ToRecipients', [])
         to_recipients = Contact._json_to_contacts(to_recipients)
@@ -102,9 +105,12 @@ class Message(object):
         is_draft = api_json.get('IsDraft', None)
         importance = api_json.get('Importance', cls.IMPORTANCE_NORMAL)
 
+        categories = api_json.get('Categories', [])
+
         return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
                                  time_created=time_created, time_sent=time_sent, parent_folder_id=parent_folder_id,
-                                 is_draft=is_draft, importance=importance)
+                                 is_draft=is_draft, importance=importance, body_preview=body_preview,
+                                 categories=categories)
         return return_message
 
     @property
@@ -168,14 +174,7 @@ class Message(object):
         else:
             raise NotImplemented
 
-        if r.status_code == 401:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-        elif r.status_code > 299:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise MiscError('Unhandled error received from Outlook. Check logging output.')
-        else:
-            log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.content))
+        check_response(r)
 
     def send(self, content_type='HTML'):
         """ Takes the recipients, body, and attachments of the Message and sends.
@@ -340,3 +339,8 @@ class Message(object):
             'ContentBytes': file_bytes
         })
         return self
+
+    def add_category(self, category_name: str):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
+        self.categories.append(category_name)
+        self._make_api_call('patch', endpoint, data=json.dumps(dict(Categories=self.categories)))
