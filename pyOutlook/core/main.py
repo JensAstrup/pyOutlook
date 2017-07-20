@@ -86,7 +86,7 @@ class OutlookAccount(object):
         return Message(self.access_token, body, subject, to)
 
     def send_email(self, body=None, subject=None, to: List[Contact] = list, cc=None, bcc=None,
-                   send_as=None, attachments=list):
+                   send_as=None, attachments=None):
         """Sends an email in one method using variables to set the various pieces of the email.
 
         Args:
@@ -103,8 +103,9 @@ class OutlookAccount(object):
         """
         email = Message(self.access_token, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
 
-        for attachment in attachments:
-            email.attach(attachment.get('bytes'), attachment.get('name'))
+        if attachments is not None:
+            for attachment in attachments:
+                email.attach(attachment.get('bytes'), attachment.get('name'))
 
         email.send()
 
