@@ -17,6 +17,9 @@ class TestMessage(TestCase):
         cls.mock_patch_patcher = patch('pyOutlook.core.message.requests.patch')
         cls.mock_patch = cls.mock_patch_patcher.start()
 
+        cls.mock_post_patcher = patch('pyOutlook.core.message.requests.post')
+        cls.mock_post = cls.mock_post_patcher.start()
+
         cls.account = OutlookAccount('token')
 
     def test_json_to_message_format(self):
@@ -103,3 +106,34 @@ class TestMessage(TestCase):
 
         self.assertIn(abc, file_bytes)
         self.assertIn('TestAttachment.csv', file_names)
+
+    def test_message_sent_with_string_recipients(self):
+        """ A list of strings or Contacts can be provided as the To/CC/BCC recipients """
+        mock_post = Mock()
+        mock_post.status_code = 200
+        self.mock_post.return_value = mock_post
+
+        message = Message(self.account, '', '', ['test@email.com'])
+        message.send()
+
+    def test_message_sent_with_contact_recipients(self):
+        """ A list of strings or Contacts can be provided as the To/CC/BCC recipients """
+        mock_post = Mock()
+        mock_post.status_code = 200
+        self.mock_post.return_value = mock_post
+
+        message = Message(self.account, '', '', [Contact('test@email.com')])
+        message.send()
+
+    def test_category_added(self):
+        """ Test that Message.categories is updated in addition to the API call made """
+        mock_patch = Mock()
+        mock_patch.status_code = 200
+
+        self.mock_patch.return_value = mock_patch
+
+        message = Message(self.account, 'test body', 'test subject', [], categories=['A'])
+        message.add_category('B')
+
+        self.assertIn('A', message.categories)
+        self.assertIn('B', message.categories)
