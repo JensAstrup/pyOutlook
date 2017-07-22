@@ -145,7 +145,7 @@ class OutlookAccount(object):
         if check_response(r):
             return Folder._json_to_folders(self, r.json())
 
-    def get_folder_by_id(self, folder_id: str):
+    def get_folder_by_id(self, folder_id) -> Folder:
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
 
         r = requests.get(endpoint, headers=self.headers)
