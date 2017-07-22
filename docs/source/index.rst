@@ -23,10 +23,6 @@ Python Versions
 _______________
 pyOutlook is only tested in, and targets, Python 3.5 and 3.6.
 
-Requirements:
--------------
--Requests
-
 Recommended:
 ------------
 pyOutlook does not handle OAuth for the access tokens provided by Outlook. These are provided by you via the OutlookAccount

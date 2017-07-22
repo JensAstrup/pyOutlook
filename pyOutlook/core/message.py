@@ -25,14 +25,18 @@ class Message(object):
             body: The body content of the email, including HTML formatting
             body_preview: "The first 255 characters of the body"
             subject: The subject of the email
-            sender: The :class:`Contacts <pyOutlook.core.contact.Contact>` who sent this email. You can set this
+            sender: The :class:`Contact <pyOutlook.core.contact.Contact>` who sent this email. You can set this
                 before sending an email to change which account the email comes from (so long as the
                 :class:`OutlookAccount <pyOutlook.core.main.OutlookAccount>` specified has access to the email.
             to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`. You can also provide a list of strings,
                 however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>` after sending the
                 email.
-            cc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the CC field.
-            bcc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the BCC field.
+            cc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the CC field. You can also provide a
+                list of strings, however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>`
+                after sending the email.
+            bcc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the BCC field. You can also provide a
+                list of strings, however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>`
+                after sending the email.
             is_draft: Whether or not the email is a draft.
             importance: The importance level of the email; with 0 indicating low, 1 indicating normal, and 2 indicating
                 high. ``Message.IMPORTANCE_LOW``, ``Message.IMPORTANCE_NORMAL``, & ``Message.IMPORTANCE_HIGH`` can be
@@ -123,7 +127,13 @@ class Message(object):
 
     @property
     def is_read(self):
-        """ Set the 'Read' status of an email """
+        """ Set and retrieve the 'Read' status of an email
+
+            >>> message = Message()
+            >>> message.is_read
+            >>> False
+            >>> message.is_read = True
+        """
         return self.__is_read
 
     @is_read.setter
