@@ -1,7 +1,7 @@
 import base64
 import logging
 import json
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Union
 
 from dateutil import parser
 import requests
@@ -23,14 +23,21 @@ class Message(object):
         Attributes:
             message_id: A string provided by Outlook identifying this specific email
             body: The body content of the email, including HTML formatting
+            body_preview: "The first 255 characters of the body"
             subject: The subject of the email
-            sender_email: The email of the person who sent this email
-            sender_name: The name of the person who sent this email, as provided by Outlook
-            to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`
+            sender: The :class:`Contacts <pyOutlook.core.contact.Contact>` who sent this email. You can set this
+                before sending an email to change which account the email comes from (so long as the
+                :class:`OutlookAccount <pyOutlook.core.main.OutlookAccount>` specified has access to the email.
+            to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`. You can also provide a list of strings,
+                however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>` after sending the
+                email.
+            cc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the CC field.
+            bcc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the BCC field.
             is_draft: Whether or not the email is a draft.
             importance: The importance level of the email; with 0 indicating low, 1 indicating normal, and 2 indicating
                 high. ``Message.IMPORTANCE_LOW``, ``Message.IMPORTANCE_NORMAL``, & ``Message.IMPORTANCE_HIGH`` can be
                 used to reference the levels.
+            categories: A list of strings, where each string is the name of a category.
             time_created: A datetime representing the time the email was created
             time_sent: A datetime representing the time the email was sent
 
@@ -40,8 +47,8 @@ class Message(object):
     IMPORTANCE_NORMAL = 1
     IMPORTANCE_HIGH = 2
 
-    def __init__(self, account, body: str, subject: str, to_recipients: List[Contact],
-                 sender: Contact = None, cc: List[Contact] = list, bcc: List[Contact] = list,
+    def __init__(self, account, body: str, subject: str, to_recipients: Union[List[Contact], List[str]],
+                 sender: Contact = None, cc: List[Contact] = None, bcc: List[Contact] = None,
                  message_id: str = None, **kwargs):
         self.account = account
         self.message_id = message_id
@@ -56,8 +63,8 @@ class Message(object):
 
         self.sender = sender
         self.to = to_recipients
-        self.cc = cc
-        self.bcc = bcc
+        self.cc = cc or []
+        self.bcc = bcc or []
 
         self.time_created = kwargs.get('time_created', None)
         self.time_sent = kwargs.get('time_sent', None)
@@ -66,6 +73,7 @@ class Message(object):
 
         self.__is_read = kwargs.get('is_read', False)
         self.__parent_folder_id = kwargs.get('parent_folder_id', None)
+        self.__parent_folder = None
 
     def __str__(self):
         return self.subject
@@ -140,7 +148,10 @@ class Message(object):
         Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
 
         """
-        return self.account.get_folder_by_id(self.__parent_folder_id)
+        if self.__parent_folder is None:
+            self.__parent_folder = self.account.get_folder_by_id(self.__parent_folder_id)
+
+        return self.__parent_folder
 
     def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict = None, data=None):
         """
@@ -176,6 +187,41 @@ class Message(object):
 
         check_response(r)
 
+    def _api_representation(self, content_type):
+        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
+
+        if self.sender is not None:
+            payload.update(Sender=self.sender._api_representation())
+
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(item, str) for item in self.to):
+            self.to = [Contact(email=email) for email in self.to]
+
+        # Turn each contact into the JSON needed for the Outlook API
+        recipients = [contact._api_representation() for contact in self.to]
+
+        payload.update(ToRecipients=recipients)
+
+        # Conduct the same process for CC and BCC if needed
+        if self.cc:
+            if any(isinstance(email, str) for email in self.cc):
+                self.cc = [Contact(email) for email in self.cc]
+
+            cc_recipients = [contact._api_representation() for contact in self.cc]
+            payload.update(CcRecipients=cc_recipients)
+
+        if self.bcc:
+            if any(isinstance(email, str) for email in self.bcc):
+                self.bcc = [Contact(email) for email in self.bcc]
+
+            bcc_recipients = [contact._api_representation() for contact in self.bcc]
+            payload.update(BccRecipients=bcc_recipients)
+
+        if self._attachments:
+            payload.update(Attachments=self._attachments)
+
+        return dict(Message=payload)
+
     def send(self, content_type='HTML'):
         """ Takes the recipients, body, and attachments of the Message and sends.
 
@@ -183,33 +229,25 @@ class Message(object):
             content_type: Can either be 'HTML' or 'Text', defaults to HTML.
 
         """
-        payload = dict()
 
-        payload.update(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
-
-        recipients = [contact._api_representation() for contact in self.to]
-
-        payload.update(ToRecipients=recipients)
-
-        if self._attachments:
-            payload.update(Attachments=self._attachments)
-
-        payload = dict(Message=payload)
+        payload = self._api_representation(content_type)
 
         endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
         self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
-    def forward(self, to_recipients, forward_comment=None):
+    def forward(self, to_recipients: List[Contact], forward_comment=None):
         """Forward Message to recipients with an optional comment.
 
         Args:
-            to_recipients: A list of recipients to send the email to.
+            to_recipients: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` to send the email to.
             forward_comment: String comment to append to forwarded email.
 
         Examples:
+            >>> john = Contact('john.doe@domain.com')
+            >>> betsy = Contact('betsy.donalds@domain.com')
             >>> email = Message()
-            >>> email.forward(['john.doe@domain.com', 'betsy.donalds@domain.com'])
-            >>> email.forward('john.doe@domain.com', 'Hey Joe')
+            >>> email.forward([john, betsy])
+            >>> email.forward([john], 'Hey John')
         """
         payload = dict()
 
@@ -327,9 +365,6 @@ class Message(object):
             file_bytes: The bytes of the file to send
             file_name: The name of the file, as a string and leaving out the extension, that should be sent
 
-        Returns:
-            Message
-
         """
 
         file_bytes = base64.b64encode(file_bytes)
@@ -338,7 +373,6 @@ class Message(object):
             'Name': get_valid_filename(file_name),
             'ContentBytes': file_bytes
         })
-        return self
 
     def add_category(self, category_name: str):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
