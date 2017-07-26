@@ -6,3 +6,4 @@ coverage
 Sphinx
 sphinx_rtd_theme
 recommonmark
+pypandoc

@@ -2,6 +2,12 @@ import setuptools
 
 from pyOutlook import __version__
 
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    long_description = open('README.md').read()
+
 setuptools.setup(
     name='pyOutlook',
     version=__version__,
@@ -12,7 +18,7 @@ setuptools.setup(
     author_email='jensaiden@gmail.com',
     description='A Python module for connecting to the Outlook REST API, without the hassle of dealing with the '
                 'JSON formatting for requests/responses and the REST endpoints and their varying requirements',
-    long_description=open('pyOutlook/README.rst').read(),
+    long_description=long_description,
     install_requires=['requests'],
     tests_require=['coverage', 'nose'],
     keywords='outlook office365 microsoft email',
