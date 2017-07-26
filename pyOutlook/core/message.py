@@ -245,7 +245,7 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
         self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
-    def forward(self, to_recipients: List[Contact], forward_comment=None):
+    def forward(self, to_recipients: Union[List[Contact], List[str]], forward_comment=None):
         """Forward Message to recipients with an optional comment.
 
         Args:
@@ -264,8 +264,12 @@ class Message(object):
         if forward_comment is not None:
             payload.update(Comment=forward_comment)
 
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(recipient, str) for recipient in to_recipients):
+            to_recipients = [Contact(email=email) for email in to_recipients]
+
         # Contact() will handle turning itself into the proper JSON format for the API
-        to_recipients = [Contact(email)._api_representation() for email in to_recipients]
+        to_recipients = [contact._api_representation() for contact in to_recipients]
 
         payload.update(ToRecipients=to_recipients)
 
@@ -324,16 +328,17 @@ class Message(object):
         """Moves the email to the account's Drafts folder"""
         self._move_to('Drafts')
 
-    def move_to(self, folder_id):
-        """Moves the email to the folder specified by the folder_id.
-
-        The folder id must match the id provided by Outlook.
+    def move_to(self, folder):
+        """Moves the email to the folder specified by the folder parameter.
 
         Args:
-            folder_id: A string containing the folder ID the message should be moved to
+            folder: A string containing the folder ID the message should be moved to, or a Folder instance
 
         """
-        self._move_to(folder_id)
+        if isinstance(folder, Folder):
+            self.move_to(folder.id)
+        else:
+            self._move_to(folder)
 
     def _copy_to(self, destination):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
