@@ -22,9 +22,10 @@ Note that this module does not handle the OAuth process, gaining an access token
 
 ```python
 from pyOutlook import *
+
 token = 'OAuth Access Token Here'
-new_token = 'OAuth Access Token2 Here'
 my_account = OutlookAccount(token)
+
 # If our token is refreshed, or to ensure that the latest token is saved prior to calling a method. 
 my_account.access_token = 'new access token'
 ```
