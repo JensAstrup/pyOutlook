@@ -390,7 +390,7 @@ class Message(object):
         self._attachments.append({
             '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
             'Name': get_valid_filename(file_name),
-            'ContentBytes': file_bytes
+            'ContentBytes': str(file_bytes, 'UTF8')
         })
 
     def add_category(self, category_name: str):
