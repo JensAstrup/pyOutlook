@@ -377,12 +377,16 @@ class Message(object):
         'johns_portrait_in_2004.jpg'
 
         Args:
-            file_bytes: The bytes of the file to send
+            file_bytes: The bytes of the file to send (if you send a string, ex for CSV, pyOutlook will attempt to
+                convert that into bytes before base64ing the content).
             file_name: The name of the file, as a string and leaving out the extension, that should be sent
 
         """
+        try:
+            file_bytes = base64.b64encode(file_bytes)
+        except TypeError:
+            file_bytes = base64.b64encode(bytes(file_bytes, 'utf-8'))
 
-        file_bytes = base64.b64encode(file_bytes)
         self._attachments.append({
             '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
             'Name': get_valid_filename(file_name),
