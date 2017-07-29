@@ -104,7 +104,7 @@ class TestMessage(TestCase):
         # The files are base64'd for the API
         abc = base64.b64encode(bytes('abc', 'UTF-8'))
 
-        self.assertIn(abc, file_bytes)
+        self.assertIn(str(abc, 'UTF-8'), file_bytes)
         self.assertIn('TestAttachment.csv', file_names)
 
     def test_message_sent_with_string_recipients(self):
