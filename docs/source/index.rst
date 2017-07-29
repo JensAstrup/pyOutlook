@@ -19,15 +19,19 @@ pyOutlook was created after I found myself attempting to connect to the Outlook 
 provided some much needed uniformity. It's easier to deal with than the win32com package by Microsoft, but obviously has
 a far smaller scope.
 
-Requirements:
--------------
--Requests
+Python Versions
+_______________
+pyOutlook is only tested in, and targets, Python 3.5 and 3.6.
 
 Recommended:
 ------------
 pyOutlook does not handle OAuth for the access tokens provided by Outlook. These are provided by you via the OutlookAccount
 class as a string. There are various OAuth packages out there: (pip install) oauth2, python-oauth2, requests_oauthlib, etc
-that can faciliate the process.
+that can facilitate the process.
+
+Notes:
+------
+All protected & private methods and anything under pyOutlook.internal is subject to change without deprecation warnings
 
 Contents:
 ---------
@@ -37,7 +41,6 @@ Contents:
    installation
    quickstart
    modules
-   readmeLink
 
 
 Indices and tables
@@ -46,5 +49,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`search`
 
-
-.. include:: ../README.md

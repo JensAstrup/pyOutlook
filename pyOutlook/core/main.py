@@ -1,51 +1,33 @@
 # Authorization and misc functions
-import warnings
+import logging
+from typing import List
 
-from pyOutlook.internal.retrieve import get_message, get_messages, get_inbox, get_messages_from_folder_name
-from pyOutlook.core.folders import get_folders, get_folder
-from pyOutlook.internal.utils import set_global_token__
+import requests
+
+from pyOutlook.core.contact import Contact
 from pyOutlook.internal.errors import MiscError, AuthError
-from pyOutlook.internal.createMessage import NewMessage
 from pyOutlook.core.message import Message
+from pyOutlook.core.folder import Folder
+from pyOutlook.internal.utils import check_response
+
+log = logging.getLogger('pyOutlook')
+__all__ = ['OutlookAccount']
 
 
 class OutlookAccount(object):
     """Sets up access to Outlook account for all methods & classes.
 
-    Access token required for instantiation. Can be refreshed at a later time using .set_access_token().
-
-    Warnings:
-        This module does not handle the OAuth process. You must and refresh tokens separately.
-
     Attributes:
         access_token: A string OAuth token from Outlook allowing access to a user's account
 
     """
+
     def __init__(self, access_token):
-        if type(access_token) is None:
-            raise AuthError('No access token provided with object instantiation.')
         self.access_token = access_token
-        set_global_token__(access_token)
 
-    def set_access_token(self, access_token):
-        """Sets access token.
-
-        Set the access token after creating an OutlookAccount object.
-
-        Args:
-            access_token: A string representing the OAuth token
-
-        Returns:
-            None
-
-        """
-        self.access_token = access_token
-        set_global_token__(access_token)
-
-    def __get_access_token(self):
-        return self.access_token
-
-    token = property(__get_access_token)
+    @property
+    def headers(self):
+        return {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
 
     def get_message(self, message_id) -> Message:
         """Gets message matching provided id.
@@ -59,43 +41,31 @@ class OutlookAccount(object):
             Message
 
         """
-        return get_message(self, message_id)
+        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self.headers)
+        check_response(r)
+        return Message._json_to_message(self, r.json())
 
-    def get_messages(self):
+    def get_messages(self, page=0):
         """Get first 10 messages in account, across all folders.
 
-        Returns:
-            List[Message]
-
-        """
-        return get_messages(self, 0)
-
-    def get_more_messages(self, page):
-        """ additional messages, across all folders, indicated by 'page' number. get_messages() fetches page 1.
-
-        Args:
+        Keyword Args:
             page (int): Integer representing the 'page' of results to fetch
 
         Returns:
             List[Message]
 
         """
-        if not isinstance(page, int):
-            raise MiscError('page parameter must be of type integer')
-        return get_messages(self, page)
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
+        if page > 0:
+            endpoint = endpoint + '/?%24skip=' + str(page) + '0'
 
-    def get_inbox(self):
-        """ first ten messages in account's inbox.
+        log.debug('Getting messages from endpoint: {} with Headers: {}'.format(endpoint, self.headers))
 
-        Returns:
-            List[Message]
+        r = requests.get(endpoint, headers=self.headers)
 
-        Warnings:
-            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.inbox` instead
+        check_response(r)
 
-        """
-        warnings.warn('OutlookAccount.get_inbox() is deprecated. Use account.inbox() instead.', DeprecationWarning)
-        return self.inbox()
+        return Message._json_to_messages(self, r.json())
 
     def inbox(self):
         """ first ten messages in account's inbox.
@@ -104,19 +74,19 @@ class OutlookAccount(object):
             List[Message]
 
         """
-        return get_inbox(self)
+        return self._get_messages_from_folder_name('Inbox')
 
-    def new_email(self):
+    def new_email(self, body='', subject='', to: List[Contact] = list):
         """Creates a NewMessage object.
 
         Returns:
-            NewMessage
+            Message
 
         """
-        return NewMessage(self.access_token)
+        return Message(self.access_token, body, subject, to)
 
-    def send_email(self, body=None, subject=None, to=None, cc=None, bcc=None,
-                   send_as=None, attachment=None):
+    def send_email(self, body=None, subject=None, to: List[Contact] = list, cc=None, bcc=None,
+                   send_as=None, attachments=None):
         """Sends an email in one method using variables to set the various pieces of the email.
 
         Args:
@@ -125,42 +95,19 @@ class OutlookAccount(object):
             to (list): A list of email addresses
             cc (list): A list of email addresses which will be added to the 'Carbon Copy' line
             bcc (list): A list of email addresses while be blindly added to the email
-            send_as (str): A string email address which the OutlookAccount has access to
-            attachment (dict): A dictionary with three parts [1] 'name' - a string which will become the file's name \
-            [2] 'ext' - a string which will become the file extension [3] 'bytes' - the bytes of the file.
+            send_as Contact: A string email address which the OutlookAccount has access to
+            attachments (list): A list of dictionaries with two parts
+                [1] 'name' - a string which will become the file's name
+                [2] 'bytes' - the bytes of the file.
 
         """
-        email = NewMessage(self.access_token)
-        if body is not None:
-            email.set_body(body)
-        if subject is not None:
-            email.set_subject(subject)
-        if to is not None:
-            email.to(to)
-        if cc is not None:
-            email.cc(cc)
-        if bcc is not None:
-            email.bcc(bcc)
-        if send_as is not None:
-            email.send_as(send_as)
-        if attachment is not None:
-            if 'bytes' not in attachment or 'name' not in attachment or 'ext' not in attachment:
-                raise TypeError('Was unable to find one or more keys in the attachment dictionary: bytes, name, ext.')
-            email.attach(attachment['bytes'], attachment['name'], attachment['ext'])
+        email = Message(self.access_token, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
+
+        if attachments is not None:
+            for attachment in attachments:
+                email.attach(attachment.get('bytes'), attachment.get('name'))
+
         email.send()
-
-    def get_sent_messages(self):
-        """ last ten sent messages.
-
-        Returns:
-            list[Message]
-
-        Warnings:
-            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.sent_messages` instead
-        """
-        warnings.warn('OutlookAccount.get_sent_messages() is deprecated. Use account.sent_messages() instead.',
-                      DeprecationWarning)
-        return self.sent_messages()
 
     def sent_messages(self):
         """ last ten sent messages.
@@ -169,21 +116,7 @@ class OutlookAccount(object):
             list[Message]
 
         """
-        return get_messages_from_folder_name(self, 'SentItems')
-
-    def get_deleted_messages(self):
-        """ last ten deleted messages.
-
-        Returns:
-            list[Message]
-
-        Warnings:
-            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.deleted_messages` instead
-
-        """
-        warnings.warn('OutlookAccount.get_deleted_messages() is deprecated. Use account.deleted_messages() instead.',
-                      DeprecationWarning)
-        return self.deleted_messages()
+        return self._get_messages_from_folder_name('SentItems')
 
     def deleted_messages(self):
         """ last ten deleted messages.
@@ -192,21 +125,7 @@ class OutlookAccount(object):
             list[Message]
 
         """
-        return get_messages_from_folder_name(self, 'DeletedItems')
-
-    def get_draft_messages(self):
-        """ last ten draft messages.
-
-        Returns:
-            list[Message]
-
-        Warnings:
-            This method is deprecated, use :py:meth:`~pyOutlook.OutlookAccount.draft_messages` instead
-
-        """
-        warnings.warn('OutlookAccount.get_draft_messages() is deprecated. Use account.draft_messages() instead.',
-                      DeprecationWarning)
-        return self.draft_messages()
+        return self._get_messages_from_folder_name('DeletedItems')
 
     def draft_messages(self):
         """ last ten draft messages.
@@ -215,40 +134,37 @@ class OutlookAccount(object):
             list[Message]
 
         """
-        return get_messages_from_folder_name(self, 'Drafts')
+        return self._get_messages_from_folder_name('Drafts')
 
-    # TODO: keep as get_x or rename?
-    def get_folder_messages(self, folder):
-        """first ten messages from provided folder.
-
-        Args:
-            folder: String providing the folder ID, from Outlook, to messages from
-
-        Returns:
-            list[Message]
-
-        """
-        return get_messages_from_folder_name(self, folder)
-
-    # TODO: keep as get_x or rename?
     def get_folders(self):
-        """ a list of folders in the account.
+        """ Returns a list of all folders for this account """
+        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
 
-        Returns:
-            list[Folder]
+        r = requests.get(endpoint, headers=self.headers)
 
-        """
-        return get_folders(self)
+        if check_response(r):
+            return Folder._json_to_folders(self, r.json())
 
-    # TODO: keep as get_x or rename?
-    def get_folder(self, folder_id):
-        """a Folder object matching the folder ID provided.
+    def get_folder_by_id(self, folder_id) -> Folder:
+        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
+
+        r = requests.get(endpoint, headers=self.headers)
+
+        check_response(r)
+        return_folder = r.json()
+        return Folder._json_to_folder(self, return_folder)
+
+    def _get_messages_from_folder_name(self, folder_name: str):
+        """ Retrieves all messages from a folder, specified by its name. This only works with "Well Known" folders,
+        such as 'Inbox' or 'Drafts'.
 
         Args:
-            folder_id: String identifying the Outlook folder to return
+            folder_name: The name of the folder to retrieve
 
-        Returns:
-            Folder
+        Returns: A list of :class:`Folders <pyOutlook.core.folder.Folder>`
 
         """
-        return get_folder(self, folder_id)
+        r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages',
+                         headers=self.headers)
+        check_response(r)
+        return Message._json_to_messages(self, r.json())

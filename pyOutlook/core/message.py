@@ -1,13 +1,20 @@
+import base64
 import logging
 import json
-import warnings
+from typing import List, TYPE_CHECKING, Union
 
+from dateutil import parser
 import requests
 
-from pyOutlook.internal.errors import AuthError, MiscError
-from pyOutlook.internal.utils import jsonify_recipients, get_global_token
+from pyOutlook.core.contact import Contact
+from pyOutlook.internal.utils import get_valid_filename, check_response
+
+if TYPE_CHECKING:
+    from pyOutlook import OutlookAccount, Folder
 
 log = logging.getLogger('pyOutlook')
+
+__all__ = ['Message']
 
 
 class Message(object):
@@ -16,27 +23,147 @@ class Message(object):
         Attributes:
             message_id: A string provided by Outlook identifying this specific email
             body: The body content of the email, including HTML formatting
+            body_preview: "The first 255 characters of the body"
             subject: The subject of the email
-            sender_email: The email of the person who sent this email
-            sender_name: The name of the person who sent this email, as provided by Outlook
-            to_recipients: A comma separated string of emails who were sent this email in the 'To' field
+            sender: The :class:`Contact <pyOutlook.core.contact.Contact>` who sent this email. You can set this
+                before sending an email to change which account the email comes from (so long as the
+                :class:`OutlookAccount <pyOutlook.core.main.OutlookAccount>` specified has access to the email.
+            to: A list of :class:`Contacts <pyOutlook.core.contact.Contact>`. You can also provide a list of strings,
+                however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>` after sending the
+                email.
+            cc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the CC field. You can also provide a
+                list of strings, however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>`
+                after sending the email.
+            bcc: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` in the BCC field. You can also provide a
+                list of strings, however these will be turned into :class:`Contacts <pyOutlook.core.contact.Contact>`
+                after sending the email.
+            is_draft: Whether or not the email is a draft.
+            importance: The importance level of the email; with 0 indicating low, 1 indicating normal, and 2 indicating
+                high. ``Message.IMPORTANCE_LOW``, ``Message.IMPORTANCE_NORMAL``, & ``Message.IMPORTANCE_HIGH`` can be
+                used to reference the levels.
+            categories: A list of strings, where each string is the name of a category.
+            time_created: A datetime representing the time the email was created
+            time_sent: A datetime representing the time the email was sent
 
         """
 
-    def __init__(self, message_id: str, body: str, subject: str, sender_email: str, sender_name: str,
-                 to_recipients: list, **kwargs):
+    IMPORTANCE_LOW = 0
+    IMPORTANCE_NORMAL = 1
+    IMPORTANCE_HIGH = 2
+
+    def __init__(self, account, body: str, subject: str, to_recipients: Union[List[Contact], List[str]],
+                 sender: Contact = None, cc: List[Contact] = None, bcc: List[Contact] = None,
+                 message_id: str = None, **kwargs):
+        self.account = account
         self.message_id = message_id
+
         self.body = body
+        self.body_preview = kwargs.get('body_preview', '')
         self.subject = subject
-        self.sender_email = sender_email
-        self.sender_name = sender_name
-        self.to_recipients = to_recipients
-        self.read = kwargs['is_read']
+
+        self.is_draft = kwargs.get('is_draft', None)
+        self.importance = kwargs.get('Importance', self.IMPORTANCE_NORMAL)
+        self.categories = kwargs.get('categories', [])
+
+        self.sender = sender
+        self.to = to_recipients
+        self.cc = cc or []
+        self.bcc = bcc or []
+
+        self.time_created = kwargs.get('time_created', None)
+        self.time_sent = kwargs.get('time_sent', None)
+
+        self._attachments = []
+
+        self.__is_read = kwargs.get('is_read', False)
+        self.__parent_folder_id = kwargs.get('parent_folder_id', None)
+        self.__parent_folder = None
 
     def __str__(self):
         return self.subject
 
-    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict=None, data=None):
+    def __repr__(self):
+        return str(self)
+
+    @classmethod
+    def _json_to_messages(cls, account, json_value):
+        return [cls._json_to_message(account, message) for message in json_value['value']]
+
+    @classmethod
+    def _json_to_message(cls, account, api_json: dict):
+        uid = api_json['Id']
+        subject = api_json.get('Subject', '')
+
+        sender = api_json.get('Sender', {})
+        sender = Contact._json_to_contact(sender)
+
+        body = api_json.get('Body', {}).get('Content', '')
+        body_preview = api_json.get('BodyPreview', '')
+
+        to_recipients = api_json.get('ToRecipients', [])
+        to_recipients = Contact._json_to_contacts(to_recipients)
+
+        is_read = api_json['IsRead']
+
+        time_created = api_json.get('CreatedDateTime', None)
+        if time_created is not None:
+            time_created = parser.parse(time_created, ignoretz=True)
+
+        time_sent = api_json.get('SentDateTime', None)
+        if time_sent is not None:
+            time_sent = parser.parse(time_sent, ignoretz=True)
+
+        parent_folder_id = api_json.get('ParentFolderId', None)
+        is_draft = api_json.get('IsDraft', None)
+        importance = api_json.get('Importance', cls.IMPORTANCE_NORMAL)
+
+        categories = api_json.get('Categories', [])
+
+        return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
+                                 time_created=time_created, time_sent=time_sent, parent_folder_id=parent_folder_id,
+                                 is_draft=is_draft, importance=importance, body_preview=body_preview,
+                                 categories=categories)
+        return return_message
+
+    @property
+    def is_read(self):
+        """ Set and retrieve the 'Read' status of an email
+
+            >>> message = Message()
+            >>> message.is_read
+            >>> False
+            >>> message.is_read = True
+        """
+        return self.__is_read
+
+    @is_read.setter
+    def is_read(self, boolean):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
+        payload = dict(IsRead=boolean)
+
+        self._make_api_call('patch', endpoint, data=json.dumps(payload))
+        self.__is_read = boolean
+
+    @property
+    def parent_folder(self) -> 'Folder':
+        """ Returns the :class:`Folder <pyOutlook.core.folder.Folder>` this message is in
+
+            >>> account = OutlookAccount('')
+            >>> message = account.get_messages()[0]
+            >>> message.parent_folder
+            Inbox
+            >>> message.parent_folder.unread_count
+            19
+
+        Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
+
+        """
+        if self.__parent_folder is None:
+            self.__parent_folder = self.account.get_folder_by_id(self.__parent_folder_id)
+
+        return self.__parent_folder
+
+    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict = None, data=None):
         """
         Internal method to handle making calls to the Outlook API and logging both the request and response
         Args:
@@ -51,7 +178,7 @@ class Message(object):
 
         """
 
-        headers = {"Authorization": "Bearer " + get_global_token(), "Content-Type": "application/json"}
+        headers = {"Authorization": "Bearer " + self.account.access_token, "Content-Type": "application/json"}
 
         if extra_headers is not None:
             headers.update(extra_headers)
@@ -68,44 +195,87 @@ class Message(object):
         else:
             raise NotImplemented
 
-        if r.status_code == 401:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise AuthError('Access Token Error, Received 401 from Outlook REST Endpoint')
-        elif r.status_code > 299:
-            log.error('Error received from Outlook. Status: {} Body: {}'.format(r.status_code, r.json()))
-            raise MiscError('Unhandled error received from Outlook. Check logging output.')
-        else:
-            # If we try  to log r.json() when there is nothing our tests will fail (even though it's successful...)
-            log.debug('Response from Outlook Status: {} Body: {}'.format(r.status_code, r.content))
+        check_response(r)
 
-    def forward_message(self, to_recipients, forward_comment=None):
+    def _api_representation(self, content_type):
+        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
+
+        if self.sender is not None:
+            payload.update(Sender=self.sender._api_representation())
+
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(item, str) for item in self.to):
+            self.to = [Contact(email=email) for email in self.to]
+
+        # Turn each contact into the JSON needed for the Outlook API
+        recipients = [contact._api_representation() for contact in self.to]
+
+        payload.update(ToRecipients=recipients)
+
+        # Conduct the same process for CC and BCC if needed
+        if self.cc:
+            if any(isinstance(email, str) for email in self.cc):
+                self.cc = [Contact(email) for email in self.cc]
+
+            cc_recipients = [contact._api_representation() for contact in self.cc]
+            payload.update(CcRecipients=cc_recipients)
+
+        if self.bcc:
+            if any(isinstance(email, str) for email in self.bcc):
+                self.bcc = [Contact(email) for email in self.bcc]
+
+            bcc_recipients = [contact._api_representation() for contact in self.bcc]
+            payload.update(BccRecipients=bcc_recipients)
+
+        if self._attachments:
+            payload.update(Attachments=self._attachments)
+
+        return dict(Message=payload)
+
+    def send(self, content_type='HTML'):
+        """ Takes the recipients, body, and attachments of the Message and sends.
+
+        Args:
+            content_type: Can either be 'HTML' or 'Text', defaults to HTML.
+
+        """
+
+        payload = self._api_representation(content_type)
+
+        endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
+        self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
+
+    def forward(self, to_recipients: Union[List[Contact], List[str]], forward_comment=None):
         """Forward Message to recipients with an optional comment.
 
         Args:
-            to_recipients: Comma separated string or list of recipients to send email to.
+            to_recipients: A list of :class:`Contacts <pyOutlook.core.contact.Contact>` to send the email to.
             forward_comment: String comment to append to forwarded email.
 
         Examples:
+            >>> john = Contact('john.doe@domain.com')
+            >>> betsy = Contact('betsy.donalds@domain.com')
             >>> email = Message()
-            >>> email.forward_message('john.doe@domain.com, betsy.donalds@domain.com')
-            >>> email.forward_message('john.doe@domain.com', 'Hey Joe')
-
-        Raises:
-            MiscError: A comma separated string of emails, or one string email, must be provided
-            AuthError: Raised if Outlook returns a 401, generally caused by an invalid or expired access token.
-
+            >>> email.forward([john, betsy])
+            >>> email.forward([john], 'Hey John')
         """
-        payload = '{'
-        if forward_comment is not None:
-            payload += '"Comment" : "' + str(forward_comment) + '",'
-        if to_recipients is None:
-            raise MiscError('To Recipients is not defined. Can not forward message.')
+        payload = dict()
 
-        payload += '"ToRecipients" : [' + jsonify_recipients(to_recipients, 'to', True) + ']}'
+        if forward_comment is not None:
+            payload.update(Comment=forward_comment)
+
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(recipient, str) for recipient in to_recipients):
+            to_recipients = [Contact(email=email) for email in to_recipients]
+
+        # Contact() will handle turning itself into the proper JSON format for the API
+        to_recipients = [contact._api_representation() for contact in to_recipients]
+
+        payload.update(ToRecipients=to_recipients)
 
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/forward'.format(self.message_id)
 
-        self._make_api_call('post', endpoint=endpoint, data=payload)
+        self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
     def reply(self, reply_comment):
         """Reply to the Message.
@@ -136,64 +306,57 @@ class Message(object):
 
         self._make_api_call('post', endpoint, data=payload)
 
-    def delete_message(self):
-        """Deletes the email"""
-        warnings.warn('delete_message() is deprecated and will be removed in v1.0. Use delete() instead.',
-                      DeprecationWarning)
-        self.delete()
-
     def delete(self):
         """Deletes the email"""
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id
         self._make_api_call('delete', endpoint)
 
-    def __move_to(self, destination):
+    def _move_to(self, destination):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
         self._make_api_call('post', endpoint, data=payload)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
-        self.__move_to('Inbox')
+        self._move_to('Inbox')
 
     def move_to_deleted(self):
         """Moves the email to the account's Deleted Items folder"""
-        self.__move_to('DeletedItems')
+        self._move_to('DeletedItems')
 
     def move_to_drafts(self):
         """Moves the email to the account's Drafts folder"""
-        self.__move_to('Drafts')
+        self._move_to('Drafts')
 
-    def move_to(self, folder_id):
-        """Moves the email to the folder specified by the folder_id.
-
-        The folder id must match the id provided by Outlook.
+    def move_to(self, folder):
+        """Moves the email to the folder specified by the folder parameter.
 
         Args:
-            folder_id: A string containing the folder ID the message should be moved to
+            folder: A string containing the folder ID the message should be moved to, or a Folder instance
 
         """
-        self.__move_to(folder_id)
+        if isinstance(folder, Folder):
+            self.move_to(folder.id)
+        else:
+            self._move_to(folder)
 
-    def __copy_to(self, destination):
-        access_token = get_global_token()
-        headers = {"Authorization": "Bearer " + access_token, "Content-Type": "application/json"}
+    def _copy_to(self, destination):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/copy'
-        payload = '{ "DestinationId": "' + destination + '"}'
+        payload = '{ "DestinationId": "{}"}'.format(destination)
 
-        self._make_api_call('post', endpoint, headers=headers, data=payload)
+        self._make_api_call('post', endpoint, data=payload)
 
     def copy_to_inbox(self):
         """Copies Message to account's Inbox"""
-        self.__copy_to('Inbox')
+        self._copy_to('Inbox')
 
     def copy_to_deleted(self):
         """Copies Message to account's Deleted Items folder"""
-        self.__copy_to('DeletedItems')
+        self._copy_to('DeletedItems')
 
     def copy_to_drafts(self):
         """Copies Message to account's Drafts folder"""
-        self.__copy_to('Drafts')
+        self._copy_to('Drafts')
 
     def copy_to(self, folder_id):
         """Copies the email to the folder specified by the folder_id.
@@ -204,84 +367,33 @@ class Message(object):
             folder_id: A string containing the folder ID the message should be copied to
 
         """
-        self.__copy_to(folder_id)
+        self._copy_to(folder_id)
 
-    def is_read(self, boolean=None):
-        """
-        Set the 'Read' status of an email
+    def attach(self, file_bytes, file_name):
+        """Adds an attachment to the email. The filename is passed through Django's get_valid_filename which removes
+        invalid characters. From the documentation for that function:
+
+        >>> get_valid_filename("john's portrait in 2004.jpg")
+        'johns_portrait_in_2004.jpg'
+
         Args:
-            boolean: True if the email has been read, False otherwise
+            file_bytes: The bytes of the file to send (if you send a string, ex for CSV, pyOutlook will attempt to
+                convert that into bytes before base64ing the content).
+            file_name: The name of the file, as a string and leaving out the extension, that should be sent
+
         """
-        if boolean is None:
-            return self.read
-        else:
-            endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
-            payload = dict(IsRead=boolean)
+        try:
+            file_bytes = base64.b64encode(file_bytes)
+        except TypeError:
+            file_bytes = base64.b64encode(bytes(file_bytes, 'utf-8'))
 
-            self._make_api_call('patch', endpoint, data=json.dumps(payload))
-            self.read = boolean
+        self._attachments.append({
+            '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
+            'Name': get_valid_filename(file_name),
+            'ContentBytes': str(file_bytes, 'UTF8')
+        })
 
-
-# TODO: this can be reduced to one function
-def clean_return_multiple(api_json):
-    """
-    :param api_json:
-    :return: List of messages
-    :rtype: list of Message
-    """
-    return_list = []
-    for key in api_json['value']:
-        if 'Sender' in key:
-            uid = key['Id']
-            try:
-                subject = key['Subject']
-            except KeyError:
-                subject = 'N/A'
-            try:
-                sender_email = key['Sender']['EmailAddress']['Address']
-            except KeyError:
-                sender_email = 'N/A'
-            try:
-                sender_name = key['Sender']['EmailAddress']['Name']
-            except KeyError:
-                sender_name = 'N/A'
-            try:
-                body = key['Body']['Content']
-            except KeyError:
-                body = ''
-            try:
-                to_recipients = key['ToRecipients']
-            except KeyError:
-                to_recipients = []
-            is_read = key['IsRead']
-
-            return_list.append(Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read))
-    return return_list
-
-
-# TODO: this can be reduced to one function
-def clean_return_single(api_json):
-    uid = api_json['Id']
-    try:
-        subject = api_json['Subject']
-    except KeyError:
-        subject = ''
-    try:
-        sender_email = api_json['Sender']['EmailAddress']['Address']
-    except KeyError:
-        sender_email = 'N/A'
-    try:
-        sender_name = api_json['Sender']['EmailAddress']['Name']
-    except KeyError:
-        sender_name = 'N/A'
-    try:
-        body = api_json['Body']['Content']
-    except KeyError:
-        body = ''
-    try:
-        to_recipients = api_json['ToRecipients']
-    except KeyError:
-        to_recipients = []
-    is_read = api_json['IsRead']
-    return_message = Message(uid, body, subject, sender_email, sender_name, to_recipients, is_read=is_read)
-    return return_message
+    def add_category(self, category_name: str):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
+        self.categories.append(category_name)
+        self._make_api_call('patch', endpoint, data=json.dumps(dict(Categories=self.categories)))
