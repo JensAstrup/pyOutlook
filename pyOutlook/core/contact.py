@@ -5,11 +5,12 @@ class Contact(object):
     """ Represents someone sending or receiving an email. Cuts down on the amount of dictionaries floating around that
     each hold the API's syntax and allows for functionality to be added in the future.
     """
-    def __init__(self, email: str, name: str = None):
+
+    def __init__(self, email, name=None):
         """
         Args:
-            email: The email of the user
-            name: The user's name, which is not always provided by the API.
+            email (str): The email of the user
+            name (str): The user's name, which is not always provided by the API.
         """
         self.email = email
         self.name = name

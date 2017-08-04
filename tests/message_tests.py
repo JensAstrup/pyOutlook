@@ -1,6 +1,10 @@
 import base64
 from unittest import TestCase
-from unittest.mock import patch, Mock
+
+try:
+    from unittest.mock import patch, Mock
+except ImportError:
+    from mock import Mock, patch
 
 from pyOutlook import OutlookAccount
 from pyOutlook.core.contact import Contact
@@ -94,17 +98,17 @@ class TestMessage(TestCase):
         """ Test that attachments are added to Message in the correct format """
         message = Message(self.account, '', '', [])
 
-        message.attach(bytes('abc', 'UTF-8'), 'Test/Attachment.csv')
-        message.attach(bytes('some bytes', 'UTF-8'), 'attached.pdf')
+        message.attach(str('abc').encode('UTF-8'), 'Test/Attachment.csv')
+        message.attach(str('some bytes').encode('UTF-8'), 'attached.pdf')
 
         self.assertEqual(len(message._attachments), 2)
         file_bytes = [attachment['ContentBytes'] for attachment in message._attachments]
         file_names = [attachment['Name'] for attachment in message._attachments]
 
         # The files are base64'd for the API
-        abc = base64.b64encode(bytes('abc', 'UTF-8'))
+        abc = base64.b64encode(str('abc').encode('UTF-8'))
 
-        self.assertIn(str(abc, 'UTF-8'), file_bytes)
+        self.assertIn(str(abc).encode('UTF-8'), file_bytes)
         self.assertIn('TestAttachment.csv', file_names)
 
     def test_message_sent_with_string_recipients(self):

@@ -1,5 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch, Mock
+
+try:
+    from unittest.mock import patch, Mock
+except ImportError:
+    from mock import Mock, patch
 
 from pyOutlook import *
 from pyOutlook.internal.utils import check_response

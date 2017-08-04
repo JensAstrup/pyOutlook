@@ -101,7 +101,8 @@ class Folder(object):
 
         check_response(r)
 
-    def move_into(self, destination_folder: 'Folder'):
+    def move_into(self, destination_folder):
+        # type: (Folder) -> None
         """Move the Folder into a different folder.
 
         This makes the Folder provided a child folder of the destination_folder.
@@ -127,7 +128,8 @@ class Folder(object):
             return_folder = r.json()
             return self._json_to_folder(self.account, return_folder)
 
-    def copy_into(self, destination_folder: 'Folder'):
+    def copy_into(self, destination_folder):
+        # type: (Folder) -> None
         """Copies the Folder into the provided destination folder.
 
         Raises:
