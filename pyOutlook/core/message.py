@@ -390,12 +390,12 @@ class Message(object):
         try:
             file_bytes = base64.b64encode(file_bytes)
         except TypeError:
-            file_bytes = base64.b64encode(str(file_bytes).encode('utf-8'))
+            file_bytes = base64.b64encode(bytes(file_bytes).encode('utf-8'))
 
         self._attachments.append({
             '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
             'Name': get_valid_filename(file_name),
-            'ContentBytes': str(file_bytes).encode('utf-8')
+            'ContentBytes': file_bytes.decode('utf-8')
         })
 
     def add_category(self, category_name):
