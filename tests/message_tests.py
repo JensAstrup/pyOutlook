@@ -98,16 +98,18 @@ class TestMessage(TestCase):
         """ Test that attachments are added to Message in the correct format """
         message = Message(self.account, '', '', [])
 
-        message.attach(bytes('abc').encode('UTF-8'), 'Test/Attachment.csv')
-        message.attach(bytes('some bytes').encode('UTF-8'), 'attached.pdf')
+        message.attach('abc', 'Test/Attachment.csv')
+        message.attach(b'some bytes', 'attached.pdf')
 
         self.assertEqual(len(message._attachments), 2)
         file_bytes = [attachment['ContentBytes'] for attachment in message._attachments]
         file_names = [attachment['Name'] for attachment in message._attachments]
 
         # The files are base64'd for the API
-        abc = base64.b64encode(bytes('abc').encode('UTF-8'))
+        some_bytes = base64.b64encode(b'some bytes')
+        abc = base64.b64encode(b'abc')
 
+        self.assertIn(some_bytes.decode('UTF-8'), file_bytes)
         self.assertIn(abc.decode('UTF-8'), file_bytes)
         self.assertIn('TestAttachment.csv', file_names)
 
