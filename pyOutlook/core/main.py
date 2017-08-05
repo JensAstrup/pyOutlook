@@ -42,6 +42,22 @@ class OutlookAccount(object):
 
     def set_auto_reply(self, message, status=AutoReplyStatus.ALWAYS_ENABLED, start=None, end=None,
                        external_message=None, audience=AutoReplyAudience.ALL):
+        # type: (str, OutlookAccount.AutoReplyStatus, datetime, datetime, str, OutlookAccount.AutoReplyAudience) -> None
+        """ Set an automatic reply for the account.
+        Args:
+            message: The message to be sent in replies. If external_message is provided this is the message sent to
+                internal recipients
+            status: Whether the auto-reply should be always enabled, scheduled, or disabled. You can use
+                :class:`AutoReplyStatus <pyOutlook.core.main.OutlookAccount.AutoReplyStatus>` to provide the value.
+                Defaults to ALWAYS_ENABLED.
+            start: If status is set to SCHEDULED, this is when the replies will start being sent.
+            end: If status is set to SCHEDULED, this is when the replies will stop being sent.
+            external_message: If provided, this message will be sent to external recipients.
+            audience: Whether replies should be sent to everyone, contacts only, or internal recipients only. You can
+                use :class:`AutoReplyAudience <pyOutlook.core.main.OutlookAccount.AutoReplyAudience>` to provide the
+                value.
+
+        """
 
         start_is_none = start is None
         end_is_none = end is None
@@ -75,10 +91,8 @@ class OutlookAccount(object):
 
         print(data)
 
-        r = requests.patch('https://outlook.office.com/api/v2.0/me/MailboxSettings',
-                           headers=self.headers, data=json.dumps(data))
-
-        return r
+        requests.patch('https://outlook.office.com/api/v2.0/me/MailboxSettings',
+                       headers=self.headers, data=json.dumps(data))
 
     def get_message(self, message_id):
         """Gets message matching provided id.
