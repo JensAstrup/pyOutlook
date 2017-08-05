@@ -1,6 +1,8 @@
 # Authorization and misc functions
+import json
 import logging
-from typing import List
+
+from datetime import datetime
 
 import requests
 
@@ -27,6 +29,56 @@ class OutlookAccount(object):
     @property
     def headers(self):
         return {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+
+    class AutoReplyAudience(object):
+        INTERNAL_ONLY = 'None'
+        CONTACTS_ONLY = 'ContactsOnly'
+        ALL = 'All'
+
+    class AutoReplyStatus(object):
+        DISABLED = 'Disabled'
+        ALWAYS_ENABLED = 'AlwaysEnabled'
+        SCHEDULED = 'Scheduled'
+
+    def set_auto_reply(self, message, status=AutoReplyStatus.ALWAYS_ENABLED, start=None, end=None,
+                       external_message=None, audience=AutoReplyAudience.ALL):
+
+        start_is_none = start is None
+        end_is_none = end is None
+
+        if (not start_is_none and end_is_none) or (start_is_none and not end_is_none):
+            raise ValueError('Start and End not must both either be None or datetimes')
+
+        start_is_datetime = isinstance(start, datetime)
+        end_is_datetime = isinstance(end, datetime)
+
+        if not start_is_datetime and not start_is_none or not end_is_datetime and not end_is_none:
+            raise ValueError('Start and End must both either be None or datetimes')
+
+        request_data = dict(Status=status, ExternalAudience=audience)
+
+        # Outlook requires both an internal and external message. For convenience, pyOutlook allows only one message
+        # and uses that as the external message if none is provided
+        if external_message is None:
+            external_message = message
+
+        request_data.update(InternalReplyMessage=message, ExternalReplyMessage=external_message)
+
+        if not start_is_none and not end_is_none:
+            request_data.update(ScheduledStartDateTime=dict(DateTime=str(start)))
+            request_data.update(ScheduledEndDateTime=dict(DateTime=str(end)))
+
+        data = {
+            "@odata.context": "https://outlook.office.com/api/v2.0/$metadata#Me/MailboxSettings",
+            "AutomaticRepliesSetting": request_data
+        }
+
+        print(data)
+
+        r = requests.patch('https://outlook.office.com/api/v2.0/me/MailboxSettings',
+                           headers=self.headers, data=json.dumps(data))
+
+        return r
 
     def get_message(self, message_id):
         """Gets message matching provided id.
