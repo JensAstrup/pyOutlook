@@ -21,7 +21,7 @@ a far smaller scope.
 
 Python Versions
 _______________
-pyOutlook is only tested in, and targets, Python 3.5 and 3.6.
+pyOutlook is only tested in, and targets, Python 3.5, 3.6, and 2.7.
 
 Recommended:
 ------------

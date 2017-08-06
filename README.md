@@ -1,8 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/pyOutlook.svg)](https://badge.fury.io/py/pyOutlook)
-[![Code Health](https://landscape.io/github/JensAstrup/pyOutlook/master/landscape.svg?style=flat)](https://landscape.io/github/JensAstrup/pyOutlook/master)
 [![coverage report](https://gitlab.com/jensastrup/pyOutlook/badges/master/coverage.svg)](https://gitlab.com/jensastrup/pyOutlook/commits/master)
 
-[![PyPI](https://img.shields.io/pypi/status/pyOutlook.svg?maxAge=2592000)]()
 [![PyPI](https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000)]()
 [![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.io/en/latest/?badge=latest)
 

@@ -1,5 +1,4 @@
 import re
-from json import JSONDecodeError
 
 from pyOutlook.internal.errors import AuthError, RequestError, APIError
 
@@ -24,7 +23,7 @@ def get_response_data(response):
     """ Handles getting response data from the requests module where .json() can raise an error """
     try:
         return response.json()
-    except JSONDecodeError:
+    except ValueError:
         return response.content
 
 

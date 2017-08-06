@@ -1,7 +1,9 @@
 import base64
 import logging
 import json
-from typing import List, TYPE_CHECKING, Union
+
+import six
+from typing import List, TYPE_CHECKING, Union, Any
 
 from dateutil import parser
 import requests
@@ -51,9 +53,9 @@ class Message(object):
     IMPORTANCE_NORMAL = 1
     IMPORTANCE_HIGH = 2
 
-    def __init__(self, account, body: str, subject: str, to_recipients: Union[List[Contact], List[str]],
-                 sender: Contact = None, cc: List[Contact] = None, bcc: List[Contact] = None,
-                 message_id: str = None, **kwargs):
+    def __init__(self, account, body, subject, to_recipients, sender=None,
+                 cc=None, bcc=None, message_id=None, **kwargs):
+        # type: (OutlookAccount, str, str, Union[List[Contact], List[str]], Contact, List[Contact], List[Contact], str) -> None
         self.account = account
         self.message_id = message_id
 
@@ -90,7 +92,7 @@ class Message(object):
         return [cls._json_to_message(account, message) for message in json_value['value']]
 
     @classmethod
-    def _json_to_message(cls, account, api_json: dict):
+    def _json_to_message(cls, account, api_json):
         uid = api_json['Id']
         subject = api_json.get('Subject', '')
 
@@ -145,7 +147,8 @@ class Message(object):
         self.__is_read = boolean
 
     @property
-    def parent_folder(self) -> 'Folder':
+    def parent_folder(self):
+        # type: () -> Folder
         """ Returns the :class:`Folder <pyOutlook.core.folder.Folder>` this message is in
 
             >>> account = OutlookAccount('')
@@ -163,7 +166,8 @@ class Message(object):
 
         return self.__parent_folder
 
-    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict = None, data=None):
+    def _make_api_call(self, http_type, endpoint, extra_headers = None, data=None):
+        # type: (str, str, dict, Any) -> None
         """
         Internal method to handle making calls to the Outlook API and logging both the request and response
         Args:
@@ -245,7 +249,8 @@ class Message(object):
         endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
         self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
-    def forward(self, to_recipients: Union[List[Contact], List[str]], forward_comment=None):
+    def forward(self, to_recipients, forward_comment=None):
+        # type: (Union[List[Contact], List[str]], str) -> None
         """Forward Message to recipients with an optional comment.
 
         Args:
@@ -390,10 +395,11 @@ class Message(object):
         self._attachments.append({
             '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
             'Name': get_valid_filename(file_name),
-            'ContentBytes': str(file_bytes, 'UTF8')
+            'ContentBytes': file_bytes.decode('utf-8')
         })
 
-    def add_category(self, category_name: str):
+    def add_category(self, category_name):
+        # type: (str) -> None
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}'.format(self.message_id)
         self.categories.append(category_name)
         self._make_api_call('patch', endpoint, data=json.dumps(dict(Categories=self.categories)))

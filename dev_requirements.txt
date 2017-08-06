@@ -7,3 +7,5 @@ Sphinx
 sphinx_rtd_theme
 recommonmark
 pypandoc
+mock
+six
