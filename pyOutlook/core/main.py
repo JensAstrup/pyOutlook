@@ -25,10 +25,27 @@ class OutlookAccount(object):
 
     def __init__(self, access_token):
         self.access_token = access_token
+        self._auto_reply = None
 
     @property
-    def headers(self):
+    def _headers(self):
         return {"Authorization": "Bearer " + self.access_token, "Content-Type": "application/json"}
+
+    @property
+    def auto_reply_message(self):
+        """ The account's Internal auto reply message. Setting the value will change the auto reply message of the
+         account, automatically setting the status to enabled (but not altering the schedule). """
+        if self._auto_reply is None:
+            r = requests.get('https://outlook.office.com/api/v2.0/me/MailboxSettings/AutomaticRepliesSetting',
+                             headers=self._headers)
+            check_response(r)
+            self._auto_reply = r.json().get('InternalReplyMessage')
+
+        return self._auto_reply
+
+    @auto_reply_message.setter
+    def auto_reply_message(self, value):
+        self.set_auto_reply(value)
 
     class AutoReplyAudience(object):
         INTERNAL_ONLY = 'None'
@@ -89,10 +106,10 @@ class OutlookAccount(object):
             "AutomaticRepliesSetting": request_data
         }
 
-        print(data)
-
         requests.patch('https://outlook.office.com/api/v2.0/me/MailboxSettings',
-                       headers=self.headers, data=json.dumps(data))
+                       headers=self._headers, data=json.dumps(data))
+
+        self._auto_reply = message
 
     def get_message(self, message_id):
         """Gets message matching provided id.
@@ -106,7 +123,7 @@ class OutlookAccount(object):
             Message
 
         """
-        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self.headers)
+        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self._headers)
         check_response(r)
         return Message._json_to_message(self, r.json())
 
@@ -124,9 +141,9 @@ class OutlookAccount(object):
         if page > 0:
             endpoint = endpoint + '/?%24skip=' + str(page) + '0'
 
-        log.debug('Getting messages from endpoint: {} with Headers: {}'.format(endpoint, self.headers))
+        log.debug('Getting messages from endpoint: {} with Headers: {}'.format(endpoint, self._headers))
 
-        r = requests.get(endpoint, headers=self.headers)
+        r = requests.get(endpoint, headers=self._headers)
 
         check_response(r)
 
@@ -212,7 +229,7 @@ class OutlookAccount(object):
         """ Returns a list of all folders for this account """
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
 
-        r = requests.get(endpoint, headers=self.headers)
+        r = requests.get(endpoint, headers=self._headers)
 
         if check_response(r):
             return Folder._json_to_folders(self, r.json())
@@ -220,7 +237,7 @@ class OutlookAccount(object):
     def get_folder_by_id(self, folder_id):
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
 
-        r = requests.get(endpoint, headers=self.headers)
+        r = requests.get(endpoint, headers=self._headers)
 
         check_response(r)
         return_folder = r.json()
@@ -237,6 +254,6 @@ class OutlookAccount(object):
 
         """
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages',
-                         headers=self.headers)
+                         headers=self._headers)
         check_response(r)
         return Message._json_to_messages(self, r.json())
