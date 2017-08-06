@@ -13,7 +13,7 @@ class TestAccount(TestCase):
     def test_headers(self):
         """ Test that headers contain the access token and the default content type only."""
         account = OutlookAccount('token123')
-        headers = account.headers
+        headers = account._headers
 
         self.assertIn('Authorization', headers)
         auth = headers.pop('Authorization')
