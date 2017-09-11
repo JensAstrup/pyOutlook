@@ -166,6 +166,41 @@ class Message(object):
 
         return self.__parent_folder
 
+    def _api_representation(self, content_type):
+        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
+
+        if self.sender is not None:
+            payload.update(From=self.sender._api_representation())
+
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(item, str) for item in self.to):
+            self.to = [Contact(email=email) for email in self.to]
+
+        # Turn each contact into the JSON needed for the Outlook API
+        recipients = [contact._api_representation() for contact in self.to]
+
+        payload.update(ToRecipients=recipients)
+
+        # Conduct the same process for CC and BCC if needed
+        if self.cc:
+            if any(isinstance(email, str) for email in self.cc):
+                self.cc = [Contact(email) for email in self.cc]
+
+            cc_recipients = [contact._api_representation() for contact in self.cc]
+            payload.update(CcRecipients=cc_recipients)
+
+        if self.bcc:
+            if any(isinstance(email, str) for email in self.bcc):
+                self.bcc = [Contact(email) for email in self.bcc]
+
+            bcc_recipients = [contact._api_representation() for contact in self.bcc]
+            payload.update(BccRecipients=bcc_recipients)
+
+        if self._attachments:
+            payload.update(Attachments=self._attachments)
+
+        return dict(Message=payload)
+
     def _make_api_call(self, http_type, endpoint, extra_headers = None, data=None):
         # type: (str, str, dict, Any) -> None
         """
@@ -200,41 +235,6 @@ class Message(object):
             raise NotImplemented
 
         check_response(r)
-
-    def _api_representation(self, content_type):
-        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
-
-        if self.sender is not None:
-            payload.update(Sender=self.sender._api_representation())
-
-        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
-        if any(isinstance(item, str) for item in self.to):
-            self.to = [Contact(email=email) for email in self.to]
-
-        # Turn each contact into the JSON needed for the Outlook API
-        recipients = [contact._api_representation() for contact in self.to]
-
-        payload.update(ToRecipients=recipients)
-
-        # Conduct the same process for CC and BCC if needed
-        if self.cc:
-            if any(isinstance(email, str) for email in self.cc):
-                self.cc = [Contact(email) for email in self.cc]
-
-            cc_recipients = [contact._api_representation() for contact in self.cc]
-            payload.update(CcRecipients=cc_recipients)
-
-        if self.bcc:
-            if any(isinstance(email, str) for email in self.bcc):
-                self.bcc = [Contact(email) for email in self.bcc]
-
-            bcc_recipients = [contact._api_representation() for contact in self.bcc]
-            payload.update(BccRecipients=bcc_recipients)
-
-        if self._attachments:
-            payload.update(Attachments=self._attachments)
-
-        return dict(Message=payload)
 
     def send(self, content_type='HTML'):
         """ Takes the recipients, body, and attachments of the Message and sends.
