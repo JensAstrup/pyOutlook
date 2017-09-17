@@ -76,6 +76,7 @@ class Message(object):
         self.time_sent = kwargs.get('time_sent', None)
 
         self._attachments = []
+        self._has_attachments = kwargs.get('has_attachments', False)
 
         self.__is_read = kwargs.get('is_read', False)
         self.__parent_folder_id = kwargs.get('parent_folder_id', None)
@@ -106,6 +107,7 @@ class Message(object):
         to_recipients = Contact._json_to_contacts(to_recipients)
 
         is_read = api_json['IsRead']
+        has_attachments = api_json['HasAttachments']
 
         time_created = api_json.get('CreatedDateTime', None)
         if time_created is not None:
@@ -124,8 +126,21 @@ class Message(object):
         return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
                                  time_created=time_created, time_sent=time_sent, parent_folder_id=parent_folder_id,
                                  is_draft=is_draft, importance=importance, body_preview=body_preview,
-                                 categories=categories)
+                                 categories=categories, has_attachments=has_attachments)
         return return_message
+
+    @property
+    def attachments(self):
+        if not self._has_attachments:
+            return []
+
+        if self._attachments:
+            return self._attachments
+
+        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/attachments'
+        r = requests.get(endpoint, headers=self.account._headers)
+
+        return r
 
     @property
     def is_read(self):
