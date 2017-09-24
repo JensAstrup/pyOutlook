@@ -201,6 +201,8 @@ class Message(object):
 
         payload.update(ToRecipients=recipients)
 
+        payload.update(Importance=str(self.importance))
+
         # Conduct the same process for CC and BCC if needed
         if self.cc:
             if any(isinstance(email, str) for email in self.cc):
