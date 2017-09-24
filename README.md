@@ -10,7 +10,7 @@ This project is maintained on [GitLab](https://gitlab.com/jensastrup/pyOutlook) 
 # pyOutlook
 A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
 
-The most up to date documentation can be found on [pyOutlook's pypi docs page](http://pythonhosted.org/pyOutlook).
+The most up to date documentation can be found on [pyOutlook's RTD page](http://pyoutlook.readthedocs.io/en/latest/).
 
 ## Instantiation
 Before anything can be retrieved or sent, an instance of  OutlookAccount must be created. 
