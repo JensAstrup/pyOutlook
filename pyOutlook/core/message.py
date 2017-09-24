@@ -8,6 +8,7 @@ from typing import List, TYPE_CHECKING, Union, Any
 from dateutil import parser
 import requests
 
+from pyOutlook.core.attachment import Attachment
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.utils import get_valid_filename, check_response
 
@@ -140,7 +141,11 @@ class Message(object):
         endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/attachments'
         r = requests.get(endpoint, headers=self.account._headers)
 
-        return r
+        if check_response(r):
+            data = r.json()
+            self._attachments = Attachment.json_to_attachments(self.account, data)
+
+        return self._attachments
 
     @property
     def is_read(self):
@@ -212,7 +217,7 @@ class Message(object):
             payload.update(BccRecipients=bcc_recipients)
 
         if self._attachments:
-            payload.update(Attachments=self._attachments)
+            payload.update(Attachments=[attachment.api_representation() for attachment in self._attachments])
 
         return dict(Message=payload)
 
@@ -407,11 +412,9 @@ class Message(object):
         except TypeError:
             file_bytes = base64.b64encode(bytes(file_bytes, 'utf-8'))
 
-        self._attachments.append({
-            '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
-            'Name': get_valid_filename(file_name),
-            'ContentBytes': file_bytes.decode('utf-8')
-        })
+        self._attachments.append(
+            Attachment(get_valid_filename(file_name), file_bytes.decode('utf-8'))
+        )
 
     def add_category(self, category_name):
         # type: (str) -> None
