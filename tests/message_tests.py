@@ -103,8 +103,8 @@ class TestMessage(TestCase):
         message.attach(b'some bytes', 'attached.pdf')
 
         self.assertEqual(len(message._attachments), 2)
-        file_bytes = [attachment['ContentBytes'] for attachment in message._attachments]
-        file_names = [attachment['Name'] for attachment in message._attachments]
+        file_bytes = [attachment._content for attachment in message._attachments]
+        file_names = [attachment.name for attachment in message._attachments]
 
         # The files are base64'd for the API
         some_bytes = base64.b64encode(b'some bytes')
