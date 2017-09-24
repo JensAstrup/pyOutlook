@@ -8,6 +8,7 @@ from typing import List, TYPE_CHECKING, Union, Any
 from dateutil import parser
 import requests
 
+from pyOutlook.core.attachment import Attachment
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.utils import get_valid_filename, check_response
 
@@ -76,6 +77,7 @@ class Message(object):
         self.time_sent = kwargs.get('time_sent', None)
 
         self._attachments = []
+        self._has_attachments = kwargs.get('has_attachments', False)
 
         self.__is_read = kwargs.get('is_read', False)
         self.__parent_folder_id = kwargs.get('parent_folder_id', None)
@@ -106,6 +108,7 @@ class Message(object):
         to_recipients = Contact._json_to_contacts(to_recipients)
 
         is_read = api_json['IsRead']
+        has_attachments = api_json['HasAttachments']
 
         time_created = api_json.get('CreatedDateTime', None)
         if time_created is not None:
@@ -124,8 +127,25 @@ class Message(object):
         return_message = Message(account, body, subject, to_recipients, sender=sender, message_id=uid, is_read=is_read,
                                  time_created=time_created, time_sent=time_sent, parent_folder_id=parent_folder_id,
                                  is_draft=is_draft, importance=importance, body_preview=body_preview,
-                                 categories=categories)
+                                 categories=categories, has_attachments=has_attachments)
         return return_message
+
+    @property
+    def attachments(self):
+        if not self._has_attachments:
+            return []
+
+        if self._attachments:
+            return self._attachments
+
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/attachments'.format(self.message_id)
+        r = requests.get(endpoint, headers=self.account._headers)
+
+        if check_response(r):
+            data = r.json()
+            self._attachments = Attachment.json_to_attachments(self.account, data)
+
+        return self._attachments
 
     @property
     def is_read(self):
@@ -166,6 +186,41 @@ class Message(object):
 
         return self.__parent_folder
 
+    def _api_representation(self, content_type):
+        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
+
+        if self.sender is not None:
+            payload.update(From=self.sender._api_representation())
+
+        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        if any(isinstance(item, str) for item in self.to):
+            self.to = [Contact(email=email) for email in self.to]
+
+        # Turn each contact into the JSON needed for the Outlook API
+        recipients = [contact._api_representation() for contact in self.to]
+
+        payload.update(ToRecipients=recipients)
+
+        # Conduct the same process for CC and BCC if needed
+        if self.cc:
+            if any(isinstance(email, str) for email in self.cc):
+                self.cc = [Contact(email) for email in self.cc]
+
+            cc_recipients = [contact._api_representation() for contact in self.cc]
+            payload.update(CcRecipients=cc_recipients)
+
+        if self.bcc:
+            if any(isinstance(email, str) for email in self.bcc):
+                self.bcc = [Contact(email) for email in self.bcc]
+
+            bcc_recipients = [contact._api_representation() for contact in self.bcc]
+            payload.update(BccRecipients=bcc_recipients)
+
+        if self._attachments:
+            payload.update(Attachments=[attachment.api_representation() for attachment in self._attachments])
+
+        return dict(Message=payload)
+
     def _make_api_call(self, http_type, endpoint, extra_headers = None, data=None):
         # type: (str, str, dict, Any) -> None
         """
@@ -200,41 +255,6 @@ class Message(object):
             raise NotImplemented
 
         check_response(r)
-
-    def _api_representation(self, content_type):
-        payload = dict(Subject=self.subject, Body=dict(ContentType=content_type, Content=self.body))
-
-        if self.sender is not None:
-            payload.update(Sender=self.sender._api_representation())
-
-        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
-        if any(isinstance(item, str) for item in self.to):
-            self.to = [Contact(email=email) for email in self.to]
-
-        # Turn each contact into the JSON needed for the Outlook API
-        recipients = [contact._api_representation() for contact in self.to]
-
-        payload.update(ToRecipients=recipients)
-
-        # Conduct the same process for CC and BCC if needed
-        if self.cc:
-            if any(isinstance(email, str) for email in self.cc):
-                self.cc = [Contact(email) for email in self.cc]
-
-            cc_recipients = [contact._api_representation() for contact in self.cc]
-            payload.update(CcRecipients=cc_recipients)
-
-        if self.bcc:
-            if any(isinstance(email, str) for email in self.bcc):
-                self.bcc = [Contact(email) for email in self.bcc]
-
-            bcc_recipients = [contact._api_representation() for contact in self.bcc]
-            payload.update(BccRecipients=bcc_recipients)
-
-        if self._attachments:
-            payload.update(Attachments=self._attachments)
-
-        return dict(Message=payload)
 
     def send(self, content_type='HTML'):
         """ Takes the recipients, body, and attachments of the Message and sends.
@@ -392,11 +412,9 @@ class Message(object):
         except TypeError:
             file_bytes = base64.b64encode(bytes(file_bytes, 'utf-8'))
 
-        self._attachments.append({
-            '@odata.type': '#Microsoft.OutlookServices.FileAttachment',
-            'Name': get_valid_filename(file_name),
-            'ContentBytes': file_bytes.decode('utf-8')
-        })
+        self._attachments.append(
+            Attachment(get_valid_filename(file_name), file_bytes.decode('utf-8'))
+        )
 
     def add_category(self, category_name):
         # type: (str) -> None
