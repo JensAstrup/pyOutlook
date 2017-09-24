@@ -68,6 +68,12 @@ class Message(object):
         self.importance = kwargs.get('Importance', self.IMPORTANCE_NORMAL)
         self.categories = kwargs.get('categories', [])
 
+        focused = kwargs.get('InferenceClassification', False)
+        if focused == 'Focused':
+            self._focused = True
+        else:
+            self._focused = False
+
         self.sender = sender
         self.to = to_recipients
         self.cc = cc or []
@@ -131,7 +137,32 @@ class Message(object):
         return return_message
 
     @property
+    def focused(self):
+        """ Sets and retrieves the 'Focused' status of a Message. If a user has the 'Focused' inbox, messages are
+        divided between the Focused and Other tabs. """
+        return self._focused
+
+    @focused.setter
+    def focused(self, value):
+
+        if not isinstance(value, bool):
+            raise TypeError('Focused must be a boolean value')
+
+        endpoint = "https://outlook.office.com/api/v2.0/me/messages('{}')".format(self.message_id)
+
+        if value:
+            data = dict(InferenceClassification='Focused')
+        else:
+            data = dict(InferenceClassification='Other')
+
+        r = requests.patch(endpoint, data=json.dumps(data), headers=self.account._headers)
+
+        if check_response(r):
+            self._focused = value
+
+    @property
     def attachments(self):
+        # type: () -> [Attachment]
         if not self._has_attachments:
             return []
 
