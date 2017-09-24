@@ -79,6 +79,7 @@ class TestMessage(TestCase):
             "ReplyTo": [],
             "ConversationId": "AAQkAGI2yEto=",
             "IsRead": False,
+            'HasAttachments': True
         }
         Message._json_to_message(self.account, json_message)
 

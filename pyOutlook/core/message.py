@@ -138,7 +138,7 @@ class Message(object):
         if self._attachments:
             return self._attachments
 
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/attachments'
+        endpoint = 'https://outlook.office.com/api/v2.0/me/messages/{}/attachments'.format(self.message_id)
         r = requests.get(endpoint, headers=self.account._headers)
 
         if check_response(r):
