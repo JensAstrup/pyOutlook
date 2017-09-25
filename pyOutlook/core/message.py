@@ -146,7 +146,7 @@ class Message(object):
     def focused(self, value):
 
         if not isinstance(value, bool):
-            raise TypeError('Focused must be a boolean value')
+            raise TypeError('Message.focused must be a boolean value')
 
         endpoint = "https://outlook.office.com/api/v2.0/me/messages('{}')".format(self.message_id)
 
@@ -232,8 +232,6 @@ class Message(object):
 
         payload.update(ToRecipients=recipients)
 
-        payload.update(Importance=str(self.importance))
-
         # Conduct the same process for CC and BCC if needed
         if self.cc:
             if any(isinstance(email, str) for email in self.cc):
@@ -251,6 +249,8 @@ class Message(object):
 
         if self._attachments:
             payload.update(Attachments=[attachment.api_representation() for attachment in self._attachments])
+
+        payload.update(Importance=str(self.importance))
 
         return dict(Message=payload)
 
