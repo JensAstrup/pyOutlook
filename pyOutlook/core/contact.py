@@ -1,3 +1,13 @@
+import json
+import typing
+
+import requests
+
+from pyOutlook.internal.utils import check_response
+
+if typing.TYPE_CHECKING:
+    from pyOutlook import OutlookAccount
+
 __all__ = ['Contact']
 
 
@@ -40,3 +50,29 @@ class Contact(object):
     def _api_representation(self):
         """ Returns the JSON formatting required by Outlook's API for contacts """
         return dict(EmailAddress=dict(Name=self.name, Address=self.email))
+
+    def set_focused_override(self, account, is_focused):
+        # type: (OutlookAccount, bool) -> bool
+        """ Emails from this contact will either always be put in the Focused inbox, or always put in Other, based on
+        the value of is_focused.
+
+        Args:
+            account (OutlookAccount): The :class:`OutlookAccount <pyOutlook.core.main.OutlookAccount>`
+                the override should be set for
+            is_focused (bool): Whether this contact should be set to Focused, or Other.
+
+        Returns:
+            True if the request was successful
+        """
+        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
+
+        if is_focused:
+            classification = 'Focused'
+        else:
+            classification = 'Other'
+
+        data = dict(ClassifyAs=classification, SenderEmailAddress=dict(Address=self.email))
+
+        r = requests.post(endpoint, headers=account._headers, data=json.dumps(data))
+
+        return check_response(r)
