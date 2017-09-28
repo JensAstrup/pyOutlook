@@ -341,7 +341,7 @@ class Message(object):
 
         """
         if isinstance(folder, Folder):
-            self.move_to(folder.id)
+            self._move_to(folder.id)
         else:
             self._move_to(folder)
 
