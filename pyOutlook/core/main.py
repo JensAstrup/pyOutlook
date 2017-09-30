@@ -26,6 +26,7 @@ class OutlookAccount(object):
     def __init__(self, access_token):
         self.access_token = access_token
         self._auto_reply = None
+        self._contact_overrides = None
 
     @property
     def _headers(self):
@@ -47,6 +48,19 @@ class OutlookAccount(object):
     def auto_reply_message(self, value):
         self.set_auto_reply(value)
 
+    @property
+    def contact_overrides(self):
+        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
+
+        if self._contact_overrides is None:
+            r = requests.get(endpoint, headers=self._headers)
+
+            check_response(r)
+
+            self._contact_overrides = Contact._json_to_contacts(r.json())
+
+        return self._contact_overrides
+
     class AutoReplyAudience(object):
         INTERNAL_ONLY = 'None'
         CONTACTS_ONLY = 'ContactsOnly'
@@ -62,17 +76,17 @@ class OutlookAccount(object):
         # type: (str, OutlookAccount.AutoReplyStatus, datetime, datetime, str, OutlookAccount.AutoReplyAudience) -> None
         """ Set an automatic reply for the account.
         Args:
-            message: The message to be sent in replies. If external_message is provided this is the message sent to
-                internal recipients
-            status: Whether the auto-reply should be always enabled, scheduled, or disabled. You can use
-                :class:`AutoReplyStatus <pyOutlook.core.main.OutlookAccount.AutoReplyStatus>` to provide the value.
-                Defaults to ALWAYS_ENABLED.
-            start: If status is set to SCHEDULED, this is when the replies will start being sent.
-            end: If status is set to SCHEDULED, this is when the replies will stop being sent.
-            external_message: If provided, this message will be sent to external recipients.
-            audience: Whether replies should be sent to everyone, contacts only, or internal recipients only. You can
-                use :class:`AutoReplyAudience <pyOutlook.core.main.OutlookAccount.AutoReplyAudience>` to provide the
-                value.
+            message (str): The message to be sent in replies. If external_message is provided this is the message sent
+            to internal recipients
+            status (OutlookAccount.AutoReplyStatus): Whether the auto-reply should be always enabled, scheduled, or
+            disabled. You can use :class:`AutoReplyStatus <pyOutlook.core.main.OutlookAccount.AutoReplyStatus>` to
+            provide the value. Defaults to ALWAYS_ENABLED.
+            start (datetime): If status is set to SCHEDULED, this is when the replies will start being sent.
+            end (datetime): If status is set to SCHEDULED, this is when the replies will stop being sent.
+            external_message (str): If provided, this message will be sent to external recipients.
+            audience (OutlookAccount.AutoReplyAudience): Whether replies should be sent to everyone, contacts only,
+            or internal recipients only. You can use
+            :class:`AutoReplyAudience <pyOutlook.core.main.OutlookAccount.AutoReplyAudience>` to provide the value.
 
         """
 
@@ -120,7 +134,7 @@ class OutlookAccount(object):
             message_id: A string for the intended message, provided by Outlook
 
         Returns:
-            Message
+            :class:`Message <pyOutlook.core.message.Message>`
 
         """
         r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self._headers)
@@ -134,7 +148,7 @@ class OutlookAccount(object):
             page (int): Integer representing the 'page' of results to fetch
 
         Returns:
-            List[Message]
+            List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
@@ -153,28 +167,29 @@ class OutlookAccount(object):
         """ first ten messages in account's inbox.
 
         Returns:
-            List[Message]
+            List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
         return self._get_messages_from_folder_name('Inbox')
 
     def new_email(self, body='', subject='', to=list):
-        """Creates a NewMessage object.
+        """Creates a :class:`Message <pyOutlook.core.message.Message>` object.
 
         Keyword Args:
             body (str): The body of the email
             subject (str): The subject of the email
-            to (list[Contact]): A list of recipients to email
+            to (List[Contact]): A list of recipients to email
 
         Returns:
-            Message
+            :class:`Message <pyOutlook.core.message.Message>`
 
         """
         return Message(self.access_token, body, subject, to)
 
     def send_email(self, body=None, subject=None, to=list, cc=None, bcc=None,
                    send_as=None, attachments=None):
-        """Sends an email in one method using variables to set the various pieces of the email.
+        """Sends an email in one method, a shortcut for creating an instance of
+        :class:`Message <pyOutlook.core.message.Message>` .
 
         Args:
             body (str): The body of the email
@@ -202,7 +217,7 @@ class OutlookAccount(object):
         """ last ten sent messages.
 
         Returns:
-            list[Message]
+            List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
         return self._get_messages_from_folder_name('SentItems')
@@ -211,7 +226,7 @@ class OutlookAccount(object):
         """ last ten deleted messages.
 
         Returns:
-            list[Message]
+            List[:class:`Message <pyOutlook.core.message.Message>` ]
 
         """
         return self._get_messages_from_folder_name('DeletedItems')
@@ -220,13 +235,17 @@ class OutlookAccount(object):
         """ last ten draft messages.
 
         Returns:
-            list[Message]
+            List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
         return self._get_messages_from_folder_name('Drafts')
 
     def get_folders(self):
-        """ Returns a list of all folders for this account """
+        """ Returns a list of all folders for this account
+
+            Returns:
+                List[:class:`Folder <pyOutlook.core.folder.Folder>`]
+        """
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
 
         r = requests.get(endpoint, headers=self._headers)
@@ -235,6 +254,14 @@ class OutlookAccount(object):
             return Folder._json_to_folders(self, r.json())
 
     def get_folder_by_id(self, folder_id):
+        """ Retrieve a Folder by its Outlook ID
+
+        Args:
+            folder_id: The ID of the :class:`Folder <pyOutlook.core.folder.Folder>` to retrieve
+
+        Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
+
+        """
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
 
         r = requests.get(endpoint, headers=self._headers)
@@ -250,7 +277,7 @@ class OutlookAccount(object):
         Args:
             folder_name (str): The name of the folder to retrieve
 
-        Returns: A list of :class:`Folders <pyOutlook.core.folder.Folder>`
+        Returns: List[:class:`Message <pyOutlook.core.message.Message>` ]
 
         """
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages',
