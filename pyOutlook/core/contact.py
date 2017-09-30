@@ -72,7 +72,12 @@ class Contact(object):
 
     @classmethod
     def _json_to_contacts(cls, json_value):
-        return [cls._json_to_contact(contact) for contact in json_value['value']]
+        # Sometimes, multiple contacts will be provided behind a dictionary with 'value' as the key
+        try:
+            json_value = json_value['value']
+        except TypeError:
+            pass
+        return [cls._json_to_contact(contact) for contact in json_value]
 
     def api_representation(self):
         """ Returns the JSON formatting required by Outlook's API for contacts """
