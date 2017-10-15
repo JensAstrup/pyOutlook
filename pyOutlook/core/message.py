@@ -319,7 +319,10 @@ class Message(object):
     def _move_to(self, destination):
         endpoint = 'https://outlook.office.com/api/v2.0/me/messages/' + self.message_id + '/move'
         payload = '{ "DestinationId": "' + destination + '"}'
-        self._make_api_call('post', endpoint, data=payload)
+        r = requests.post(endpoint, data=payload, headers=self.account._headers)
+        check_response(r)
+        data = r.json()
+        self.message_id = data.get('Id', self.message_id)
 
     def move_to_inbox(self):
         """Moves the email to the account's Inbox"""
