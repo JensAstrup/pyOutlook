@@ -275,7 +275,7 @@ class Message(object):
 
         """
 
-        headers = {"Authorization": "Bearer " + self.account.access_token, "Content-Type": "application/json"}
+        headers = {"Authorization": "Bearer " + self.account, "Content-Type": "application/json"}
 
         if extra_headers is not None:
             headers.update(extra_headers)
