@@ -1,11 +1,17 @@
 from base64 import b64decode
+
+import typing
 from dateutil import parser
 
 __all__ = ['Attachment']
 
+if typing.TYPE_CHECKING:
+    from datetime import datetime
+
 
 class Attachment(object):
     def __init__(self, name, content, outlook_id=None, size=None, last_modified=None, content_type=None):
+        # type: (str, str, str, int, datetime, str) -> None
         self.name = name
 
         self._content = content

@@ -2,7 +2,7 @@ import base64
 import logging
 import json
 
-from typing import List, TYPE_CHECKING, Union, Any
+from typing import List, TYPE_CHECKING, Union, Any, Type
 
 from dateutil import parser
 import requests
@@ -55,7 +55,7 @@ class Message(object):
 
     def __init__(self, account, body, subject, to_recipients, sender=None,
                  cc=None, bcc=None, message_id=None, **kwargs):
-        # type: (OutlookAccount, str, str, Union[List[Contact], List[str]], Contact, List[Contact], List[Contact], str) -> None
+        # type: (OutlookAccount, str, str, Union[List[Contact], List[str], Type[list]], Contact, List[Contact], List[Contact], str, Any) -> None
         self.account = account
         self.message_id = message_id
 

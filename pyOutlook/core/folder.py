@@ -1,9 +1,13 @@
 import requests
+import typing
 
 from pyOutlook.core.message import Message
 from pyOutlook.internal.utils import check_response
 
 __all__ = ['Folder']
+
+if typing.TYPE_CHECKING:
+    from pyOutlook.core import OutlookAccount
 
 
 class Folder(object):
@@ -20,6 +24,7 @@ class Folder(object):
 
     """
     def __init__(self, account, folder_id, folder_name, parent_id, child_folder_count, unread_count, total_items):
+        # type: (OutlookAccount, str, str, str, int, int, int) -> None
         self.account = account
         self.parent_id = parent_id
         self.child_folder_count = child_folder_count
