@@ -32,9 +32,7 @@ class Contact(object):
     """
 
     def __init__(self, email, name=None, focused=None):
-        """
-
-        """
+        # type: (str, str, bool) -> None
         self.email = email
         self.name = name
         self.focused = focused

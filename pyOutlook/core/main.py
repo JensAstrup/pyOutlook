@@ -24,8 +24,8 @@ class OutlookAccount(object):
     """
 
     def __init__(self, access_token):
-        self.access_token = access_token
-        self._auto_reply = None
+        self.access_token = access_token  # type: str
+        self._auto_reply = None  # type: str
         self._contact_overrides = None
 
     @property
@@ -205,7 +205,7 @@ class OutlookAccount(object):
                 [2] 'bytes' - the bytes of the file.
 
         """
-        email = Message(self, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
+        email = Message(self, body, subject, to, cc=cc, bcc=bcc, sender=send_as,)
 
         if attachments is not None:
             for attachment in attachments:
