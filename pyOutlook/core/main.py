@@ -184,7 +184,7 @@ class OutlookAccount(object):
             :class:`Message <pyOutlook.core.message.Message>`
 
         """
-        return Message(self.access_token, body, subject, to)
+        return Message(self, body, subject, to)
 
     def send_email(self, body=None, subject=None, to=list, cc=None, bcc=None,
                    send_as=None, attachments=None):
@@ -205,7 +205,7 @@ class OutlookAccount(object):
                 [2] 'bytes' - the bytes of the file.
 
         """
-        email = Message(self.access_token, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
+        email = Message(self, body, subject, to, cc=cc, bcc=bcc, sender=send_as)
 
         if attachments is not None:
             for attachment in attachments:
