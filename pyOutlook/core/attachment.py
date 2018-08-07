@@ -1,12 +1,9 @@
 from base64 import b64decode
 
-import typing
+from datetime import datetime
 from dateutil import parser
 
 __all__ = ['Attachment']
-
-if typing.TYPE_CHECKING:
-    from datetime import datetime
 
 
 class Attachment(object):

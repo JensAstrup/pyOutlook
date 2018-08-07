@@ -1,12 +1,7 @@
 import json
-import typing
-
 import requests
 
 from pyOutlook.internal.utils import check_response
-
-if typing.TYPE_CHECKING:
-    from pyOutlook import OutlookAccount
 
 __all__ = ['Contact']
 
