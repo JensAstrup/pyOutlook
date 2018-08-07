@@ -1,4 +1,6 @@
 from base64 import b64decode
+
+from datetime import datetime
 from dateutil import parser
 
 __all__ = ['Attachment']
@@ -6,6 +8,7 @@ __all__ = ['Attachment']
 
 class Attachment(object):
     def __init__(self, name, content, outlook_id=None, size=None, last_modified=None, content_type=None):
+        # type: (str, str, str, int, datetime, str) -> None
         self.name = name
 
         self._content = content

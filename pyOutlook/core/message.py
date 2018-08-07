@@ -2,17 +2,13 @@ import base64
 import logging
 import json
 
-from typing import List, TYPE_CHECKING, Union, Any
-
 from dateutil import parser
 import requests
 
 from pyOutlook.core.attachment import Attachment
 from pyOutlook.core.contact import Contact
+from pyOutlook.core.folder import Folder
 from pyOutlook.internal.utils import get_valid_filename, check_response
-
-if TYPE_CHECKING:
-    from pyOutlook import OutlookAccount, Folder
 
 log = logging.getLogger('pyOutlook')
 
@@ -55,7 +51,6 @@ class Message(object):
 
     def __init__(self, account, body, subject, to_recipients, sender=None,
                  cc=None, bcc=None, message_id=None, **kwargs):
-        # type: (OutlookAccount, str, str, Union[List[Contact], List[str]], Contact, List[Contact], List[Contact], str) -> None
         self.account = account
         self.message_id = message_id
 
@@ -201,6 +196,7 @@ class Message(object):
         # type: () -> Folder
         """ Returns the :class:`Folder <pyOutlook.core.folder.Folder>` this message is in
 
+            >>> from pyOutlook import *
             >>> account = OutlookAccount('')
             >>> message = account.get_messages()[0]
             >>> message.parent_folder
@@ -308,7 +304,7 @@ class Message(object):
         self._make_api_call('post', endpoint=endpoint, data=json.dumps(payload))
 
     def forward(self, to_recipients, forward_comment=None):
-        # type: (Union[List[Contact], List[str]], str) -> None
+        # type: (list, str) -> None
         """Forward Message to recipients with an optional comment.
 
         Args:
@@ -327,7 +323,8 @@ class Message(object):
         if forward_comment is not None:
             payload.update(Comment=forward_comment)
 
-        # A list of strings can also be provided for convenience. If provided, convert them into Contacts
+        # A list of strings can also be provided for convenience.
+        # If provided, convert them into Contacts
         if any(isinstance(recipient, str) for recipient in to_recipients):
             to_recipients = [Contact(email=email) for email in to_recipients]
 
@@ -356,6 +353,7 @@ class Message(object):
         self._make_api_call('post', endpoint, data=payload)
 
     def reply_all(self, reply_comment):
+        # type: (str) -> None
         """Replies to everyone on the email, including those on the CC line.
 
         With great power, comes great responsibility.
@@ -395,6 +393,7 @@ class Message(object):
         self._move_to('Drafts')
 
     def move_to(self, folder):
+        # type: (Folder) -> None
         """Moves the email to the folder specified by the folder parameter.
 
         Args:
@@ -425,6 +424,7 @@ class Message(object):
         self._copy_to('Drafts')
 
     def copy_to(self, folder_id):
+        # type: (str) -> None
         """Copies the email to the folder specified by the folder_id.
 
         The folder id must match the id provided by Outlook.

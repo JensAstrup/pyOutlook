@@ -1,6 +1,5 @@
 import requests
 
-from pyOutlook.core.message import Message
 from pyOutlook.internal.utils import check_response
 
 __all__ = ['Folder']
@@ -102,7 +101,7 @@ class Folder(object):
         check_response(r)
 
     def move_into(self, destination_folder):
-        # type: (Folder) -> None
+        # type: (Folder) -> Folder
         """Move the Folder into a different folder.
 
         This makes the Folder provided a child folder of the destination_folder.
@@ -129,7 +128,7 @@ class Folder(object):
             return self._json_to_folder(self.account, return_folder)
 
     def copy_into(self, destination_folder):
-        # type: (Folder) -> None
+        # type: (Folder) -> Folder
         """Copies the Folder into the provided destination folder.
 
         Raises:
@@ -176,6 +175,7 @@ class Folder(object):
         headers = self.headers
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
         check_response(r)
+        from pyOutlook.core.message import Message
         return Message._json_to_messages(self.account, r.json())
 
 
