@@ -21,7 +21,10 @@ a far smaller scope.
 
 Python Versions
 _______________
-pyOutlook is only tested in, and targets, Python 3.5, 3.6, and 2.7.
+pyOutlook is only tested in, and targets, Python 2.7, 3.5, 3.6, 3.7, and 3.8.
+
+.. warning::
+   Support for Python 2.7 will be dropped in version 5.0.0
 
 Recommended:
 ------------
