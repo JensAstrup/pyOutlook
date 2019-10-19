@@ -16,6 +16,7 @@ setuptools.setup(
     install_requires=['requests', 'python-dateutil'],
     tests_require=['coverage', 'nose'],
     keywords='outlook office365 microsoft email',
+    python_requires='>=2.7',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
 
@@ -29,6 +30,8 @@ setuptools.setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 2.7',
         'Natural Language :: English'
     ]
