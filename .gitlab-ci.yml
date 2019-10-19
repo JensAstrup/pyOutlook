@@ -1,5 +1,6 @@
 stages:
   - tests
+  - deploy
 
 python2.7:
   stage: tests
@@ -40,3 +41,16 @@ python3.8:
     - pip install -r dev_requirements.txt
   script:
     - nosetests --with-coverage --cover-package=pyOutlook
+
+
+package:
+  stage: deploy
+  image: python:3.7
+  script:
+    - pip install -U twine
+    - python setup.py sdist bdist_wheel
+    - twine upload --username="$PYPI_USERNAME" --password="$PYPI_PASSWORD" dist/*
+  environment:
+    name: pypi
+  only:
+    - tags
