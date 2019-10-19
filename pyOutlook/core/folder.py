@@ -32,6 +32,15 @@ class Folder(object):
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        return self.id == other.id
+
+    def __ne__(self, other):
+        return self.id != other.id
+
+    def __hash__(self):
+        return hash(self.id)
         
     @property
     def headers(self):
@@ -119,7 +128,7 @@ class Folder(object):
         """
         headers = self.headers
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/move'
-        payload = '{ "DestinationId": "' + destination_folder.id + '"}'
+        payload = '{"DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
@@ -143,7 +152,7 @@ class Folder(object):
         """
         headers = self.headers
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/copy'
-        payload = '{ "DestinationId": "' + destination_folder.id + '"}'
+        payload = '{"DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
@@ -161,7 +170,7 @@ class Folder(object):
         """
         headers = self.headers
         endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
-        payload = '{ "DisplayName": "' + folder_name + '"}'
+        payload = '{"DisplayName": "' + folder_name + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
 
@@ -172,10 +181,11 @@ class Folder(object):
     def messages(self):
         """ Retrieves the messages in this Folder, 
         returning a list of :class:`Messages <pyOutlook.core.message.Message>`."""
+        from pyOutlook.core.message import Message
+
         headers = self.headers
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
         check_response(r)
-        from pyOutlook.core.message import Message
         return Message._json_to_messages(self.account, r.json())
 
 
