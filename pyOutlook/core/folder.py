@@ -17,6 +17,9 @@ class Folder(object):
         unread_count: The number of unread messages inside this Folder
         total_items: A sum of all items inside Folder
 
+    Warnings:
+        Setting the id attribute on a folder instance will no longer be supported in v5.0.0
+
     """
     def __init__(self, account, folder_id, folder_name, parent_id, child_folder_count, unread_count, total_items):
         self.account = account
