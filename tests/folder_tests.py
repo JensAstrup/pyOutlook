@@ -1,4 +1,6 @@
 import json
+import six
+
 from unittest import TestCase
 try:
     from unittest.mock import patch, Mock
@@ -50,7 +52,7 @@ class TestMessage(TestCase):
             Folder(self.account, 'Folder1', 'Folder 1', 'Parent Folder', 3, 4, 20),
             Folder(self.account, 'Folder2', 'Folder 2', 'Parent Folder 2', 0, 2, 10)
         ]
-        self.assertCountEqual(Folder._json_to_folders(self.account, folders), expected)
+        six.assertCountEqual(self, Folder._json_to_folders(self.account, folders), expected)
 
     @patch('pyOutlook.core.folder.requests.patch')
     def test_rename_folder(self, patch):
@@ -128,7 +130,7 @@ class TestMessage(TestCase):
             Folder(self.account, 'Folder1', 'Folder 1', 'Parent Folder', 3, 4, 20),
             Folder(self.account, 'Folder2', 'Folder 2', 'Parent Folder 2', 0, 2, 10)
         ]
-        self.assertCountEqual(self.folder.get_subfolders(), expected)
+        six.assertCountEqual(self, self.folder.get_subfolders(), expected)
         expected_url = 'https://outlook.office.com/api/v2.0/me/MailFolders/ID/childfolders'
         get.assert_called_once_with(expected_url, headers=self.folder.headers)
 
