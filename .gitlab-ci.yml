@@ -33,10 +33,10 @@ package:
   stage: deploy
   image: python:3.7
   script:
+    - pip install -U twine
     - python setup.py sdist bdist_wheel
-    - python twine upload --username="$PYPI_USERNAME" --password="$PYPI_PASSWORD" dist/*
+    - twine upload --username="$PYPI_USERNAME" --password="$PYPI_PASSWORD" dist/*
   environment:
     name: pypi
   only:
-    refs:
-      - master
+    - tags
