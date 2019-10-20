@@ -12,27 +12,52 @@ from pyOutlook.core.message import Message
 from tests.utils import sample_message
 
 
-class TestMessage(TestCase):
+class MessageTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.mock_get_patcher = patch('pyOutlook.core.message.requests.get')
-        cls.mock_get = cls.mock_get_patcher.start()
-
-        cls.mock_patch_patcher = patch('pyOutlook.core.message.requests.patch')
-        cls.mock_patch = cls.mock_patch_patcher.start()
-
-        cls.mock_post_patcher = patch('pyOutlook.core.message.requests.post')
-        cls.mock_post = cls.mock_post_patcher.start()
-
         cls.account = OutlookAccount('token')
+        cls.message = Message(cls.account, 'Test Body', 'Test Subject', ['test@email.com'], message_id='123')
 
-    def test_json_to_message_format(self):
+    def test__str__(self):
+        self.assertEqual(str(self.message), 'Test Subject')
+
+    def test__repr__(self):
+        self.assertEqual(repr(self.message), 'Test Subject')
+
+    def test__eq__message_id_equal(self):
+        other_message = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com'], message_id='123')
+        self.assertEqual(self.message, other_message)
+
+    def test__eq__message_id_not_equal(self):
+        other_message = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com'], message_id='1234')
+        self.assertNotEqual(self.message, other_message)
+
+    def test__eq__no_message_id_equal(self):
+        message_1 = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com'])
+        message_2 = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com'])
+        self.assertEqual(message_1, message_2)
+
+    def test__eq__no_message_id_not_equal(self):
+        other_message = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com', 'other@email.com'])
+        self.assertNotEqual(self.message, other_message)
+
+    def test__hash__message_id(self):
+        expected_hash = hash(self.message.message_id)
+        self.assertEqual(hash(self.message), expected_hash)
+
+    def test__hash__no_message_id(self):
+        other_message = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com', 'other@email.com'])
+        with self.assertRaisesRegexp(TypeError, 'Unable to hash messages with no Outlook ID'):
+            hash(other_message)
+
+    @patch('pyOutlook.core.message.requests.get')
+    def test_json_to_message_format(self, get):
         """ Test that JSON is turned into a Message correctly """
-        mock_response = Mock()
-        mock_response.json.return_value = sample_message
-        mock_response.status_code = 200
+        response = Mock()
+        response.json.return_value = sample_message
+        response.status_code = 200
 
-        self.mock_get.return_value = mock_response
+        get.return_value = response
 
         account = OutlookAccount('token')
 
@@ -83,12 +108,13 @@ class TestMessage(TestCase):
         }
         Message._json_to_message(self.account, json_message)
 
-    def test_is_read_status(self):
+    @patch('pyOutlook.core.message.requests.patch')
+    def test_is_read_status(self, requests_patch):
         """ Test that the correct value is returned after changing the is_read status """
-        mock_patch = Mock()
-        mock_patch.status_code = 200
+        response = Mock()
+        response.status_code = 200
 
-        self.mock_patch.return_value = mock_patch
+        requests_patch.return_value = response
 
         message = Message(self.account, 'test body', 'test subject', [], is_read=False)
         message.is_read = True
@@ -114,30 +140,33 @@ class TestMessage(TestCase):
         self.assertIn(abc.decode('UTF-8'), file_bytes)
         self.assertIn('TestAttachment.csv', file_names)
 
-    def test_message_sent_with_string_recipients(self):
+    @patch('pyOutlook.core.message.requests.post')
+    def test_message_sent_with_string_recipients(self, post):
         """ A list of strings or Contacts can be provided as the To/CC/BCC recipients """
-        mock_post = Mock()
-        mock_post.status_code = 200
-        self.mock_post.return_value = mock_post
+        response = Mock()
+        response.status_code = 200
+        post.return_value = response
 
         message = Message(self.account, '', '', ['test@email.com'])
         message.send()
 
-    def test_message_sent_with_contact_recipients(self):
+    @patch('pyOutlook.core.message.requests.post')
+    def test_message_sent_with_contact_recipients(self, post):
         """ A list of strings or Contacts can be provided as the To/CC/BCC recipients """
-        mock_post = Mock()
-        mock_post.status_code = 200
-        self.mock_post.return_value = mock_post
+        response = Mock()
+        response.status_code = 200
+        post.return_value = response
 
         message = Message(self.account, '', '', [Contact('test@email.com')])
         message.send()
 
-    def test_category_added(self):
+    @patch('pyOutlook.core.message.requests.patch')
+    def test_category_added(self, requests_patch):
         """ Test that Message.categories is updated in addition to the API call made """
-        mock_patch = Mock()
-        mock_patch.status_code = 200
+        response = Mock()
+        response.status_code = 200
 
-        self.mock_patch.return_value = mock_patch
+        requests_patch.return_value = response
 
         message = Message(self.account, 'test body', 'test subject', [], categories=['A'])
         message.add_category('B')

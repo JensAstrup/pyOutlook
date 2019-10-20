@@ -9,7 +9,7 @@ except ImportError:
 from pyOutlook import *
 
 
-class TestMessage(TestCase):
+class FolderTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         cls.account = OutlookAccount('token')

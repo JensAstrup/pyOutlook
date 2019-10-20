@@ -89,6 +89,30 @@ class Message(object):
     def __repr__(self):
         return str(self)
 
+    def __eq__(self, other):
+        if self.message_id is not None or other.message_id is not None:
+            return self.message_id == other.message_id
+        else:
+            return all([self.account == other.account,
+                        self.body == other.body,
+                        self.subject == other.subject,
+                        self.to == other.to])
+
+    def __ne__(self, other):
+        if self.message_id is not None or other.message_id is not None:
+            return self.message_id != other.message_id
+        else:
+            return any([self.account != other.account,
+                        self.body != other.body,
+                        self.subject != other.subject,
+                        self.to != other.to])
+
+    def __hash__(self):
+        if self.message_id is not None:
+            return hash(self.message_id)
+        else:
+            raise TypeError('Unable to hash messages with no Outlook ID')
+
     @classmethod
     def _json_to_messages(cls, account, json_value):
         return [cls._json_to_message(account, message) for message in json_value['value']]

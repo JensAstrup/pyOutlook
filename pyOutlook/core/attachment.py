@@ -25,6 +25,24 @@ class Attachment(object):
     def __repr__(self):
         return self.name
 
+    def __eq__(self, other):
+        if self.outlook_id is not None or other.outlook_id is not None:
+            return self.outlook_id == other.outlook_id
+        else:
+            return self._content == other._content
+
+    def __ne__(self, other):
+        if self.outlook_id is not None or other.outlook_id is not None:
+            return self.outlook_id != other.outlook_id
+        else:
+            return self._content != other._content
+
+    def __hash__(self):
+        if self.outlook_id is not None:
+            return hash(self.outlook_id)
+        else:
+            return hash(self._content)
+
     @classmethod
     def json_to_attachment(cls, account, api_json):
         outlook_id = api_json.get('Id')
