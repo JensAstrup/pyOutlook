@@ -38,8 +38,9 @@ class MessageTestCase(TestCase):
         self.assertEqual(message_1, message_2)
 
     def test__eq__no_message_id_not_equal(self):
-        other_message = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com', 'other@email.com'])
-        self.assertNotEqual(self.message, other_message)
+        message_1 = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com'])
+        message_2 = Message(self.account, 'Test Body', 'Test Subject', ['test@email.com', 'other@email.com'])
+        self.assertNotEqual(message_1, message_2)
 
     def test__hash__message_id(self):
         expected_hash = hash(self.message.message_id)
