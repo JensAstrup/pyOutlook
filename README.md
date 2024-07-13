@@ -4,8 +4,8 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000)]()
 [![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.io/en/latest/?badge=latest)
 
-# Maintained on GitLab
-This project is maintained on [GitLab](https://gitlab.com/jensastrup/pyOutlook) and mirrored to [GitHub](https://github.com/JensAstrup/pyOutlook). Issues opened on the latter are still addressed.
+# No longer maintained
+This project is no longer maintained, I would recommend either using great caution using this in production applications (as dependencies are likely out of date) or even better, offering to become a contributor/maintainer on the project (check out my profile for contact methods)
 
 # pyOutlook
 A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
