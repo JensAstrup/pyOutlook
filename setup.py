@@ -14,7 +14,7 @@ setuptools.setup(
                 'JSON formatting for requests/responses and the REST endpoints and their varying requirements',
     long_description='Documentation is available at `ReadTheDocs <http://pyoutlook.readthedocs.io/en/latest/>`_.',
     install_requires=['requests', 'python-dateutil'],
-    tests_require=['coverage', 'nose'],
+    tests_require=['coverage', 'pytest', 'pytest-cov'],
     keywords='outlook office365 microsoft email',
     classifiers=[
         'Development Status :: 5 - Production/Stable',

@@ -1,7 +1,8 @@
 -r requirements.txt
 
 requests_mock
-nose
+pytest
+pytest-cov
 coverage
 Sphinx
 sphinx_rtd_theme

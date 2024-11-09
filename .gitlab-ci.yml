@@ -8,7 +8,7 @@ python2.7:
   before_script:
     - pip install -r dev_requirements.txt
   script:
-   - nosetests --with-coverage --cover-package=pyOutlook
+   - pytest --cov=pyOutlook
 
 python3.5:
   type: test
@@ -17,7 +17,7 @@ python3.5:
   before_script:
     - pip install -r dev_requirements.txt
   script:
-   - nosetests --with-coverage --cover-package=pyOutlook
+   - pytest --cov=pyOutlook
 
 python3.6:
   type: test
@@ -26,4 +26,13 @@ python3.6:
   before_script:
     - pip install -r dev_requirements.txt
   script:
-   - nosetests --with-coverage --cover-package=pyOutlook
+   - pytest --cov=pyOutlook
+
+python3.10:
+  type: test
+  stage: tests
+  image: python:3.6
+  before_script:
+    - pip install -r dev_requirements.txt
+  script:
+   - pytest --cov=pyOutlook
