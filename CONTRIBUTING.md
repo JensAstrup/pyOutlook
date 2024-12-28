@@ -2,6 +2,6 @@
 
 Please provide the full traceback you encountered, and the version of `pyOutlook` you're using. 
 
-## Merge Requests
-Please try and include additional tests to cover whatever additions you are making. Keep an eye out on the [Gitlab CI Pipeline](https://gitlab.com/jensastrup/pyOutlook/pipelines) - 
-if any of the jobs fail, check to see what issues were encountered and get those fixed. If the tests fail, we can't merge into the master branch!
+## Pull Requests
+- Please include additional tests to cover whatever additions or updates you are making. If the tests fail, we can't merge into the main branch!
+- Pull requests should be made to the `development` branch.
