@@ -49,7 +49,7 @@ print(email.body)
 ```
 
 ### inbox()
-This method is identical to get_messages(), however it returns only the ten most recent message in the inbox (ignoring messages that were put into seperate folders by an Outlook rule, junk email, etc)
+This method is identical to get_messages(), however it returns only the ten most recent message in the inbox (ignoring messages that were put into separate folders by an Outlook rule, junk email, etc)
 
 ```python
 from pyOutlook import *
