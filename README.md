@@ -4,16 +4,13 @@
 [![PyPI](https://img.shields.io/pypi/pyversions/pyOutlook.svg?maxAge=2592000)]()
 [![Documentation Status](https://readthedocs.org/projects/pyoutlook/badge/?version=latest)](http://pyoutlook.readthedocs.io/en/latest/?badge=latest)
 
-# No longer maintained
-This project is no longer maintained, I would recommend either using great caution using this in production applications (as dependencies are likely out of date). If someone is interested enough in having this project continue, feel free to become a sponsor and I'll revive the project. I'm also accepting offers to become a contributor/maintainer on the project (check out my profile for contact methods).
-
 # pyOutlook
 A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements
 
-The most up to date documentation can be found on [pyOutlook's RTD page](http://pyoutlook.readthedocs.io/en/latest/).
+The most up-to-date documentation can be found on [pyOutlook's RTD page](http://pyoutlook.readthedocs.io/en/latest/).
 
 ## Instantiation
-Before anything can be retrieved or sent, an instance of  OutlookAccount must be created. 
+Before anything can be retrieved or sent, an instance of OutlookAccount must be created. 
 The only parameter required is the access token for the account. 
 
 Note that this module does not handle the OAuth process, gaining an access token must be done outside of this module.
