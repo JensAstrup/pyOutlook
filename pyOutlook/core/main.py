@@ -94,7 +94,7 @@ class OutlookAccount(object):
         end_is_none = end is None
 
         if (not start_is_none and end_is_none) or (start_is_none and not end_is_none):
-            raise ValueError('Start and End not must both either be None or datetimes')
+            raise ValueError('Start and End must both either be None or datetimes')
 
         start_is_datetime = isinstance(start, datetime)
         end_is_datetime = isinstance(end, datetime)
