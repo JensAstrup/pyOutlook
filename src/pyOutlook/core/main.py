@@ -52,14 +52,10 @@ class OutlookAccount(object):
 
     @property
     def contact_overrides(self):
-        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
-
+        from pyOutlook.services.contact import ContactService
+        
         if self._contact_overrides is None:
-            r = requests.get(endpoint, headers=self._headers)
-
-            check_response(r)
-
-            self._contact_overrides = Contact._json_to_contacts(r.json())
+            self._contact_overrides = ContactService.get_contact_overrides(self)
 
         return self._contact_overrides
 
@@ -139,9 +135,7 @@ class OutlookAccount(object):
             :class:`Message <pyOutlook.core.message.Message>`
 
         """
-        r = requests.get('https://outlook.office.com/api/v2.0/me/messages/' + message_id, headers=self._headers)
-        check_response(r)
-        return Message._json_to_message(self, r.json())
+        return MessageService.get_message(self, message_id)
 
     def get_messages(self, page=0):
         """Get first 10 messages in account, across all folders.
@@ -153,17 +147,7 @@ class OutlookAccount(object):
             List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
-        if page > 0:
-            endpoint = endpoint + '/?%24skip=' + str(page) + '0'
-
-        log.debug('Getting messages from endpoint: {} with Headers: {}'.format(endpoint, self._headers))
-
-        r = requests.get(endpoint, headers=self._headers)
-
-        check_response(r)
-
-        return Message._json_to_messages(self, r.json())
+        return MessageService.get_messages(self, page)
 
     def inbox(self):
         """ first ten messages in account's inbox.
@@ -172,7 +156,7 @@ class OutlookAccount(object):
             List[:class:`Message <pyOutlook.core.message.Message>`]
 
         """
-        return self._get_messages_from_folder_name('Inbox')
+        return MessageService.get_messages_from_folder(self, 'Inbox')
 
     def new_email(self, body='', subject='', to=list):
         """Creates a :class:`Message <pyOutlook.core.message.Message>` object.
@@ -248,12 +232,7 @@ class OutlookAccount(object):
             Returns:
                 List[:class:`Folder <pyOutlook.core.folder.Folder>`]
         """
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
-
-        r = requests.get(endpoint, headers=self._headers)
-
-        if check_response(r):
-            return Folder._json_to_folders(self, r.json())
+        return FolderService.get_folders(self)
 
     def get_folder_by_id(self, folder_id):
         """ Retrieve a Folder by its Outlook ID
@@ -264,13 +243,7 @@ class OutlookAccount(object):
         Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
 
         """
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_id
-
-        r = requests.get(endpoint, headers=self._headers)
-
-        check_response(r)
-        return_folder = r.json()
-        return Folder._json_to_folder(self, return_folder)
+        return FolderService.get_folder(self, folder_id)
 
     def _get_messages_from_folder_name(self, folder_name):
         """ Retrieves all messages from a folder, specified by its name. This only works with "Well Known" folders,
@@ -282,7 +255,4 @@ class OutlookAccount(object):
         Returns: List[:class:`Message <pyOutlook.core.message.Message>` ]
 
         """
-        r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + folder_name + '/messages',
-                         headers=self._headers)
-        check_response(r)
-        return Message._json_to_messages(self, r.json())
+        return MessageService.get_messages_from_folder(self, folder_name)
