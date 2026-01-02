@@ -10,6 +10,8 @@ from pyOutlook.core.contact import Contact
 from pyOutlook.core.message import Message
 from pyOutlook.core.folder import Folder
 from pyOutlook.internal.utils import check_response
+from pyOutlook.services.message import MessageService
+from pyOutlook.services.folder import FolderService
 
 log = logging.getLogger('pyOutlook')
 __all__ = ['OutlookAccount']
