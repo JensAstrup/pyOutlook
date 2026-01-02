@@ -39,12 +39,15 @@ class Folder(object):
     
     @classmethod
     def _json_to_folder(cls, account, json_value):
-        return Folder(account, json_value['Id'], json_value['DisplayName'], json_value['ParentFolderId'],
-                      json_value['ChildFolderCount'], json_value['UnreadItemCount'], json_value['TotalItemCount'])
+        '''Backward compatibility: delegates to FolderService.'''
+        from pyOutlook.services.folder import FolderService
+        return FolderService._json_to_folder(account, json_value)
 
     @classmethod
     def _json_to_folders(cls, account, json_value):
-        return [cls._json_to_folder(account, folder) for folder in json_value['value']]
+        '''Backward compatibility: delegates to FolderService.'''
+        from pyOutlook.services.folder import FolderService
+        return FolderService._json_to_folders(account, json_value)
 
     def rename(self, new_folder_name):
         """Renames the Folder to the provided name.
@@ -172,10 +175,11 @@ class Folder(object):
     def messages(self):
         """ Retrieves the messages in this Folder, 
         returning a list of :class:`Messages <pyOutlook.core.message.Message>`."""
+        from pyOutlook.services.message import MessageService
+        
         headers = self.headers
         r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
         check_response(r)
-        from pyOutlook.core.message import Message
-        return Message._json_to_messages(self.account, r.json())
+        return MessageService._json_to_messages(self.account, r.json())
 
 
