@@ -42,35 +42,15 @@ class Contact(object):
 
     @classmethod
     def _json_to_contact(cls, json_value):
-        contact = json_value.get('EmailAddress', None)
-        # The API returns this information in a different format if it's related to Focused inbox overrides
-        contact_override = json_value.get('SenderEmailAddress', None)
-        if contact is not None:
-            email = contact.get('Address', None)
-            name = contact.get('Name', None)
-
-            return Contact(email, name)
-        # This contains override information
-        elif contact_override is not None:
-            # Whether they are 'Focused' or 'Other'
-            classification = json_value.get('ClassifyAs', 'Other')
-            focused = True if classification == 'Focused' else False
-
-            email = contact_override.get('Address', None)
-            name = contact_override.get('Name', None)
-
-            return Contact(email, name, focused=focused)
-        else:
-            return None
+        '''Backward compatibility: delegates to ContactService.'''
+        from pyOutlook.services.contact import ContactService
+        return ContactService._json_to_contact(json_value)
 
     @classmethod
     def _json_to_contacts(cls, json_value):
-        # Sometimes, multiple contacts will be provided behind a dictionary with 'value' as the key
-        try:
-            json_value = json_value['value']
-        except TypeError:
-            pass
-        return [cls._json_to_contact(contact) for contact in json_value]
+        '''Backward compatibility: delegates to ContactService.'''
+        from pyOutlook.services.contact import ContactService
+        return ContactService._json_to_contacts(json_value)
 
     def api_representation(self):
         """ Returns the JSON formatting required by Outlook's API for contacts """
