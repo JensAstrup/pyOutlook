@@ -46,3 +46,6 @@ Documentation = "http://pyoutlook.readthedocs.io/en/latest/"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["pyOutlook*"]
+
+[tool.pyrefly]
+search_path = ["src/pyOutlook"]
