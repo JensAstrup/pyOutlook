@@ -1,0 +1,7 @@
+schema-version: v1
+rulesets:
+  - github-actions
+  - python-best-practices
+  - python-security
+  - python-inclusive
+  - python-code-style
