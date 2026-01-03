@@ -63,7 +63,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id
         payload = '{ "DisplayName": "' + new_folder_name + '"}'
 
         r = requests.patch(endpoint, headers=headers, data=payload)
@@ -82,7 +82,7 @@ class Folder(object):
             List[:class:`Folder <pyOutlook.core.folder.Folder>`]
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/childfolders'
 
         r = requests.get(endpoint, headers=headers)
 
@@ -97,7 +97,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id
 
         r = requests.delete(endpoint, headers=headers)
 
@@ -121,7 +121,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/move'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/move'
         payload = '{ "DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -145,7 +145,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/copy'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/copy'
         payload = '{ "DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -163,7 +163,7 @@ class Folder(object):
         Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/childfolders'
         payload = '{ "DisplayName": "' + folder_name + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -178,7 +178,7 @@ class Folder(object):
         from pyOutlook.services.message import MessageService
         
         headers = self.headers
-        r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
+        r = requests.get('https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/messages', headers=headers)
         check_response(r)
         return MessageService._json_to_messages(self.account, r.json())
 

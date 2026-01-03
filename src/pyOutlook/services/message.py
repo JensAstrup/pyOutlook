@@ -31,68 +31,60 @@ class MessageService:
         Returns:
             Message instance
         '''
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{message_id}'
-        r = requests.get(endpoint, headers=account._headers)
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
+        r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         check_response(r)
-        return cls._json_to_message(account, r.json())
+        return self._json_to_message(r.json())
     
-    @classmethod
-    def get_messages(cls, account, page: int = 0):
+    def all(self, page: int = 0) -> list['Message']:
         '''Retrieves multiple messages from the API.
         
         Args:
-            account: OutlookAccount instance
             page: Integer representing the 'page' of results to fetch
             
         Returns:
             List of Message instances
         '''
-        endpoint = 'https://outlook.office.com/api/v2.0/me/messages'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/messages'
         if page > 0:
-            endpoint = endpoint + '/?%24skip=' + str(page) + '0'
+            endpoint = f"{endpoint}/?%24skip={page}0"
         
-        log.debug(f'Getting messages from endpoint: {endpoint} with Headers: {account._headers}')
+        log.debug(f'Getting messages from endpoint: {endpoint} with Headers: {self.account._headers}')
         
-        r = requests.get(endpoint, headers=account._headers)
+        r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         check_response(r)
         
-        return cls._json_to_messages(account, r.json())
+        return self._json_to_messages(r.json())
     
-    @classmethod
-    def get_messages_from_folder(cls, account, folder_name: str):
+    def from_folder(self, folder_name: str) -> list['Message']:
         '''Retrieves messages from a specific folder.
         
         Args:
-            account: OutlookAccount instance
             folder_name: Name of the folder
             
         Returns:
             List of Message instances
         '''
-        endpoint = f'https://outlook.office.com/api/v2.0/me/MailFolders/{folder_name}/messages'
-        r = requests.get(endpoint, headers=account._headers)
+        endpoint = f'https://graph.microsoft.com/v1.0/me/mailFolders/{folder_name}/messages'
+        r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         check_response(r)
-        return cls._json_to_messages(account, r.json())
+        return self._json_to_messages(r.json())
     
-    @classmethod
-    def _json_to_messages(cls, account, json_value: dict):
+    def _json_to_messages(self, json_value: dict) -> list['Message']:
         '''Converts JSON array to list of Message instances.
         
         Args:
-            account: OutlookAccount instance
             json_value: JSON response containing 'value' array
             
         Returns:
             List of Message instances
         '''
-        return [cls._json_to_message(account, message) for message in json_value['value']]
+        return [self._json_to_message(message) for message in json_value['value']]
     
-    @classmethod
-    def _json_to_message(cls, account, api_json: dict):
+    def _json_to_message(self, api_json: dict) -> 'Message':
         '''Factory method: Converts JSON to a Message instance.
         
         Args:
-            account: OutlookAccount instance
             api_json: JSON object representing a message
             
         Returns:

@@ -23,7 +23,7 @@ class ContactService:
         Returns:
             List of Contact instances with focused status
         '''
-        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/InferenceClassification/Overrides'
         r = requests.get(endpoint, headers=account._headers)
         
         check_response(r)

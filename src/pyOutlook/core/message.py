@@ -110,7 +110,7 @@ class Message:
         # Lazy load from API
         if self.message_id:
             from pyOutlook.services.message import MessageService
-            endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/attachments'
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/attachments'
             r = requests.get(endpoint, headers=self.headers)
             
             if check_response(r):
@@ -152,7 +152,7 @@ class Message:
             raise ValueError('Cannot reply to a message without message_id')
         
         payload = json.dumps({'Comment': comment})
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/reply'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/reply'
         
         r = requests.post(endpoint, headers=self.headers, data=payload)
         check_response(r)
@@ -167,7 +167,7 @@ class Message:
             raise ValueError('Cannot reply to a message without message_id')
         
         payload = json.dumps({'Comment': comment})
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/replyall'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/replyall'
         
         r = requests.post(endpoint, headers=self.headers, data=payload)
         check_response(r)
@@ -195,7 +195,7 @@ class Message:
         to_recipients = [contact.api_representation() for contact in to_recipients]
         payload['ToRecipients'] = to_recipients
         
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/forward'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/forward'
         
         r = requests.post(endpoint, headers=self.headers, data=json.dumps(payload))
         check_response(r)
@@ -205,7 +205,7 @@ class Message:
         if not self.message_id:
             raise ValueError('Cannot delete a message without message_id')
         
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
         
         r = requests.delete(endpoint, headers=self.headers)
         check_response(r)
@@ -226,7 +226,7 @@ class Message:
         else:
             destination_id = destination
         
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/move'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/move'
         payload = json.dumps({'DestinationId': destination_id})
         
         r = requests.post(endpoint, headers=self.headers, data=payload)
@@ -264,7 +264,7 @@ class Message:
         else:
             destination_id = destination
         
-        endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}/copy'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/copy'
         payload = json.dumps({'DestinationId': destination_id})
         
         r = requests.post(endpoint, headers=self.headers, data=payload)
@@ -289,7 +289,7 @@ class Message:
             is_read: True to mark as read, False for unread
         '''
         if self.message_id:
-            endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}'
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
             payload = json.dumps({'IsRead': is_read})
             
             r = requests.patch(endpoint, headers=self.headers, data=payload)
@@ -306,7 +306,7 @@ class Message:
         if not self.message_id:
             raise ValueError('Cannot set focused status on a message without message_id')
         
-        endpoint = f"https://outlook.office.com/api/v2.0/me/messages('{self.message_id}')"
+        endpoint = f"https://graph.microsoft.com/v1.0/me/messages('{self.message_id}')"
         data = {'InferenceClassification': 'Focused' if is_focused else 'Other'}
         
         r = requests.patch(endpoint, data=json.dumps(data), headers=self.headers)
@@ -323,7 +323,7 @@ class Message:
         self.categories.append(category_name)
         
         if self.message_id:
-            endpoint = f'https://outlook.office.com/api/v2.0/me/messages/{self.message_id}'
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
             payload = json.dumps({'Categories': self.categories})
             
             r = requests.patch(endpoint, headers=self.headers, data=payload)

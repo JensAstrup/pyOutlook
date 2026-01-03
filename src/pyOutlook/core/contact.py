@@ -69,7 +69,7 @@ class Contact(object):
         Returns:
             True if the request was successful
         """
-        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/InferenceClassification/Overrides'
 
         if is_focused:
             classification = 'Focused'

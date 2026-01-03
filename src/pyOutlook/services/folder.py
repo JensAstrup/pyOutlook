@@ -23,7 +23,7 @@ class FolderService:
         Returns:
             List of Folder instances
         '''
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/'
         r = requests.get(endpoint, headers=account._headers)
         
         if check_response(r):
@@ -41,7 +41,7 @@ class FolderService:
         Returns:
             Folder instance
         '''
-        endpoint = f'https://outlook.office.com/api/v2.0/me/MailFolders/{folder_id}'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/MailFolders/{folder_id}'
         r = requests.get(endpoint, headers=account._headers)
         
         check_response(r)
