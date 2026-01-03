@@ -49,8 +49,8 @@ class Message:
     IMPORTANCE_NORMAL = 1
     IMPORTANCE_HIGH = 2
     
-    def __init__(self, account, body: str = '', subject: str = '', to_recipients: list | None = None, 
-                 sender: Contact | None = None, cc: list | None = None, bcc: list | None = None, message_id: str | None = None, **kwargs):
+    def __init__(self, account, body: str = '', subject: str = '', to_recipients: list[Contact] | None = None, 
+                 sender: Contact | None = None, cc: list[Contact] | None = None, bcc: list[Contact] | None = None, message_id: str | None = None, **kwargs):
         self.account = account
         self.message_id = message_id
         self.subject = subject
