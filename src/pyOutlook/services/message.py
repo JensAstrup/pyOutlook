@@ -1,11 +1,15 @@
 import logging
+from typing import TYPE_CHECKING
 
 from dateutil import parser
 import requests
 
-from pyOutlook.core.attachment import Attachment
+from pyOutlook.core.message import Message
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.utils import check_response
+
+if TYPE_CHECKING:
+    from pyOutlook.core.main import OutlookAccount
 
 log = logging.getLogger('pyOutlook')
 
@@ -19,9 +23,12 @@ class MessageService:
     Message objects. All operations on individual messages are instance methods
     on the Message class itself.
     '''
+    account: 'OutlookAccount'
+
+    def __init__(self, account: 'OutlookAccount'):
+        self.account = account
     
-    @classmethod
-    def get_message(cls, account, message_id: str):
+    def get(self, message_id: str) -> 'Message':
         '''Retrieves a single message from the API.
         
         Args:
@@ -92,23 +99,25 @@ class MessageService:
         '''
         # Import here to avoid circular dependency
         from pyOutlook.core.message import Message
+
+        uid = api_json['id']
+        subject = api_json.get('subject', '')
         
-        uid = api_json['Id']
-        subject = api_json.get('Subject', '')
-        
-        sender = api_json.get('Sender', {})
+        sender = api_json.get('sender', {})
         sender = Contact._json_to_contact(sender)
         
-        body = api_json.get('Body', {}).get('Content', '')
-        body_preview = api_json.get('BodyPreview', '')
+        body = api_json.get('body', {}).get('content', '')
+        body_preview = api_json.get('bodyPreview', '')
         
-        to_recipients = api_json.get('ToRecipients', [])
+        to_recipients = api_json.get('toRecipients', [])
         to_recipients = Contact._json_to_contacts(to_recipients)
+        # Filter out None values to match Message.__init__ type signature
+        to_recipients = [contact for contact in (to_recipients or []) if contact is not None]
         
-        is_read = api_json['IsRead']
-        has_attachments = api_json['HasAttachments']
+        is_read = api_json['isRead']
+        has_attachments = api_json['hasAttachments']
         
-        time_created = api_json.get('CreatedDateTime', None)
+        time_created = api_json.get('createdDateTime', None)
         if time_created is not None:
             time_created = parser.parse(time_created, ignoretz=True)
         
@@ -125,7 +134,7 @@ class MessageService:
         focused = api_json.get('InferenceClassification', 'Other') == 'Focused'
         
         return Message(
-            account, 
+            self.account, 
             body, 
             subject, 
             to_recipients, 
@@ -141,47 +150,4 @@ class MessageService:
             categories=categories, 
             has_attachments=has_attachments,
             focused=focused
-        )
-    
-    @classmethod
-    def _json_to_attachments(cls, account, api_json: dict):
-        '''Factory method: Converts JSON array to list of Attachment instances.
-        
-        Args:
-            account: OutlookAccount instance
-            api_json: JSON response containing 'value' array
-            
-        Returns:
-            List of Attachment instances
-        '''
-        return [cls._json_to_attachment(account, value) for value in api_json['value']]
-    
-    @classmethod
-    def _json_to_attachment(cls, account, api_json: dict):
-        '''Factory method: Converts JSON to an Attachment instance.
-        
-        Args:
-            account: OutlookAccount instance
-            api_json: JSON object representing an attachment
-            
-        Returns:
-            Attachment instance
-        '''
-        outlook_id = api_json.get('Id')
-        name = api_json.get('Name')
-        content = api_json.get('ContentBytes', None)
-        size = api_json.get('Size', None)
-        content_type = api_json.get('ContentType', None)
-        
-        last_modified = api_json.get('LastModifiedDateTime', None)
-        if last_modified is not None:
-            last_modified = parser.parse(last_modified, ignoretz=True)
-        
-        return Attachment(
-            name, 
-            outlook_id=outlook_id, 
-            content=content, 
-            size=size,
-            content_type=content_type, 
-            last_modified=last_modified
         )
