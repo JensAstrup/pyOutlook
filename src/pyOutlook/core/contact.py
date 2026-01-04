@@ -66,7 +66,7 @@ class Contact(object):
 
         data = dict(ClassifyAs=classification, SenderEmailAddress=dict(Address=self.email))
 
-        r = requests.post(endpoint, headers=account._headers, data=json.dumps(data))
+        r = requests.post(endpoint, headers=account._headers, data=json.dumps(data), timeout=10)
 
         # Will raise an error if necessary, otherwise returns True
         result = check_response(r)
