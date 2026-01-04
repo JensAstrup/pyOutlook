@@ -40,21 +40,9 @@ class Contact(object):
     def __repr__(self):
         return str(self)
 
-    @classmethod
-    def _json_to_contact(cls, json_value):
-        '''Backward compatibility: delegates to ContactService.'''
-        from pyOutlook.services.contact import ContactService
-        return ContactService._json_to_contact(json_value)
-
-    @classmethod
-    def _json_to_contacts(cls, json_value):
-        '''Backward compatibility: delegates to ContactService.'''
-        from pyOutlook.services.contact import ContactService
-        return ContactService._json_to_contacts(json_value)
-
-    def api_representation(self):
-        """ Returns the JSON formatting required by Outlook's API for contacts """
-        return dict(EmailAddress=dict(Name=self.name, Address=self.email))
+    def __iter__(self):
+        """Allows dict(Contact) to return an API-formatted dictionary."""
+        yield 'EmailAddress', {'Name': self.name, 'Address': self.email}
 
     def set_focused(self, account, is_focused):
         # type: (OutlookAccount, bool) -> bool
