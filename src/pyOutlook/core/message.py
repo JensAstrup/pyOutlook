@@ -111,11 +111,16 @@ class Message:
         if self.message_id:
             from pyOutlook.services.message import MessageService
             endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/attachments'
-            r = requests.get(endpoint, headers=self.headers)
+            r = requests.get(endpoint, headers=self.headers, timeout=10)
             
             if check_response(r):
                 data = r.json()
-                self._attachments = MessageService._json_to_attachments(self.account, data)
+                self._attachments = [Attachment(name=attachment['name'], 
+                                     content=attachment['contentBytes'], 
+                                     outlook_id=attachment['contentId'],
+                                     size=attachment['size'],
+                                     last_modified=datetime.fromisoformat(attachment['lastModifiedDateTime']),
+                                     content_type=attachment['contentType']) for attachment in data['value']]
         
         return self._attachments
     

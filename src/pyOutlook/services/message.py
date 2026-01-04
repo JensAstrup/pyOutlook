@@ -1,3 +1,5 @@
+from pyOutlook.core.attachment import Attachment
+import json
 import logging
 from typing import TYPE_CHECKING
 
@@ -104,13 +106,13 @@ class MessageService:
         subject = api_json.get('subject', '')
         
         sender = api_json.get('sender', {})
-        sender = Contact._json_to_contact(sender)
+        sender = Contact(sender['emailAddress']['address'])
         
         body = api_json.get('body', {}).get('content', '')
         body_preview = api_json.get('bodyPreview', '')
         
         to_recipients = api_json.get('toRecipients', [])
-        to_recipients = Contact._json_to_contacts(to_recipients)
+        to_recipients = [Contact(recipient['emailAddress']['address']) for recipient in to_recipients]
         # Filter out None values to match Message.__init__ type signature
         to_recipients = [contact for contact in (to_recipients or []) if contact is not None]
         
@@ -151,3 +153,33 @@ class MessageService:
             has_attachments=has_attachments,
             focused=focused
         )
+
+    def send(self, subject: str, body: str, to: list[Contact], cc: list[Contact] | None = None, 
+             bcc: list[Contact] | None = None, attachments: list['Attachment'] | None = None) -> None:
+        '''Sends a message.
+        
+        Args:
+            subject: The subject of the message
+            body: The body of the message
+            to: The list of recipients
+            cc: The list of CC recipients
+            bcc: The list of BCC recipients
+        '''
+        payload: dict[str, object] = {
+            'subject': subject,
+            'body': {
+                'contentType': 'HTML',
+                'content': body
+            },
+            'toRecipients': [contact.api_representation() for contact in to]
+        }
+        if cc:
+            payload['ccRecipients'] = [contact.api_representation() for contact in cc]
+        if bcc:
+            payload['bccRecipients'] = [contact.api_representation() for contact in bcc]
+        if attachments:
+            payload['attachments'] = [dict(attachment) for attachment in attachments]
+        r = requests.post('https://graph.microsoft.com/v1.0/me/sendMail', 
+                          headers=self.account._headers, 
+                          data=json.dumps(payload), timeout=10)
+        check_response(r)
