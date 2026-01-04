@@ -9,6 +9,7 @@ import requests
 from pyOutlook.internal.utils import check_response
 from pyOutlook.services.message import MessageService
 from pyOutlook.services.folder import FolderService
+from pyOutlook.services.contact import ContactService
 
 log = logging.getLogger('pyOutlook')
 __all__ = ['OutlookAccount']
@@ -27,35 +28,29 @@ class OutlookAccount(object):
         self._auto_reply = None
         self._contact_overrides = None
         self.messages = MessageService(self)  # pyrefly: ignore
+        self.folders = FolderService(self)  # pyrefly: ignore
+        self.contacts = ContactService(self)  # pyrefly: ignore
 
     @property
     def _headers(self):
         return {'Authorization': f'Bearer {self.access_token}', 'Content-Type': 'application/json'}
 
     @property
-    def auto_reply_message(self):
+    def auto_reply_message(self) -> str:
         ''' The account's Internal auto reply message. Setting the value will change the auto reply message of the
          account, automatically setting the status to enabled (but not altering the schedule). '''
         if self._auto_reply is None:
-            r = requests.get('https://graph.microsoft.com/v1.0/me/MailboxSettings/AutomaticRepliesSetting',
+            r = requests.get('https://graph.microsoft.com/v1.0/me/mailboxSettings/',
                              headers=self._headers, timeout=10)
             check_response(r)
-            self._auto_reply = r.json().get('InternalReplyMessage')
+            data = r.json()
+            self._auto_reply = data.get('automaticReplies').get('internalReplyMessage')
 
         return self._auto_reply
 
     @auto_reply_message.setter
     def auto_reply_message(self, value):
         self.set_auto_reply(value)
-
-    @property
-    def contact_overrides(self):
-        from ..services.contact import ContactService
-        
-        if self._contact_overrides is None:
-            self._contact_overrides = ContactService.get_contact_overrides(self)
-
-        return self._contact_overrides
 
     class AutoReplyAudience(object):
         INTERNAL_ONLY = 'None'
@@ -156,22 +151,3 @@ class OutlookAccount(object):
 
         '''
         return self.messages.from_folder('Drafts')
-
-    def get_folders(self):
-        ''' Returns a list of all folders for this account
-
-            Returns:
-                List[:class:`Folder <pyOutlook.core.folder.Folder>`]
-        '''
-        return FolderService.get_folders(self)
-
-    def get_folder_by_id(self, folder_id):
-        ''' Retrieve a Folder by its Outlook ID
-
-        Args:
-            folder_id: The ID of the :class:`Folder <pyOutlook.core.folder.Folder>` to retrieve
-
-        Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
-
-        '''
-        return FolderService.get_folder(self, folder_id)

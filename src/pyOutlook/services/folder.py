@@ -1,6 +1,12 @@
+from typing import TYPE_CHECKING
+
 import requests
 
 from pyOutlook.internal.utils import check_response
+from pyOutlook.core.folder import Folder
+
+if TYPE_CHECKING:
+    from core.main import OutlookAccount
 
 __all__ = ['FolderService']
 
@@ -12,47 +18,44 @@ class FolderService:
     Folder objects. All operations on individual folders are instance methods
     on the Folder class itself.
     '''
+
+    account: 'OutlookAccount'
+
+    def __init__(self, account: 'OutlookAccount'):
+        self.account = account
     
-    @classmethod
-    def get_folders(cls, account):
+    def all(self) -> list['Folder']:
         '''Retrieves all folders for an account.
         
-        Args:
-            account: OutlookAccount instance
-            
         Returns:
             List of Folder instances
         '''
-        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/'
-        r = requests.get(endpoint, headers=account._headers)
+        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/'
+        r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         
         if check_response(r):
-            return cls._json_to_folders(account, r.json())
+            return self._json_to_folders(r.json())
         return []
     
-    @classmethod
-    def get_folder(cls, account, folder_id: str):
+    def get(self, folder_id: str) -> 'Folder':
         '''Retrieves a single folder by ID.
         
         Args:
-            account: OutlookAccount instance
             folder_id: The ID of the folder to retrieve
             
         Returns:
             Folder instance
         '''
-        endpoint = f'https://graph.microsoft.com/v1.0/me/MailFolders/{folder_id}'
-        r = requests.get(endpoint, headers=account._headers)
+        endpoint = f'https://graph.microsoft.com/v1.0/me/mailFolders/{folder_id}'
+        r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         
         check_response(r)
-        return cls._json_to_folder(account, r.json())
+        return self._json_to_folder(r.json())
     
-    @classmethod
-    def _json_to_folder(cls, account, json_value: dict):
+    def _json_to_folder(self, json_value: dict) -> 'Folder':
         '''Factory method: Converts JSON to a Folder instance.
         
         Args:
-            account: OutlookAccount instance
             json_value: JSON object representing a folder
             
         Returns:
@@ -61,24 +64,22 @@ class FolderService:
         from pyOutlook.core.folder import Folder
         
         return Folder(
-            account, 
-            json_value['Id'], 
-            json_value['DisplayName'], 
-            json_value['ParentFolderId'],
-            json_value['ChildFolderCount'], 
-            json_value['UnreadItemCount'], 
-            json_value['TotalItemCount']
+            self.account,
+            json_value['id'], 
+            json_value['displayName'], 
+            json_value['parentFolderId'],
+            json_value['childFolderCount'], 
+            json_value['unreadItemCount'], 
+            json_value['totalItemCount']
         )
     
-    @classmethod
-    def _json_to_folders(cls, account, json_value: dict):
+    def _json_to_folders(self, json_value: dict) -> list['Folder']:
         '''Converts JSON array to list of Folder instances.
         
         Args:
-            account: OutlookAccount instance
             json_value: JSON response containing 'value' array
             
         Returns:
             List of Folder instances
         '''
-        return [cls._json_to_folder(account, folder) for folder in json_value['value']]
+        return [self._json_to_folder(folder) for folder in json_value['value']]
