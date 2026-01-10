@@ -24,7 +24,7 @@ def get_response_data(response):
     try:
         return response.json()
     except ValueError:
-        return response.content
+        return response.text
 
 
 def check_response(response):

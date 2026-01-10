@@ -40,41 +40,9 @@ class Contact(object):
     def __repr__(self):
         return str(self)
 
-    @classmethod
-    def _json_to_contact(cls, json_value):
-        contact = json_value.get('EmailAddress', None)
-        # The API returns this information in a different format if it's related to Focused inbox overrides
-        contact_override = json_value.get('SenderEmailAddress', None)
-        if contact is not None:
-            email = contact.get('Address', None)
-            name = contact.get('Name', None)
-
-            return Contact(email, name)
-        # This contains override information
-        elif contact_override is not None:
-            # Whether they are 'Focused' or 'Other'
-            classification = json_value.get('ClassifyAs', 'Other')
-            focused = True if classification == 'Focused' else False
-
-            email = contact_override.get('Address', None)
-            name = contact_override.get('Name', None)
-
-            return Contact(email, name, focused=focused)
-        else:
-            return None
-
-    @classmethod
-    def _json_to_contacts(cls, json_value):
-        # Sometimes, multiple contacts will be provided behind a dictionary with 'value' as the key
-        try:
-            json_value = json_value['value']
-        except TypeError:
-            pass
-        return [cls._json_to_contact(contact) for contact in json_value]
-
-    def api_representation(self):
-        """ Returns the JSON formatting required by Outlook's API for contacts """
-        return dict(EmailAddress=dict(Name=self.name, Address=self.email))
+    def __iter__(self):
+        """Allows dict(Contact) to return an API-formatted dictionary."""
+        yield 'EmailAddress', {'Name': self.name, 'Address': self.email}
 
     def set_focused(self, account, is_focused):
         # type: (OutlookAccount, bool) -> bool
@@ -89,7 +57,7 @@ class Contact(object):
         Returns:
             True if the request was successful
         """
-        endpoint = 'https://outlook.office.com/api/v2.0/me/InferenceClassification/Overrides'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/InferenceClassification/Overrides'
 
         if is_focused:
             classification = 'Focused'
@@ -98,7 +66,7 @@ class Contact(object):
 
         data = dict(ClassifyAs=classification, SenderEmailAddress=dict(Address=self.email))
 
-        r = requests.post(endpoint, headers=account._headers, data=json.dumps(data))
+        r = requests.post(endpoint, headers=account._headers, data=json.dumps(data), timeout=10)
 
         # Will raise an error if necessary, otherwise returns True
         result = check_response(r)
