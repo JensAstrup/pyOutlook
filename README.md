@@ -34,8 +34,8 @@ You can optionally specify the page of results to retrieve - 1 is the default.
 ```python
 from pyOutlook import *
 account = OutlookAccount('')
-account.get_messages()
-account.get_messages(2)
+account.messages.all()
+account.messages.all(2)
 ```
 
 ### get_message(message_id)
@@ -44,7 +44,7 @@ This method retrieves the information for the message matching the id provided
 from pyOutlook import *
 account = OutlookAccount('')
 
-email = account.get_message('message_id')
+email = account.messages.get('message_id')
 print(email.body)
 ```
 
@@ -68,7 +68,7 @@ This method forwards a message to the list of recipients, along with an optional
 from pyOutlook import *
 account = OutlookAccount('')
 
-email = account.get_message('id')
+email = account.messages.get('id')
 email.forward([Contact('John.Adams@domain.com'), Contact('Nice.Guy@domain.com')])
 email.forward(['John.Smith@domain.com'], 'Read the message below')
 ```
@@ -79,7 +79,7 @@ This method allows you to respond to the sender of an email with a comment appen
 from pyOutlook import *
 account = OutlookAccount('')
 
-email = account.get_message(id)
+email = account.messages.get(id)
 email.reply('That was a nice email Lisa')
 ```
 ### reply_all(reply_comment)
@@ -88,7 +88,7 @@ This method allows you to respond to all recipients an email with a comment appe
 from pyOutlook import *
 account = OutlookAccount('')
 
-email = account.get_message(id)
+email = account.messages.get(id)
 email.reply_all('I am replying to everyone, which will likely annoy 9/10 of those who receive this')
 ```
 ### move_to*
@@ -106,7 +106,7 @@ message.move_to_deleted()
 message.move_to_drafts()
 message.move_to('my_folder_id')
 
-folders = account.get_folders()
+folders = account.folders.all()
 
 message.move_to(folders[0])
 ```
@@ -121,29 +121,15 @@ message = account.inbox()[0]
 message.delete()
 ```
 ## Sending Emails
-There are a couple of ways to create new emails. You can either use ``new_email()`` to get a ``Message()``
-instance, which you can alter before sending. Alternatively, you can use ``send_email()`` where you pass in 
-commonly used parameters and the email gets sent once called.
 
-Example:
 ```python
 from pyOutlook import *
 account = OutlookAccount('')
 
-test_email = account.new_email('This is a test body. <br> Best, <br> John Smith', 'This is a test subject', [Contact('anEmailAccount@gmail.com')])
-test_email.attach('FILE_BYTES_HERE', 'FileName.pdf')
-test_email.send()
-```
-Or:
-```python
-from pyOutlook import *
-account = OutlookAccount('')
-
-account.send_email(
-"I'm sending an email through Python. <br> Best, <br> Me",
+account.messages.send(
 'A subject',
-to=['myemail@domain.com'],
-# or to=[Contact('myemail@domain.com']
+"I'm sending an email through Python. <br> Best, <br> Me",
+to=[Contact('myemail@domain.com']
 )
 ```
 ## Folders
@@ -153,23 +139,23 @@ Folders can be created, retrieved, moved, copied, renamed, and deleted. You can 
 Folder ID parameters can be replaced with the following strings where indicated:
 'Inbox', 'Drafts', 'SentItems', or 'DeletedItems'
 
-### get_folders()
+### all()
 This methods returns a list of Folder objects representing each folder in the user's account. 
 ```python
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folders()[0]
+folder = account.folders.all()[0]
 print(folder.name)
 >>> 'Inbox'
 ```
-### get_folder_by_id(folder_id)
+### get(folder_id)
 If you have the id of a folder, you can get a Folder object for it with this method
 ```python
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folder_by_id('id')
+folder = account.folders.get('id')
 print(folder.name)
 >>> 'My Folder'
 ```
@@ -178,7 +164,7 @@ Note that you can replace the folder ID parameter with the name of a 'well known
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folder_by_id('Drafts')
+folder = account.folders.get('Drafts')
 print(folder.name)
 >>> 'Drafts'
 ```
@@ -191,7 +177,7 @@ representing that folder.
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = my_account.get_folders()[0]
+folder = my_account.folders.all()[0]
 folder = folder.rename('My New Folder v2')
 folder.name
 >>> 'My New Folder v2'
@@ -213,7 +199,7 @@ Self-explanatory, deletes the provided folder in Outlook
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folders()[0]
+folder = account.folders.all()[0]
 folder.delete()
 # and now it doesn't exist
 ```
@@ -225,8 +211,8 @@ Move the Folder provided into a new folder.
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folders()[0]
-folder_1 = account.get_folders()[1]
+folder = account.folders.all()[0]
+folder_1 = account.folders.all()[1]
 
 folder.move_into(folder_1)
 ```
@@ -237,8 +223,8 @@ Copies the folder and its contents to the designated folder which can be either 
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folders()[0]
-folder_1 = account.get_folders()[1]
+folder = account.folders.all()[0]
+folder_1 = account.folders.all()[1]
 
 folder.copy_into(folder_1)
 ```
@@ -249,7 +235,7 @@ This creates a [folder within a folder](http://dab1nmslvvntp.cloudfront.net/wp-c
 from pyOutlook import *
 account = OutlookAccount('')
 
-folder = account.get_folders()[0]
+folder = account.folders.all()[0]
 new_folder = folder.create_child_folder('New Folder')
 new_folder.unread_count
 >>> 0
