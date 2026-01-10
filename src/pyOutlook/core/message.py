@@ -115,12 +115,22 @@ class Message:
             
             if check_response(r):
                 data = r.json()
-                self._attachments = [Attachment(name=attachment['name'], 
-                                     content=attachment['contentBytes'], 
-                                     outlook_id=attachment['contentId'],
-                                     size=attachment['size'],
-                                     last_modified=datetime.fromisoformat(attachment['lastModifiedDateTime']),
-                                     content_type=attachment['contentType']) for attachment in data['value']]
+                self._attachments = []
+                for attachment in data['value']:
+                    last_modified_str = attachment['lastModifiedDateTime']
+                    # Handle 'Z' suffix for UTC timezone (fromisoformat doesn't support 'Z')
+                    if last_modified_str and last_modified_str.endswith('Z'):
+                        last_modified_str = last_modified_str[:-1] + '+00:00'
+                    last_modified = datetime.fromisoformat(last_modified_str)
+                    
+                    self._attachments.append(Attachment(
+                        name=attachment['name'], 
+                        content=attachment['contentBytes'], 
+                        outlook_id=attachment['contentId'],
+                        size=attachment['size'],
+                        last_modified=last_modified,
+                        content_type=attachment['contentType']
+                    ))
         
         return self._attachments
     
