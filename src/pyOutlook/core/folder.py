@@ -39,12 +39,15 @@ class Folder(object):
     
     @classmethod
     def _json_to_folder(cls, account, json_value):
-        return Folder(account, json_value['Id'], json_value['DisplayName'], json_value['ParentFolderId'],
-                      json_value['ChildFolderCount'], json_value['UnreadItemCount'], json_value['TotalItemCount'])
+        '''Backward compatibility: delegates to FolderService.'''
+        from pyOutlook.services.folder import FolderService
+        return FolderService._json_to_folder(account, json_value)
 
     @classmethod
     def _json_to_folders(cls, account, json_value):
-        return [cls._json_to_folder(account, folder) for folder in json_value['value']]
+        '''Backward compatibility: delegates to FolderService.'''
+        from pyOutlook.services.folder import FolderService
+        return FolderService._json_to_folders(account, json_value)
 
     def rename(self, new_folder_name):
         """Renames the Folder to the provided name.
@@ -60,7 +63,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id
         payload = '{ "DisplayName": "' + new_folder_name + '"}'
 
         r = requests.patch(endpoint, headers=headers, data=payload)
@@ -79,7 +82,7 @@ class Folder(object):
             List[:class:`Folder <pyOutlook.core.folder.Folder>`]
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/childfolders'
 
         r = requests.get(endpoint, headers=headers)
 
@@ -94,7 +97,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id
 
         r = requests.delete(endpoint, headers=headers)
 
@@ -118,7 +121,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/move'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/move'
         payload = '{ "DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -142,7 +145,7 @@ class Folder(object):
 
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/copy'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/copy'
         payload = '{ "DestinationId": "' + destination_folder.id + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -160,7 +163,7 @@ class Folder(object):
         Returns: :class:`Folder <pyOutlook.core.folder.Folder>`
         """
         headers = self.headers
-        endpoint = 'https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/childfolders'
+        endpoint = 'https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/childfolders'
         payload = '{ "DisplayName": "' + folder_name + '"}'
 
         r = requests.post(endpoint, headers=headers, data=payload)
@@ -172,10 +175,11 @@ class Folder(object):
     def messages(self):
         """ Retrieves the messages in this Folder, 
         returning a list of :class:`Messages <pyOutlook.core.message.Message>`."""
+        from pyOutlook.services.message import MessageService
+        
         headers = self.headers
-        r = requests.get('https://outlook.office.com/api/v2.0/me/MailFolders/' + self.id + '/messages', headers=headers)
+        r = requests.get('https://graph.microsoft.com/v1.0/me/MailFolders/' + self.id + '/messages', headers=headers)
         check_response(r)
-        from pyOutlook.core.message import Message
-        return Message._json_to_messages(self.account, r.json())
+        return MessageService._json_to_messages(self.account, r.json())
 
 
