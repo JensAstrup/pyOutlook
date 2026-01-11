@@ -3,32 +3,61 @@ import re
 from pyOutlook.internal.errors import AuthError, RequestError, APIError
 
 
-def get_valid_filename(s):
-    """
-    Shamelessly taken from Django.
-    https://github.com/django/django/blob/master/django/utils/text.py
+def get_valid_filename(s: str) -> str:
+    """Return a sanitized filename safe for filesystem use.
 
-    Return the given string converted to a string that can be used for a clean
-    filename. Remove leading and trailing spaces; convert other spaces to
-    underscores; and remove anything that is not an alphanumeric, dash,
-    underscore, or dot.
-    >>> get_valid_filename("john's portrait in 2004.jpg")
-    'johns_portrait_in_2004.jpg'
+    Removes leading and trailing spaces, converts other spaces to underscores,
+    and removes any characters that are not alphanumeric, dash, underscore, or dot.
+
+    Adapted from Django's ``django.utils.text.get_valid_filename``.
+
+    :param s: The string to convert to a valid filename.
+    :type s: str
+
+    :returns: A sanitized filename string.
+    :rtype: str
+
+    Example::
+
+        >>> get_valid_filename("john's portrait in 2004.jpg")
+        'johns_portrait_in_2004.jpg'
     """
     s = str(s).strip().replace(' ', '_')
     return re.sub(r'(?u)[^-\w.]', '', s)
 
 
-def get_response_data(response):
-    """ Handles getting response data from the requests module where .json() can raise an error """
+def get_response_data(response) -> dict | str:
+    """Extract data from a requests Response object.
+
+    Attempts to parse the response as JSON, falling back to text if JSON
+    parsing fails.
+
+    :param response: A requests Response object.
+
+    :returns: The response data as a dictionary (if JSON) or string (if text).
+    :rtype: dict or str
+    """
     try:
         return response.json()
     except ValueError:
         return response.text
 
 
-def check_response(response):
-    """ Checks that a response is successful, raising the appropriate Exceptions otherwise. """
+def check_response(response) -> bool:
+    """Check that an API response is successful.
+
+    Validates the HTTP status code and raises appropriate exceptions for
+    error responses.
+
+    :param response: A requests Response object.
+
+    :returns: ``True`` if the response indicates success (status 100-299).
+    :rtype: bool
+
+    :raises AuthError: If the status code is 401 or 403.
+    :raises RequestError: If the status code is 400.
+    :raises APIError: For any other error status code.
+    """
     status_code = response.status_code
 
     if 100 < status_code < 299:
