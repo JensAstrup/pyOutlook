@@ -9,6 +9,8 @@ import requests
 from pyOutlook.core.message import Message
 from pyOutlook.core.contact import Contact
 from pyOutlook.internal.utils import check_response
+from pyOutlook.utils.constants import BASE_API_URL
+
 
 if TYPE_CHECKING:
     from pyOutlook.core.main import OutlookAccount
@@ -61,7 +63,7 @@ class MessageService:
         :raises AuthError: If authentication fails.
         :raises RequestError: If the message ID is invalid or the request fails.
         """
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{message_id}'
+        endpoint = f'{BASE_API_URL}/me/messages/{message_id}'
         r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         check_response(r)
         return self._json_to_message(r.json())
@@ -79,7 +81,7 @@ class MessageService:
         :raises AuthError: If authentication fails.
         :raises RequestError: If the API request fails.
         """
-        endpoint = 'https://graph.microsoft.com/v1.0/me/messages'
+        endpoint = f'{BASE_API_URL}/me/messages'
         if page > 0:
             endpoint = f"{endpoint}/?%24skip={page}0"
 
@@ -103,7 +105,7 @@ class MessageService:
         :raises AuthError: If authentication fails.
         :raises RequestError: If the folder is not found or the request fails.
         """
-        endpoint = f'https://graph.microsoft.com/v1.0/me/mailFolders/{folder_name}/messages'
+        endpoint = f'{BASE_API_URL}/me/mailFolders/{folder_name}/messages'
         r = requests.get(endpoint, headers=self.account._headers, timeout=10)
         check_response(r)
         return self._json_to_messages(r.json())

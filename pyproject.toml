@@ -50,6 +50,7 @@ search_path = ["src/pyOutlook"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+norecursedirs = ["scripts", "venv", "build", "dist", "*.egg-info"]
 
 [tool.coverage.run]
 omit = [

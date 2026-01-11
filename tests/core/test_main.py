@@ -142,7 +142,7 @@ class SetAutoReplyTestCase(unittest.TestCase):
         # Check data
         data = json.loads(call_args[1]['data'])
         self.assertEqual(data['@odata.context'],
-                        'https://outlook.office.com/api/v2.0/$metadata#Me/MailboxSettings')
+                        'https://graph.microsoft.com/v1.0/$metadata#Me/MailboxSettings')
         self.assertEqual(data['AutomaticRepliesSetting']['Status'],
                         OutlookAccount.AutoReplyStatus.ALWAYS_ENABLED)
         self.assertEqual(data['AutomaticRepliesSetting']['ExternalAudience'],
