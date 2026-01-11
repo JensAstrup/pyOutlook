@@ -18,6 +18,20 @@ log = logging.getLogger('pyOutlook')
 __all__ = ['MessageService']
 
 
+def _recipient_to_dict(recipient: Contact | str) -> dict:
+    '''Converts a recipient to API format.
+    
+    Args:
+        recipient: Either a Contact object or a string email address
+        
+    Returns:
+        Dictionary in the format expected by the Microsoft Graph API
+    '''
+    if isinstance(recipient, str):
+        return {'EmailAddress': {'Name': None, 'Address': recipient}}
+    return dict(recipient)
+
+
 class MessageService:
     '''Service class for creating Message instances from API responses.
     
@@ -154,16 +168,17 @@ class MessageService:
             focused=focused
         )
 
-    def send(self, subject: str, body: str, to: list[Contact], cc: list[Contact] | None = None, 
-             bcc: list[Contact] | None = None, attachments: list['Attachment'] | None = None) -> None:
+    def send(self, subject: str, body: str, to: list[Contact | str], cc: list[Contact | str] | None = None, 
+             bcc: list[Contact | str] | None = None, attachments: list['Attachment'] | None = None) -> None:
         '''Sends a message.
         
         Args:
             subject: The subject of the message
             body: The body of the message
-            to: The list of recipients
-            cc: The list of CC recipients
-            bcc: The list of BCC recipients
+            to: The list of recipients (Contact objects or email strings)
+            cc: The list of CC recipients (Contact objects or email strings)
+            bcc: The list of BCC recipients (Contact objects or email strings)
+            attachments: The list of attachments
         '''
         payload: dict[str, object] = {
             'subject': subject,
@@ -171,15 +186,15 @@ class MessageService:
                 'contentType': 'HTML',
                 'content': body
             },
-            'toRecipients': [contact.api_representation() for contact in to]
+            'toRecipients': [_recipient_to_dict(recipient) for recipient in to]
         }
         if cc:
-            payload['ccRecipients'] = [contact.api_representation() for contact in cc]
+            payload['ccRecipients'] = [_recipient_to_dict(recipient) for recipient in cc]
         if bcc:
-            payload['bccRecipients'] = [contact.api_representation() for contact in bcc]
+            payload['bccRecipients'] = [_recipient_to_dict(recipient) for recipient in bcc]
         if attachments:
             payload['attachments'] = [dict(attachment) for attachment in attachments]
         r = requests.post('https://graph.microsoft.com/v1.0/me/sendMail', 
                           headers=self.account._headers, 
-                          data=json.dumps(payload), timeout=10)
+                          data=json.dumps({'message': payload}), timeout=10)
         check_response(r)
