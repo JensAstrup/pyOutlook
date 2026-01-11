@@ -130,9 +130,7 @@ class MessageService:
         """
         # Import here to avoid circular dependency
         from pyOutlook.core.message import Message
-        print(api_json)
         uid = api_json['id']
-        print(uid)
         subject = api_json.get('subject', '')
         
         sender = api_json.get('sender', {})
@@ -142,9 +140,18 @@ class MessageService:
         body_preview = api_json.get('bodyPreview', '')
         
         to_recipients = api_json.get('toRecipients', [])
-        to_recipients = [Contact(recipient['emailAddress']['address']) for recipient in to_recipients]
-        # Filter out None values to match Message.__init__ type signature
-        to_recipients = [contact for contact in (to_recipients or []) if contact is not None]
+        # Parse recipients, handling malformed data gracefully
+        parsed_recipients = []
+        for recipient in to_recipients:
+            try:
+                email_address = recipient.get('emailAddress', {})
+                address = email_address.get('address', None)
+                if address:
+                    parsed_recipients.append(Contact(address))
+            except (KeyError, TypeError, AttributeError):
+                # Skip malformed recipient data
+                continue
+        to_recipients = parsed_recipients
         
         is_read = api_json['isRead']
         has_attachments = api_json['hasAttachments']
