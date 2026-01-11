@@ -266,7 +266,7 @@ class MessageServiceTestCase(unittest.TestCase):
         result = self.service._json_to_message(api_json)
 
         self.assertIsInstance(result, Message)
-        self.assertEqual(result.message_id, 'message123')
+        self.assertEqual(result.id, 'message123')
         self.assertEqual(result.subject, 'Complete Message')
         self.assertEqual(result.sender.email, 'sender@example.com')
         self.assertEqual(result.body, '<html>Body content</html>')
@@ -298,7 +298,7 @@ class MessageServiceTestCase(unittest.TestCase):
 
         result = self.service._json_to_message(api_json)
 
-        self.assertEqual(result.message_id, 'minimal_msg')
+        self.assertEqual(result.id, 'minimal_msg')
         self.assertEqual(result.subject, '')
         self.assertEqual(result.sender.email, 'sender@example.com')
         self.assertEqual(result.body, '')

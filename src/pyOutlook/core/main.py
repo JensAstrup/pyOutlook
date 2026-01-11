@@ -16,12 +16,40 @@ __all__ = ['OutlookAccount']
 
 
 class OutlookAccount(object):
-    '''Sets up access to an Outlook account.
+    """Sets up access to an Outlook account via the Microsoft Graph API.
 
-    Attributes:
-        access_token: A string OAuth token from Outlook allowing access to a user's account
+    This is the main entry point for interacting with an Outlook account.
+    It provides access to messages, folders, and contacts through service objects.
 
-    '''
+    :param access_token: OAuth token from Microsoft allowing access to a user's account.
+    :type access_token: str
+
+    :ivar access_token: The OAuth access token for API authentication.
+    :ivar messages: Service for retrieving and sending messages.
+    :vartype messages: MessageService
+    :ivar folders: Service for retrieving and managing mail folders.
+    :vartype folders: FolderService
+    :ivar contacts: Service for managing contacts and focused inbox overrides.
+    :vartype contacts: ContactService
+
+    Example::
+
+        # Initialize with an OAuth token
+        account = OutlookAccount('your-access-token')
+
+        # Access inbox messages
+        inbox_messages = account.inbox()
+
+        # Get all folders
+        all_folders = account.folders.all()
+
+        # Send a message
+        account.messages.send(
+            subject='Hello',
+            body='<p>Hello World!</p>',
+            to=['recipient@example.com']
+        )
+    """
 
     def __init__(self, access_token: str):
         self.access_token = access_token
@@ -37,8 +65,17 @@ class OutlookAccount(object):
 
     @property
     def auto_reply_message(self) -> str:
-        ''' The account's Internal auto reply message. Setting the value will change the auto reply message of the
-         account, automatically setting the status to enabled (but not altering the schedule). '''
+        """The account's internal auto reply message.
+
+        Setting this property will change the auto reply message of the account,
+        automatically enabling auto-replies (but not altering the schedule).
+
+        :returns: The current internal auto reply message.
+        :rtype: str
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+        """
         if self._auto_reply is None:
             r = requests.get('https://graph.microsoft.com/v1.0/me/mailboxSettings/',
                              headers=self._headers, timeout=10)
@@ -49,37 +86,82 @@ class OutlookAccount(object):
         return self._auto_reply
 
     @auto_reply_message.setter
-    def auto_reply_message(self, value):
+    def auto_reply_message(self, value: str):
+        """Set the auto reply message.
+
+        :param value: The new auto reply message.
+        :type value: str
+        """
         self.set_auto_reply(value)
 
     class AutoReplyAudience(object):
+        """Constants for specifying who receives automatic replies.
+
+        :cvar INTERNAL_ONLY: Send auto-replies only to internal organization members.
+        :cvar CONTACTS_ONLY: Send auto-replies only to contacts.
+        :cvar ALL: Send auto-replies to all senders.
+        """
         INTERNAL_ONLY = 'None'
         CONTACTS_ONLY = 'ContactsOnly'
         ALL = 'All'
 
     class AutoReplyStatus(object):
+        """Constants for automatic reply status.
+
+        :cvar DISABLED: Auto-replies are disabled.
+        :cvar ALWAYS_ENABLED: Auto-replies are always sent.
+        :cvar SCHEDULED: Auto-replies are sent during a scheduled time window.
+        """
         DISABLED = 'Disabled'
         ALWAYS_ENABLED = 'AlwaysEnabled'
         SCHEDULED = 'Scheduled'
 
-    def set_auto_reply(self, message, status=AutoReplyStatus.ALWAYS_ENABLED, start=None, end=None,
-                       external_message=None, audience=AutoReplyAudience.ALL):
-        # type: (str, OutlookAccount.AutoReplyStatus, datetime, datetime, str, OutlookAccount.AutoReplyAudience) -> None
-        ''' Set an automatic reply for the account.
-        Args:
-            message (str): The message to be sent in replies. If external_message is provided this is the message sent
-            to internal recipients
-            status (OutlookAccount.AutoReplyStatus): Whether the auto-reply should be always enabled, scheduled, or
-            disabled. You can use :class:`AutoReplyStatus <pyOutlook.core.main.OutlookAccount.AutoReplyStatus>` to
-            provide the value. Defaults to ALWAYS_ENABLED.
-            start (datetime): If status is set to SCHEDULED, this is when the replies will start being sent.
-            end (datetime): If status is set to SCHEDULED, this is when the replies will stop being sent.
-            external_message (str): If provided, this message will be sent to external recipients.
-            audience (OutlookAccount.AutoReplyAudience): Whether replies should be sent to everyone, contacts only,
-            or internal recipients only. You can use
-            :class:`AutoReplyAudience <pyOutlook.core.main.OutlookAccount.AutoReplyAudience>` to provide the value.
+    def set_auto_reply(self, message: str, status: 'AutoReplyStatus' = AutoReplyStatus.ALWAYS_ENABLED,
+                       start: datetime | None = None, end: datetime | None = None,
+                       external_message: str | None = None,
+                       audience: 'AutoReplyAudience' = AutoReplyAudience.ALL) -> None:
+        """Set an automatic reply for the account.
 
-        '''
+        :param message: The message to be sent in replies. If ``external_message`` is
+            provided, this is the message sent to internal recipients only.
+        :type message: str
+        :param status: Whether the auto-reply should be always enabled, scheduled, or
+            disabled. Defaults to ``AutoReplyStatus.ALWAYS_ENABLED``.
+        :type status: AutoReplyStatus
+        :param start: If status is ``SCHEDULED``, when the replies will start being sent.
+        :type start: datetime or None
+        :param end: If status is ``SCHEDULED``, when the replies will stop being sent.
+        :type end: datetime or None
+        :param external_message: If provided, this message will be sent to external
+            recipients. If not provided, the ``message`` is used for both.
+        :type external_message: str or None
+        :param audience: Who should receive auto-replies. Defaults to ``AutoReplyAudience.ALL``.
+        :type audience: AutoReplyAudience
+
+        :raises ValueError: If only one of ``start`` or ``end`` is provided, or if they
+            are not datetime objects.
+
+        Example::
+
+            from datetime import datetime
+
+            # Enable auto-reply for everyone
+            account.set_auto_reply('I am currently out of office.')
+
+            # Schedule auto-reply with different internal/external messages
+            account.set_auto_reply(
+                message='Internal: I am on vacation.',
+                external_message='Thank you for your email. I am currently unavailable.',
+                status=account.AutoReplyStatus.SCHEDULED,
+                start=datetime(2024, 12, 20),
+                end=datetime(2024, 12, 31),
+                audience=account.AutoReplyAudience.ALL
+            )
+
+        .. seealso::
+            :class:`AutoReplyStatus` for status options.
+            :class:`AutoReplyAudience` for audience options.
+        """
 
         start_is_none = start is None
         end_is_none = end is None
@@ -116,38 +198,60 @@ class OutlookAccount(object):
 
         self._auto_reply = message
 
-    def inbox(self):
-        ''' first ten messages in account's inbox.
+    def inbox(self) -> list:
+        """Retrieve messages from the account's inbox.
 
-        Returns:
-            List[:class:`Message <pyOutlook.core.message.Message>`]
+        Returns the default page of messages from the Inbox folder
+        (10 items per Microsoft Graph API defaults).
 
-        '''
+        :returns: Messages from the inbox folder.
+        :rtype: list[Message]
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+
+        .. seealso:: :meth:`MessageService.from_folder` for more control over retrieval.
+        """
         return self.messages.from_folder('Inbox')
 
-    def sent_messages(self):
-        ''' last ten sent messages.
+    def sent_messages(self) -> list:
+        """Retrieve sent messages.
 
-        Returns:
-            List[:class:`Message <pyOutlook.core.message.Message>`]
+        Returns the default page of messages from the Sent Items folder
+        (10 items per Microsoft Graph API defaults).
 
-        '''
+        :returns: Messages from the sent items folder.
+        :rtype: list[Message]
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+        """
         return self.messages.from_folder('SentItems')
 
-    def deleted_messages(self):
-        ''' last ten deleted messages.
+    def deleted_messages(self) -> list:
+        """Retrieve deleted messages.
 
-        Returns:
-            List[:class:`Message <pyOutlook.core.message.Message>` ]
+        Returns the default page of messages from the Deleted Items folder
+        (10 items per Microsoft Graph API defaults).
 
-        '''
+        :returns: Messages from the deleted items folder.
+        :rtype: list[Message]
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+        """
         return self.messages.from_folder('DeletedItems')
 
-    def draft_messages(self):
-        ''' last ten draft messages.
+    def draft_messages(self) -> list:
+        """Retrieve draft messages.
 
-        Returns:
-            List[:class:`Message <pyOutlook.core.message.Message>`]
+        Returns the default page of messages from the Drafts folder
+        (10 items per Microsoft Graph API defaults).
 
-        '''
+        :returns: Messages from the drafts folder.
+        :rtype: list[Message]
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+        """
         return self.messages.from_folder('Drafts')

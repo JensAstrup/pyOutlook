@@ -1,0 +1,6 @@
+---
+name: use-type-hint
+description: Specifies type hint usage
+---
+
+All new and updated code shoud specify type hints for arguments and return types

@@ -1,33 +1,45 @@
 import json
+from typing import TYPE_CHECKING
+
 import requests
 
 from pyOutlook.internal.utils import check_response
+
+if TYPE_CHECKING:
+    from pyOutlook.core.main import OutlookAccount
 
 __all__ = ['Contact']
 
 
 class Contact(object):
-    """ Represents someone sending or receiving an email. Cuts down on the amount of dictionaries floating around that
-    each hold the API's syntax and allows for functionality to be added in the future.
+    """Represents someone sending or receiving an email.
 
-    Args:
-        email (str): The email of the user
-        name (str): The user's name, which is not always provided by the API.
+    Provides a structured representation of email addresses with optional
+    name and focused inbox override settings.
 
-    Keyword Args:
-        focused: Whether messages from this sender are always sent to the Focused inbox, or to the Other tab.
-            This value is set when retrieving a contact from the API, or after setting it via
-            :func:`set_focused() <pyOutlook.core.contact.Contact.set_focused>`
+    :param email: The email address of the contact.
+    :type email: str
+    :param name: The contact's display name. May be ``None`` if not provided by the API.
+    :type name: str or None
+    :param focused: Whether messages from this sender go to Focused inbox.
+        ``True`` for Focused, ``False`` for Other, ``None`` if not set or retrieved.
+    :type focused: bool or None
 
-    Attributes:
-        email: The email of the user
-        name: The name of the user
-        focused: A boolean indicating whether this contact has an override for their messages to go to the Focused inbox
-            or the "Other" inbox. None indicates that the value has not yet been retrieved by the API or set.
+    :ivar email: The email address.
+    :ivar name: The display name.
+    :ivar focused: Focused inbox override status. This value is set when retrieving
+        a contact from the API, or after calling :meth:`set_focused`.
+
+    Example::
+
+        # Creating a contact for sending
+        recipient = Contact('user@example.com', name='John Doe')
+
+        # Using with the API
+        payload = dict(recipient)  # Converts to API format
     """
 
-    def __init__(self, email, name=None, focused=None):
-        # type: (str, str, bool) -> None
+    def __init__(self, email: str, name: str | None = None, focused: bool | None = None):
         self.email = email
         self.name = name
         self.focused = focused
@@ -41,21 +53,38 @@ class Contact(object):
         return str(self)
 
     def __iter__(self):
-        """Allows dict(Contact) to return an API-formatted dictionary."""
+        """Allows ``dict(Contact)`` to return an API-formatted dictionary.
+
+        Used when building API payloads for sending messages.
+
+        :yields: Tuples of (key, value) for dictionary construction.
+        :rtype: Iterator[tuple[str, dict]]
+
+        Example::
+
+            recipient = Contact('user@example.com', name='John')
+            api_format = dict(recipient)
+            # {'EmailAddress': {'Name': 'John', 'Address': 'user@example.com'}}
+        """
         yield 'EmailAddress', {'Name': self.name, 'Address': self.email}
 
-    def set_focused(self, account, is_focused):
-        # type: (OutlookAccount, bool) -> bool
-        """ Emails from this contact will either always be put in the Focused inbox, or always put in Other, based on
-        the value of is_focused.
+    def set_focused(self, account: 'OutlookAccount', is_focused: bool) -> bool:
+        """Set whether emails from this contact go to Focused or Other inbox.
 
-        Args:
-            account (OutlookAccount): The :class:`OutlookAccount <pyOutlook.core.main.OutlookAccount>`
-                the override should be set for
-            is_focused (bool): Whether this contact should be set to Focused, or Other.
+        Creates an inference classification override for this sender's email address.
+        After calling this method, all future emails from this contact will be
+        automatically sorted to the specified inbox section.
 
-        Returns:
-            True if the request was successful
+        :param account: The OutlookAccount to set the override for.
+        :type account: OutlookAccount
+        :param is_focused: ``True`` to send to Focused inbox, ``False`` for Other.
+        :type is_focused: bool
+
+        :returns: ``True`` if the request was successful.
+        :rtype: bool
+
+        :raises AuthError: If authentication fails (invalid or expired token).
+        :raises RequestError: If the API request is invalid.
         """
         endpoint = 'https://graph.microsoft.com/v1.0/me/InferenceClassification/Overrides'
 
