@@ -1,0 +1,1 @@
+BASE_API_URL = 'https://graph.microsoft.com/v1.0'

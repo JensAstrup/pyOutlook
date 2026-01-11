@@ -1,7 +1,7 @@
 # Sample response taken from Outlook REST API docs
 sample_message = {
-    "@odata.context": "https://outlook.office.com/api/v2.0/$metadata#Me/Messages/$entity",
-    "@odata.id": "https://outlook.office.com/api/v2.0/Users('ddfcd489-628b-40d7-"
+    "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#Me/Messages/$entity",
+    "@odata.id": "https://graph.microsoft.com/v1.0/Users('ddfcd489-628b-40d7-"
                  "b48b-57002df800e5@1717622f-1d94-4d0c-9d74-709fad664b77')/Messages('AAMkAGI2THVSAAA=')",
     "@odata.etag": "W/\"CQAAABYAAACd9nJ/tVysQos2hTfspaWRAAADTIKz\"",
     "Id": "AAMkAGI2THVSAAA=",

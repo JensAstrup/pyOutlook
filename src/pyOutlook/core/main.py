@@ -116,10 +116,10 @@ class OutlookAccount(object):
         ALWAYS_ENABLED = 'AlwaysEnabled'
         SCHEDULED = 'Scheduled'
 
-    def set_auto_reply(self, message: str, status: 'AutoReplyStatus' = AutoReplyStatus.ALWAYS_ENABLED,
+    def set_auto_reply(self, message: str, status: str = AutoReplyStatus.ALWAYS_ENABLED,
                        start: datetime | None = None, end: datetime | None = None,
                        external_message: str | None = None,
-                       audience: 'AutoReplyAudience' = AutoReplyAudience.ALL) -> None:
+                       audience: str = AutoReplyAudience.ALL) -> None:
         """Set an automatic reply for the account.
 
         :param message: The message to be sent in replies. If ``external_message`` is
@@ -189,7 +189,7 @@ class OutlookAccount(object):
             request_data.update(ScheduledEndDateTime=dict(DateTime=str(end)))
 
         data = {
-            '@odata.context': 'https://outlook.office.com/api/v2.0/$metadata#Me/MailboxSettings',
+            '@odata.context': 'https://graph.microsoft.com/v1.0/$metadata#Me/MailboxSettings',
             'AutomaticRepliesSetting': request_data
         }
 
