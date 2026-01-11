@@ -1,99 +1,45 @@
 name: Python package
 
-# Permissions needed:
-# - contents: read - to checkout the repository code
-# - actions: write - to cancel the workflow run via API if no relevant changes
 permissions:
   contents: read
-  actions: write
 
-# Trigger on pull requests to main or development branches
-# Note: We don't use path filters here because we want the workflow to always run
-# so it appears in PR checks, then we cancel it gracefully if no relevant changes
 on:
   pull_request:
     branches:
       - main
       - development
+    paths:
+      - 'tests/**'
+      - 'src/**'
+      - '.github/workflows/unit_tests.yml'
 
 jobs:
   test:
     name: Test on Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
 
-    # Test against multiple Python versions in parallel
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-    # Checkout the repository code with full history (fetch-depth: 0)
-    # Needed to compare changes between the PR branch and base branch
     - name: Checkout code
       uses: actions/checkout@v6
-      with:
-        fetch-depth: 0
 
-    # Check if any files under tests/ or src/ have changed in this PR
-    # This step always runs and sets an output variable that subsequent steps use
-    # to determine whether to proceed with the test run
-    - name: Check if tests should run
-      id: check_paths
-      run: |
-        # Get all changed files between the PR branch and the base branch
-        CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
-        # Filter for files starting with tests/ or src/
-        RELEVANT_CHANGES=$(echo "$CHANGED_FILES" | grep -E "^(tests/|src/)" || true)
-        
-        # If no relevant changes found, set should_run to false
-        # Otherwise set it to true to proceed with tests
-        if [ -z "$RELEVANT_CHANGES" ]; then
-          echo "No changes detected in tests/ or src/ directories"
-          echo "should_run=false" >> $GITHUB_OUTPUT
-        else
-          echo "Relevant changes detected, running tests"
-          echo "should_run=true" >> $GITHUB_OUTPUT
-        fi
-
-    # Cancel the workflow gracefully if no relevant changes detected
-    # This uses the GitHub API to cancel the current workflow run
-    # The workflow will show as "cancelled" rather than "failed" or "skipped"
-    - name: Cancel workflow if no relevant changes
-      if: steps.check_paths.outputs.should_run != 'true'
-      run: |
-        echo "Cancelling workflow - no changes in tests/ or src/ directories"
-        curl -X POST \
-          -H "Accept: application/vnd.github+json" \
-          -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-          -H "X-GitHub-Api-Version: 2022-11-28" \
-          https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/cancel || true
-
-    # All subsequent steps only run if should_run is true
-    # This prevents unnecessary work (installing Python, dependencies, running tests)
-    # when there are no relevant changes
-
-    # Set up the Python version specified in the matrix
     - name: Set up Python ${{ matrix.python-version }}
-      if: steps.check_paths.outputs.should_run == 'true'
       uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
 
-    # Install development dependencies needed for testing
     - name: Install dependencies
-      if: steps.check_paths.outputs.should_run == 'true'
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.dev.txt
 
-    # Install the package in editable mode so tests can import it
     - name: Install package
-      if: steps.check_paths.outputs.should_run == 'true'
       run: |
         pip install -e .
 
-    # Run the test suite with coverage reporting
     - name: Run tests
-      if: steps.check_paths.outputs.should_run == 'true'
       run: |
         pytest --cov=pyOutlook
