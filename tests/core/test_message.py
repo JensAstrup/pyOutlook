@@ -10,6 +10,7 @@ from pyOutlook.core.message import Message
 from pyOutlook.core.attachment import Attachment
 from pyOutlook.internal.errors import AuthError, RequestError, APIError
 from tests.utils import sample_message
+from pyOutlook.utils import BASE_API_URL
 
 
 class MessageTestCase(unittest.TestCase):

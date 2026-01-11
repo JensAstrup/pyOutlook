@@ -1,6 +1,6 @@
 import unittest
 from unittest import mock
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
 
 import requests
 
