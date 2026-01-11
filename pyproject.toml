@@ -7,7 +7,7 @@ name = "pyOutlook"
 version = "5.0.1"
 description = "A Python module for connecting to the Outlook REST API, without the hassle of dealing with the JSON formatting for requests/responses and the REST endpoints and their varying requirements"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
     {name = "Jens Astrup", email = "jensaiden@gmail.com"}
@@ -20,7 +20,6 @@ classifiers = [
     "Topic :: Office/Business",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Natural Language :: English"
@@ -51,3 +50,31 @@ search_path = ["src/pyOutlook"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.coverage.run]
+omit = [
+    "build/",
+    "docs/",
+    "pyOutlook.egg-info/",
+    "setup.py",
+    "tests/",
+    "venv/",
+]
+exclude_lines = [
+    "def __repr__",
+    "def __str__",
+]
+
+[tool.coverage.report]
+omit = [
+    "build/",
+    "docs/",
+    "pyOutlook.egg-info/",
+    "setup.py",
+    "tests/",
+    "venv/",
+]
+exclude_lines = [
+    "def __repr__",
+    "def __str__",
+]
