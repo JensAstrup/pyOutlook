@@ -633,13 +633,14 @@ class MessageServiceTestCase(unittest.TestCase):
 
         # Verify payload
         payload = json.loads(call_args[1]['data'])
-        self.assertEqual(payload['subject'], 'Test Subject')
-        self.assertEqual(payload['body']['contentType'], 'HTML')
-        self.assertEqual(payload['body']['content'], '<html>Test Body</html>')
-        self.assertEqual(len(payload['toRecipients']), 1)
-        self.assertNotIn('ccRecipients', payload)
-        self.assertNotIn('bccRecipients', payload)
-        self.assertNotIn('attachments', payload)
+        message = payload['message']
+        self.assertEqual(message['subject'], 'Test Subject')
+        self.assertEqual(message['body']['contentType'], 'HTML')
+        self.assertEqual(message['body']['content'], '<html>Test Body</html>')
+        self.assertEqual(len(message['toRecipients']), 1)
+        self.assertNotIn('ccRecipients', message)
+        self.assertNotIn('bccRecipients', message)
+        self.assertNotIn('attachments', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -656,8 +657,9 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, cc=cc)
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertEqual(len(payload['ccRecipients']), 2)
-        self.assertEqual(payload['ccRecipients'][0]['EmailAddress']['Address'], 'cc1@example.com')
+        message = payload['message']
+        self.assertEqual(len(message['ccRecipients']), 2)
+        self.assertEqual(message['ccRecipients'][0]['EmailAddress']['Address'], 'cc1@example.com')
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -674,8 +676,9 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, bcc=bcc)
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertEqual(len(payload['bccRecipients']), 1)
-        self.assertEqual(payload['bccRecipients'][0]['EmailAddress']['Address'], 'bcc@example.com')
+        message = payload['message']
+        self.assertEqual(len(message['bccRecipients']), 1)
+        self.assertEqual(message['bccRecipients'][0]['EmailAddress']['Address'], 'bcc@example.com')
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -692,8 +695,9 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, attachments=[attachment])
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertIn('attachments', payload)
-        self.assertEqual(len(payload['attachments']), 1)
+        message = payload['message']
+        self.assertIn('attachments', message)
+        self.assertEqual(len(message['attachments']), 1)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -712,10 +716,11 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Subject', 'Body', to, cc=cc, bcc=bcc, attachments=[attachment])
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertIn('toRecipients', payload)
-        self.assertIn('ccRecipients', payload)
-        self.assertIn('bccRecipients', payload)
-        self.assertIn('attachments', payload)
+        message = payload['message']
+        self.assertIn('toRecipients', message)
+        self.assertIn('ccRecipients', message)
+        self.assertIn('bccRecipients', message)
+        self.assertIn('attachments', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -731,7 +736,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, cc=None)
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('ccRecipients', payload)
+        message = payload['message']
+        self.assertNotIn('ccRecipients', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -747,7 +753,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, bcc=None)
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('bccRecipients', payload)
+        message = payload['message']
+        self.assertNotIn('bccRecipients', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -763,7 +770,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, attachments=None)
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('attachments', payload)
+        message = payload['message']
+        self.assertNotIn('attachments', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -779,7 +787,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, cc=[])
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('ccRecipients', payload)
+        message = payload['message']
+        self.assertNotIn('ccRecipients', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -795,7 +804,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, bcc=[])
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('bccRecipients', payload)
+        message = payload['message']
+        self.assertNotIn('bccRecipients', message)
 
     @patch('pyOutlook.services.message.requests.post')
     @patch('pyOutlook.services.message.check_response')
@@ -811,7 +821,8 @@ class MessageServiceTestCase(unittest.TestCase):
         self.service.send('Test Subject', 'Test Body', to, attachments=[])
 
         payload = json.loads(mock_post.call_args[1]['data'])
-        self.assertNotIn('attachments', payload)
+        message = payload['message']
+        self.assertNotIn('attachments', message)
 
     @patch('pyOutlook.services.message.requests.get')
     @patch('pyOutlook.services.message.check_response')
