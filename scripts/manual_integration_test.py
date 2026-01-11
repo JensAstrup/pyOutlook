@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 """
-Comprehensive test script for pyOutlook library services.
+Comprehensive integration test script for pyOutlook library services.
 
 This script tests all methods from MessageService, FolderService, and ContactService
 using a real Outlook account access token.
 
+Note: This is NOT a pytest unit test. It's a manual integration test script.
+
 Usage:
-    python test_services.py [access_token]
-    ACCESS_TOKEN=your_token python test_services.py
+    python manual_integration_test.py [access_token]
+    ACCESS_TOKEN=your_token python manual_integration_test.py
 """
 
 import sys
@@ -34,7 +36,7 @@ def get_access_token() -> Optional[str]:
 
 def print_section(title: str):
     """Print a formatted section header."""
-    print(f'\n{'-' * 80}')
+    print('\n' + '=' * 80)
     print(f'  {title}')
     print('=' * 80)
 
