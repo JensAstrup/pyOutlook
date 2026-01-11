@@ -47,7 +47,7 @@ messages = account.inbox()
 print(f'Successfully retrieved {len(messages)} messages')
 
 # Test other features
-folders = account.get_folders()
+folders = account.folders.all()
 print(f'Found {len(folders)} folders')
 ```
 
@@ -59,7 +59,7 @@ print(f'Found {len(folders)} folders')
 pip install -r requirements.dev.txt
 ```
 
-### Run the Test Suite
+### Run Unit Tests (pytest)
 
 ```bash
 # Run all tests
@@ -75,27 +75,26 @@ pytest tests/test_message.py
 pytest -v
 ```
 
-### Manual Integration Testing
+### Run Service Integration Tests
 
-For integration tests that require a real Outlook account:
+The `utils/test_services.py` script tests all services with a real Outlook account:
 
-1. Get an access token using the method described above
-2. Set it as an environment variable:
-   ```bash
-   export OUTLOOK_ACCESS_TOKEN='your_token_here'
-   ```
-3. Run integration tests:
-   ```python
-   import os
-   from pyOutlook import OutlookAccount
-   
-   token = os.environ.get('OUTLOOK_ACCESS_TOKEN')
-   if not token:
-       raise ValueError('Please set OUTLOOK_ACCESS_TOKEN environment variable')
-   
-   account = OutlookAccount(token)
-   # Run your tests here
-   ```
+```bash
+# Method 1: Command line argument
+python utils/test_services.py "your_access_token"
+
+# Method 2: Environment variable
+ACCESS_TOKEN="your_access_token" python utils/test_services.py
+```
+
+This script tests:
+- FolderService (all folders, get specific folder)
+- MessageService retrieval (all, inbox, sent, drafts, from_folder, get by ID)
+- MessageService sending (simple, with Contact, with CC/BCC, with attachment)
+- ContactService (get overrides)
+- Contact operations (create and convert to dict)
+
+**Note**: The script sends 4 test emails to `jensaiden@gmail.com` when testing sending functionality.
 
 ## Token Expiration
 
