@@ -76,3 +76,20 @@ class Attachment(object):
         yield 'name', self.name
         yield 'contentBytes', self._content
         yield 'contentType', self.content_type
+    
+    def api_representation(self) -> dict:
+        """Returns the API-formatted dictionary representation of this attachment.
+
+        This is a convenience method that returns the same format as ``dict(attachment)``.
+        Exists for backward compatibility with code that calls this method directly.
+
+        :returns: Dictionary in the format expected by the Microsoft Graph API.
+        :rtype: dict
+
+        Example::
+
+            attachment = Attachment('file.pdf', 'base64content...')
+            api_format = attachment.api_representation()
+            # {'@odata.type': '#microsoft.graph.fileAttachment', 'name': 'file.pdf', ...}
+        """
+        return dict(self)

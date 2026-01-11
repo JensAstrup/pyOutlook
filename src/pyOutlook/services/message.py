@@ -130,8 +130,9 @@ class MessageService:
         """
         # Import here to avoid circular dependency
         from pyOutlook.core.message import Message
-
+        print(api_json)
         uid = api_json['id']
+        print(uid)
         subject = api_json.get('subject', '')
         
         sender = api_json.get('sender', {})
@@ -170,7 +171,7 @@ class MessageService:
             subject, 
             to_recipients, 
             sender=sender, 
-            message_id=uid, 
+            id=uid, 
             is_read=is_read,
             time_created=time_created, 
             time_sent=time_sent, 

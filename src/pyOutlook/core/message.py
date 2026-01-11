@@ -13,6 +13,7 @@ from pyOutlook.internal.utils import get_valid_filename, check_response
 
 if TYPE_CHECKING:
     from pyOutlook.core.folder import Folder
+    from pyOutlook.core.main import OutlookAccount
 
 log = logging.getLogger('pyOutlook')
 
@@ -88,10 +89,10 @@ class Message:
     IMPORTANCE_NORMAL = 1
     IMPORTANCE_HIGH = 2
     
-    def __init__(self, account, body: str = '', subject: str = '', to_recipients: list[Contact] | None = None, 
-                 sender: Contact | None = None, cc: list[Contact] | None = None, bcc: list[Contact] | None = None, message_id: str | None = None, **kwargs):
+    def __init__(self, account: 'OutlookAccount', body: str = '', subject: str = '', to_recipients: list[Contact] | None = None, 
+                 sender: Contact | None = None, cc: list[Contact] | None = None, bcc: list[Contact] | None = None, id: str | None = None, **kwargs):
         self.account = account
-        self.message_id = message_id
+        self.id = id
         self.subject = subject
         self.body = body
         self.body_preview = kwargs.get('body_preview', '')
@@ -99,11 +100,12 @@ class Message:
         self.to = to_recipients or []
         self.cc = cc or []
         self.bcc = bcc or []
+        self.id = id
         self._is_read = kwargs.get('is_read', False)
         self.is_draft = kwargs.get('is_draft', False)
         self.importance = kwargs.get('importance', self.IMPORTANCE_NORMAL)
         self.categories = kwargs.get('categories', [])
-        self.focused = kwargs.get('focused', False)
+        self._focused = kwargs.get('focused', False)
         self.time_created = kwargs.get('time_created')
         self.time_sent = kwargs.get('time_sent')
         self.parent_folder_id = kwargs.get('parent_folder_id')
@@ -117,7 +119,7 @@ class Message:
         return self.subject
     
     def __repr__(self):
-        return f'Message(subject={self.subject!r}, message_id={self.message_id!r})'
+        return f'Message(subject={self.subject!r}, message_id={self.id})'
     
     @property
     def headers(self) -> dict:
@@ -151,6 +153,27 @@ class Message:
         :type value: bool
         """
         self.set_read_status(value)
+    
+    @property
+    def focused(self) -> bool:
+        """Get the focused status of this message.
+
+        :returns: ``True`` if the message is in Focused inbox, ``False`` for Other.
+        :rtype: bool
+        """
+        return self._focused
+    
+    @focused.setter
+    def focused(self, value: bool):
+        """Set the focused status of this message.
+
+        Setting this property will call :meth:`set_focused` to update
+        the status via the API.
+
+        :param value: ``True`` for Focused inbox, ``False`` for Other.
+        :type value: bool
+        """
+        self.set_focused(value)
 
     @property
     def attachments(self) -> list[Attachment]:
@@ -171,7 +194,7 @@ class Message:
         # Lazy load from API
         if self.message_id:
             from pyOutlook.services.message import MessageService
-            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/attachments'
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/attachments'
             r = requests.get(endpoint, headers=self.headers, timeout=10)
             
             if check_response(r):
@@ -233,7 +256,7 @@ class Message:
         payload = self._create_api_payload(content_type)
         endpoint = 'https://outlook.office.com/api/v1.0/me/sendmail'
 
-        r = requests.post(endpoint, headers=self.headers, data=json.dumps(payload))
+        r = requests.post(endpoint, headers=self.headers, data=json.dumps(payload), timeout=10)
         check_response(r)
     
     def reply(self, comment: str) -> None:
@@ -254,7 +277,7 @@ class Message:
         payload = json.dumps({'Comment': comment})
         endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/reply'
 
-        r = requests.post(endpoint, headers=self.headers, data=payload)
+        r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
         check_response(r)
 
     def reply_all(self, comment: str) -> None:
@@ -275,15 +298,15 @@ class Message:
         payload = json.dumps({'Comment': comment})
         endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/replyall'
 
-        r = requests.post(endpoint, headers=self.headers, data=payload)
+        r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
         check_response(r)
 
-    def forward(self, to_recipients: list, forward_comment: str | None = None) -> None:
+    def forward(self, to_recipients: Contact | str | list[Contact | str], forward_comment: str | None = None) -> None:
         """Forward this message to recipients.
 
-        :param to_recipients: List of recipients. Can be Contact instances or email
-            address strings.
-        :type to_recipients: list[Contact] or list[str]
+        :param to_recipients: Single recipient or list of recipients. Can be Contact
+            instances or email address strings.
+        :type to_recipients: Contact or str or list[Contact] or list[str]
         :param forward_comment: Optional comment to include with the forwarded message.
         :type forward_comment: str or None
 
@@ -291,30 +314,45 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
 
-        .. warning::
-            This method calls ``api_representation()`` on Contact objects, which
-            is currently not implemented. Use ``dict(contact)`` format instead
-            until this is fixed.
+        Example::
+
+            # Single recipient as string
+            message.forward('user@example.com')
+
+            # Multiple recipients as list
+            message.forward(['user1@example.com', 'user2@example.com'])
+
+            # With a comment
+            message.forward('user@example.com', forward_comment='FYI')
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot forward a message without message_id')
 
-        payload = {}
+        # Normalize to list if single recipient provided
+        if isinstance(to_recipients, (str, Contact)):
+            recipients_list = [to_recipients]
+        else:
+            recipients_list = to_recipients
+
+        payload: dict[str, object] = {}
 
         if forward_comment is not None:
-            payload['Comment'] = forward_comment
+            payload['comment'] = forward_comment
 
-        # Convert strings to Contacts if needed
-        if any(isinstance(recipient, str) for recipient in to_recipients):
-            to_recipients = [Contact(email=email) for email in to_recipients]
+        # Convert strings to Contacts if needed and format for API
+        payload['toRecipients'] = [
+            {
+                'emailAddress': {
+                    'name': recipient if isinstance(recipient, str) else recipient.name,
+                    'address': recipient if isinstance(recipient, str) else recipient.email
+                }
+            }
+            for recipient in recipients_list
+        ]
 
-        # Convert to API format
-        to_recipients = [contact.api_representation() for contact in to_recipients]
-        payload['ToRecipients'] = to_recipients
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/forward'
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/forward'
-
-        r = requests.post(endpoint, headers=self.headers, data=json.dumps(payload))
+        r = requests.post(endpoint, headers=self.headers, data=json.dumps(payload), timeout=10)
         check_response(r)
 
     def delete(self) -> None:
@@ -331,9 +369,32 @@ class Message:
 
         endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
 
-        r = requests.delete(endpoint, headers=self.headers)
+        r = requests.delete(endpoint, headers=self.headers, timeout=10)
         check_response(r)
     
+    def _move_to(self, destination: str) -> None:
+        """Internal method to move this message to a destination folder.
+
+        :param destination: The destination folder ID or well-known name.
+        :type destination: str
+
+        :raises ValueError: If the message has no ``message_id``.
+        :raises RequestError: If the API request fails.
+        :raises AuthError: If authentication fails.
+        """
+        if not self.message_id:
+            raise ValueError('Cannot move a message without message_id')
+
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/move'
+        payload = json.dumps({'DestinationId': destination})
+
+        r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
+        check_response(r)
+
+        # Update message_id if changed
+        data = r.json()
+        self.message_id = data.get('Id', self.message_id)
+
     def move_to(self, destination) -> None:
         """Move this message to a destination folder.
 
@@ -347,9 +408,6 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
-            raise ValueError('Cannot move a message without message_id')
-
         from pyOutlook.core.folder import Folder
 
         if isinstance(destination, Folder):
@@ -357,15 +415,7 @@ class Message:
         else:
             destination_id = destination
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/move'
-        payload = json.dumps({'DestinationId': destination_id})
-
-        r = requests.post(endpoint, headers=self.headers, data=payload)
-        check_response(r)
-
-        # Update message_id if changed
-        data = r.json()
-        self.message_id = data.get('Id', self.message_id)
+        self._move_to(destination_id)
 
     def move_to_inbox(self) -> None:
         """Move this message to the Inbox folder.
@@ -394,6 +444,25 @@ class Message:
         """
         self.move_to('Drafts')
 
+    def _copy_to(self, destination: str) -> None:
+        """Internal method to copy this message to a destination folder.
+
+        :param destination: The destination folder ID or well-known name.
+        :type destination: str
+
+        :raises ValueError: If the message has no ``message_id``.
+        :raises RequestError: If the API request fails.
+        :raises AuthError: If authentication fails.
+        """
+        if not self.message_id:
+            raise ValueError('Cannot copy a message without message_id')
+
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/copy'
+        payload = json.dumps({'DestinationId': destination})
+
+        r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
+        check_response(r)
+
     def copy_to(self, destination) -> None:
         """Copy this message to a destination folder.
 
@@ -407,9 +476,6 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
-            raise ValueError('Cannot copy a message without message_id')
-
         from pyOutlook.core.folder import Folder
 
         if isinstance(destination, Folder):
@@ -417,11 +483,7 @@ class Message:
         else:
             destination_id = destination
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/copy'
-        payload = json.dumps({'DestinationId': destination_id})
-
-        r = requests.post(endpoint, headers=self.headers, data=payload)
-        check_response(r)
+        self._copy_to(destination_id)
 
     def copy_to_inbox(self) -> None:
         """Copy this message to the Inbox folder.
@@ -465,7 +527,7 @@ class Message:
             endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
             payload = json.dumps({'IsRead': is_read})
 
-            r = requests.patch(endpoint, headers=self.headers, data=payload)
+            r = requests.patch(endpoint, headers=self.headers, data=payload, timeout=10)
             check_response(r)
 
         self._is_read = is_read
@@ -488,10 +550,10 @@ class Message:
         endpoint = f"https://graph.microsoft.com/v1.0/me/messages('{self.message_id}')"
         data = {'InferenceClassification': 'Focused' if is_focused else 'Other'}
 
-        r = requests.patch(endpoint, data=json.dumps(data), headers=self.headers)
+        r = requests.patch(endpoint, data=json.dumps(data), headers=self.headers, timeout=10)
         check_response(r)
 
-        self.focused = is_focused
+        self._focused = is_focused
 
     def add_category(self, category_name: str) -> None:
         """Add a category to this message.
@@ -512,7 +574,7 @@ class Message:
             endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
             payload = json.dumps({'Categories': self.categories})
 
-            r = requests.patch(endpoint, headers=self.headers, data=payload)
+            r = requests.patch(endpoint, headers=self.headers, data=payload, timeout=10)
             check_response(r)
 
     def attach(self, file_bytes, file_name: str) -> None:
@@ -547,13 +609,8 @@ class Message:
 
         :returns: Dictionary formatted for the Outlook API sendMail endpoint.
         :rtype: dict
-
-        .. warning::
-            This method calls ``api_representation()`` on Contact and Attachment
-            objects, which is currently not implemented. The code may fail until
-            these methods are added.
         """
-        payload = {
+        payload: dict[str, object] = {
             'Subject': self.subject,
             'Body': {
                 'ContentType': content_type,
@@ -562,71 +619,73 @@ class Message:
         }
         
         if self.sender is not None:
-            payload['From'] = self.sender.api_representation()
+            payload['From'] = dict(self.sender)
         
         # Handle To recipients
         to = self.to
         if any(isinstance(item, str) for item in to):
             to = [Contact(email=email) for email in to]
-        payload['ToRecipients'] = [contact.api_representation() for contact in to]
+        payload['ToRecipients'] = [dict(contact) for contact in to]
         
         # Handle CC recipients
         if self.cc:
             cc = self.cc
             if any(isinstance(email, str) for email in cc):
                 cc = [Contact(email=email) for email in cc]
-            payload['CcRecipients'] = [contact.api_representation() for contact in cc]
+            payload['CcRecipients'] = [dict(contact) for contact in cc]
         
         # Handle BCC recipients
         if self.bcc:
             bcc = self.bcc
             if any(isinstance(email, str) for email in bcc):
                 bcc = [Contact(email=email) for email in bcc]
-            payload['BccRecipients'] = [contact.api_representation() for contact in bcc]
+            payload['BccRecipients'] = [dict(contact) for contact in bcc]
         
         # Handle attachments
         if self._attachments:
-            payload['Attachments'] = [att.api_representation() for att in self._attachments]
+            payload['Attachments'] = [dict(attachment) for attachment in self._attachments]
         
         payload['Importance'] = str(self.importance)
         
         return {'Message': payload}
+ 
+    def _make_api_call(self, http_type: str, endpoint: str, extra_headers: dict | None = None, data: str | None = None) -> None:
+        """Internal method to handle making calls to the Outlook API.
+
+        Handles making HTTP requests to the API with proper headers and logging.
+
+        :param http_type: The HTTP method - ``'post'``, ``'delete'``, or ``'patch'``.
+        :type http_type: str
+        :param endpoint: The API endpoint URL.
+        :type endpoint: str
+        :param extra_headers: Optional additional headers to include in the request.
+        :type extra_headers: dict or None
+        :param data: Optional request body data.
+        :type data: str or None
+
+        :raises RequestError: If the API request fails.
+        :raises AuthError: If authentication fails.
+        :raises NotImplementedError: If an unsupported HTTP method is provided.
+        """
+        headers = {
+            'Authorization': f'Bearer {self.account.access_token}',
+            'Content-Type': 'application/json'
+        }
+
+        if extra_headers is not None:
+            headers.update(extra_headers)
+
+        log.debug('Making Outlook API request for message (ID: %s) with Headers: %s Data: %s',
+                  self.message_id, headers, data)
+
+        if http_type == 'post':
+            r = requests.post(endpoint, headers=headers, data=data, timeout=10)
+        elif http_type == 'delete':
+            r = requests.delete(endpoint, headers=headers, timeout=10)
+        elif http_type == 'patch':
+            r = requests.patch(endpoint, headers=headers, data=data, timeout=10)
+        else:
+            raise NotImplementedError(f'HTTP method {http_type} is not supported')
+
+        check_response(r)
     
-    # Backward compatibility: class methods that delegate to MessageService
-    @classmethod
-    def _json_to_messages(cls, account, json_value: dict) -> list['Message']:
-        """Converts JSON array to list of Message instances.
-
-        .. deprecated::
-            Use :meth:`MessageService._json_to_messages` directly instead.
-            This method exists for backward compatibility.
-
-        :param account: The OutlookAccount for the messages.
-        :type account: OutlookAccount
-        :param json_value: JSON response containing ``'value'`` array.
-        :type json_value: dict
-
-        :returns: List of Message instances.
-        :rtype: list[Message]
-        """
-        from pyOutlook.services.message import MessageService
-        return MessageService._json_to_messages(account, json_value)
-
-    @classmethod
-    def _json_to_message(cls, account, api_json: dict) -> 'Message':
-        """Converts JSON to a Message instance.
-
-        .. deprecated::
-            Use :meth:`MessageService._json_to_message` directly instead.
-            This method exists for backward compatibility.
-
-        :param account: The OutlookAccount for the message.
-        :type account: OutlookAccount
-        :param api_json: JSON object representing a message.
-        :type api_json: dict
-
-        :returns: Message instance.
-        :rtype: Message
-        """
-        from pyOutlook.services.message import MessageService
-        return MessageService._json_to_message(account, api_json)
