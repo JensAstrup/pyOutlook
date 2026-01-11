@@ -119,7 +119,7 @@ class Message:
         return self.subject
     
     def __repr__(self):
-        return f'Message(subject={self.subject!r}, message_id={self.id})'
+        return f'Message(subject={self.subject!r}, message_id={self.id!r})'
     
     @property
     def headers(self) -> dict:
@@ -192,7 +192,7 @@ class Message:
             return self._attachments
         
         # Lazy load from API
-        if self.message_id:
+        if self.id:
             from pyOutlook.services.message import MessageService
             endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/attachments'
             r = requests.get(endpoint, headers=self.headers, timeout=10)
@@ -271,11 +271,11 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot reply to a message without message_id')
 
         payload = json.dumps({'Comment': comment})
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/reply'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/reply'
 
         r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
         check_response(r)
@@ -292,11 +292,11 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot reply to a message without message_id')
 
         payload = json.dumps({'Comment': comment})
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/replyall'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/replyall'
 
         r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
         check_response(r)
@@ -364,10 +364,10 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot delete a message without message_id')
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}'
 
         r = requests.delete(endpoint, headers=self.headers, timeout=10)
         check_response(r)
@@ -382,10 +382,10 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot move a message without message_id')
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/move'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/move'
         payload = json.dumps({'DestinationId': destination})
 
         r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
@@ -393,7 +393,7 @@ class Message:
 
         # Update message_id if changed
         data = r.json()
-        self.message_id = data.get('Id', self.message_id)
+        self.id = data.get('Id', self.id)
 
     def move_to(self, destination) -> None:
         """Move this message to a destination folder.
@@ -454,10 +454,10 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot copy a message without message_id')
 
-        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}/copy'
+        endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}/copy'
         payload = json.dumps({'DestinationId': destination})
 
         r = requests.post(endpoint, headers=self.headers, data=payload, timeout=10)
@@ -523,8 +523,8 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if self.message_id:
-            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
+        if self.id:
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}'
             payload = json.dumps({'IsRead': is_read})
 
             r = requests.patch(endpoint, headers=self.headers, data=payload, timeout=10)
@@ -544,10 +544,10 @@ class Message:
         :raises RequestError: If the API request fails.
         :raises AuthError: If authentication fails.
         """
-        if not self.message_id:
+        if not self.id:
             raise ValueError('Cannot set focused status on a message without message_id')
 
-        endpoint = f"https://graph.microsoft.com/v1.0/me/messages('{self.message_id}')"
+        endpoint = f"https://graph.microsoft.com/v1.0/me/messages('{self.id}')"
         data = {'InferenceClassification': 'Focused' if is_focused else 'Other'}
 
         r = requests.patch(endpoint, data=json.dumps(data), headers=self.headers, timeout=10)
@@ -570,8 +570,8 @@ class Message:
         """
         self.categories.append(category_name)
 
-        if self.message_id:
-            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.message_id}'
+        if self.id:
+            endpoint = f'https://graph.microsoft.com/v1.0/me/messages/{self.id}'
             payload = json.dumps({'Categories': self.categories})
 
             r = requests.patch(endpoint, headers=self.headers, data=payload, timeout=10)
@@ -676,7 +676,7 @@ class Message:
             headers.update(extra_headers)
 
         log.debug('Making Outlook API request for message (ID: %s) with Headers: %s Data: %s',
-                  self.message_id, headers, data)
+                  self.id, headers, data)
 
         if http_type == 'post':
             r = requests.post(endpoint, headers=headers, data=data, timeout=10)

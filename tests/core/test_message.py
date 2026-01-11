@@ -39,7 +39,7 @@ class MessageTestCase(unittest.TestCase):
         message = Message(self.account)
 
         self.assertEqual(message.account, self.account)
-        self.assertIsNone(message.message_id)
+        self.assertIsNone(message.id)
         self.assertEqual(message.body, '')
         self.assertEqual(message.subject, '')
         self.assertEqual(message.to, [])
@@ -65,7 +65,7 @@ class MessageTestCase(unittest.TestCase):
             sender=self.sample_sender,
             cc=self.sample_cc,
             bcc=self.sample_bcc,
-            message_id='test_id_123',
+            id='test_id_123',
             body_preview='Test preview',
             is_read=True,
             is_draft=True,
@@ -79,7 +79,7 @@ class MessageTestCase(unittest.TestCase):
         )
 
         self.assertEqual(message.account, self.account)
-        self.assertEqual(message.message_id, 'test_id_123')
+        self.assertEqual(message.id, 'test_id_123')
         self.assertEqual(message.body, 'Test body')
         self.assertEqual(message.subject, 'Test subject')
         self.assertEqual(message.to, self.sample_to)
@@ -111,7 +111,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_repr__returns_formatted_string(self):
         """Test __repr__ returns properly formatted string."""
-        message = Message(self.account, subject='Test Subject', message_id='msg_123')
+        message = Message(self.account, subject='Test Subject', id='msg_123')
         expected = "Message(subject='Test Subject', message_id='msg_123')"
         self.assertEqual(repr(message), expected)
 
@@ -140,7 +140,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', is_read=False)
+        message = Message(self.account, id='msg_123', is_read=False)
         message.is_read = True
 
         self.assertTrue(message.is_read)
@@ -190,7 +190,7 @@ class MessageTestCase(unittest.TestCase):
         }
         mock_get.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', has_attachments=True)
+        message = Message(self.account, id='msg_123', has_attachments=True)
         result = message.attachments
 
         self.assertEqual(len(result), 2)
@@ -201,7 +201,7 @@ class MessageTestCase(unittest.TestCase):
     @patch('pyOutlook.core.message.requests.get')
     def test_attachments__no_message_id_returns_empty_list(self, mock_get):
         """Test attachments property when message_id is None."""
-        message = Message(self.account, message_id=None, has_attachments=True)
+        message = Message(self.account, id=None, has_attachments=True)
         result = message.attachments
 
         self.assertEqual(result, [])
@@ -215,7 +215,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.json.return_value = {'error': 'Unauthorized'}
         mock_get.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', has_attachments=True)
+        message = Message(self.account, id='msg_123', has_attachments=True)
 
         with self.assertRaises(AuthError):
             _ = message.attachments
@@ -314,7 +314,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.reply('This is my reply')
 
         mock_post.assert_called_once()
@@ -325,7 +325,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_reply__no_message_id_raises_error(self):
         """Test reply method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.reply('Reply text')
@@ -339,7 +339,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.reply_all('Reply to all')
 
         mock_post.assert_called_once()
@@ -350,7 +350,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_reply_all__no_message_id_raises_error(self):
         """Test reply_all method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.reply_all('Reply text')
@@ -364,7 +364,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         recipients = [Contact('forward@test.com', 'Forward Recipient')]
         message.forward(recipients, 'Please review this')
 
@@ -372,8 +372,8 @@ class MessageTestCase(unittest.TestCase):
         call_args = mock_post.call_args
         self.assertIn('msg_123/forward', call_args[0][0])
         payload = json.loads(call_args[1]['data'])
-        self.assertEqual(payload['Comment'], 'Please review this')
-        self.assertEqual(len(payload['ToRecipients']), 1)
+        self.assertEqual(payload['comment'], 'Please review this')
+        self.assertEqual(len(payload['toRecipients']), 1)
 
     @patch('pyOutlook.core.message.requests.post')
     def test_forward__with_string_recipients(self, mock_post):
@@ -382,14 +382,14 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         recipients = ['user1@test.com', 'user2@test.com']
         message.forward(recipients)
 
         mock_post.assert_called_once()
         call_args = mock_post.call_args
         payload = json.loads(call_args[1]['data'])
-        self.assertEqual(len(payload['ToRecipients']), 2)
+        self.assertEqual(len(payload['toRecipients']), 2)
 
     @patch('pyOutlook.core.message.requests.post')
     def test_forward__without_comment(self, mock_post):
@@ -398,18 +398,18 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         recipients = [Contact('forward@test.com')]
         message.forward(recipients, forward_comment=None)
 
         mock_post.assert_called_once()
         call_args = mock_post.call_args
         payload = json.loads(call_args[1]['data'])
-        self.assertNotIn('Comment', payload)
+        self.assertNotIn('comment', payload)
 
     def test_forward__no_message_id_raises_error(self):
         """Test forward method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
         recipients = [Contact('forward@test.com')]
 
         with self.assertRaises(ValueError) as context:
@@ -424,7 +424,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_delete.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.delete()
 
         mock_delete.assert_called_once()
@@ -433,7 +433,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_delete__no_message_id_raises_error(self):
         """Test delete method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.delete()
@@ -459,14 +459,14 @@ class MessageTestCase(unittest.TestCase):
         # Make isinstance return True for our stub
         mock_isinstance.return_value = True
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to(folder_stub)
 
         mock_post.assert_called_once()
         call_args = mock_post.call_args
         payload = json.loads(call_args[1]['data'])
         self.assertEqual(payload['DestinationId'], 'folder_456')
-        self.assertEqual(message.message_id, 'new_msg_id')
+        self.assertEqual(message.id, 'new_msg_id')
 
     @patch('pyOutlook.core.message.requests.post')
     def test_move_to__with_folder_id_string(self, mock_post):
@@ -476,7 +476,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.json.return_value = {'Id': 'msg_123'}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to('folder_456')
 
         mock_post.assert_called_once()
@@ -486,7 +486,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_move_to__no_message_id_raises_error(self):
         """Test move_to method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.move_to('folder_123')
@@ -501,7 +501,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.json.return_value = {'Id': 'msg_123'}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to_inbox()
 
         call_args = mock_post.call_args
@@ -516,7 +516,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.json.return_value = {'Id': 'msg_123'}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to_deleted()
 
         call_args = mock_post.call_args
@@ -531,7 +531,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.json.return_value = {'Id': 'msg_123'}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to_drafts()
 
         call_args = mock_post.call_args
@@ -556,7 +556,7 @@ class MessageTestCase(unittest.TestCase):
         # Make isinstance return True for our stub
         mock_isinstance.return_value = True
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.copy_to(folder_stub)
 
         mock_post.assert_called_once()
@@ -572,7 +572,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.copy_to('folder_789')
 
         mock_post.assert_called_once()
@@ -582,7 +582,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_copy_to__no_message_id_raises_error(self):
         """Test copy_to method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.copy_to('folder_123')
@@ -596,7 +596,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.copy_to_inbox()
 
         call_args = mock_post.call_args
@@ -610,7 +610,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.copy_to_deleted()
 
         call_args = mock_post.call_args
@@ -624,7 +624,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.copy_to_drafts()
 
         call_args = mock_post.call_args
@@ -638,7 +638,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', is_read=False)
+        message = Message(self.account, id='msg_123', is_read=False)
         message.set_read_status(True)
 
         mock_patch.assert_called_once()
@@ -654,7 +654,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', is_read=True)
+        message = Message(self.account, id='msg_123', is_read=True)
         message.set_read_status(False)
 
         mock_patch.assert_called_once()
@@ -666,7 +666,7 @@ class MessageTestCase(unittest.TestCase):
     @patch('pyOutlook.core.message.requests.patch')
     def test_set_read_status__without_message_id(self, mock_patch):
         """Test set_read_status method without message_id only updates internal state."""
-        message = Message(self.account, message_id=None, is_read=False)
+        message = Message(self.account, id=None, is_read=False)
         message.set_read_status(True)
 
         mock_patch.assert_not_called()
@@ -679,7 +679,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', focused=False)
+        message = Message(self.account, id='msg_123', focused=False)
         message.set_focused(True)
 
         mock_patch.assert_called_once()
@@ -695,7 +695,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', focused=True)
+        message = Message(self.account, id='msg_123', focused=True)
         message.set_focused(False)
 
         mock_patch.assert_called_once()
@@ -706,7 +706,7 @@ class MessageTestCase(unittest.TestCase):
 
     def test_set_focused__no_message_id_raises_error(self):
         """Test set_focused method without message_id raises ValueError."""
-        message = Message(self.account, message_id=None)
+        message = Message(self.account, id=None)
 
         with self.assertRaises(ValueError) as context:
             message.set_focused(True)
@@ -716,7 +716,7 @@ class MessageTestCase(unittest.TestCase):
     @patch('pyOutlook.core.message.requests.patch')
     def test_add_category__new_category_without_message_id(self, mock_patch):
         """Test add_category method without message_id."""
-        message = Message(self.account, message_id=None, categories=['Category1'])
+        message = Message(self.account, id=None, categories=['Category1'])
         message.add_category('Category2')
 
         self.assertIn('Category1', message.categories)
@@ -731,7 +731,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', categories=['Category1'])
+        message = Message(self.account, id='msg_123', categories=['Category1'])
         message.add_category('Category2')
 
         mock_patch.assert_called_once()
@@ -746,7 +746,7 @@ class MessageTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_patch.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123', categories=[])
+        message = Message(self.account, id='msg_123', categories=[])
         message.add_category('FirstCategory')
 
         self.assertEqual(message.categories, ['FirstCategory'])
@@ -1022,26 +1022,15 @@ class MessageTestCase(unittest.TestCase):
 
         self.assertEqual(payload['Message']['Body']['ContentType'], 'Text')
 
-    @patch('pyOutlook.services.message.MessageService._json_to_messages')
-    def test_json_to_messages__delegates_to_service(self, mock_service_method):
-        """Test _json_to_messages class method delegates to MessageService."""
-        mock_service_method.return_value = []
-        json_data = {'value': []}
+    def test_json_to_messages__removed(self):
+        """Test that _json_to_messages has been removed from Message class."""
+        # This method has been removed and moved to MessageService
+        self.assertFalse(hasattr(Message, '_json_to_messages'))
 
-        result = Message._json_to_messages(self.account, json_data)
-
-        mock_service_method.assert_called_once_with(self.account, json_data)
-
-    @patch('pyOutlook.services.message.MessageService._json_to_message')
-    def test_json_to_message__delegates_to_service(self, mock_service_method):
-        """Test _json_to_message class method delegates to MessageService."""
-        mock_message = Mock()
-        mock_service_method.return_value = mock_message
-
-        result = Message._json_to_message(self.account, sample_message)
-
-        mock_service_method.assert_called_once_with(self.account, sample_message)
-        self.assertEqual(result, mock_message)
+    def test_json_to_message__removed(self):
+        """Test that _json_to_message has been removed from Message class."""
+        # This method has been removed and moved to MessageService
+        self.assertFalse(hasattr(Message, '_json_to_message'))
 
 
 class MessageIntegrationTestCase(unittest.TestCase):
@@ -1051,44 +1040,14 @@ class MessageIntegrationTestCase(unittest.TestCase):
         """Set up test fixtures."""
         self.account = OutlookAccount('test_token')
 
-    @patch('pyOutlook.services.message.MessageService._json_to_message')
-    def test_json_to_message__correct_format(self, mock_service_method):
-        """Test that JSON is converted to Message correctly."""
-        expected_message = Message(
-            self.account,
-            subject='Re: Meeting Notes',
-            sender=Contact('katiej@a830edad9050849NDA1.onmicrosoft.com', 'Katie Jordan')
-        )
-        mock_service_method.return_value = expected_message
-
-        message = Message._json_to_message(self.account, sample_message)
-
-        self.assertEqual(message.subject, 'Re: Meeting Notes')
-        self.assertEqual(message.sender.email, 'katiej@a830edad9050849NDA1.onmicrosoft.com')
-
-    @patch('pyOutlook.services.message.MessageService._json_to_message')
-    def test_recipients_missing_json__no_failure(self, mock_service_method):
-        """Test that missing ToRecipients doesn't cause failure."""
-        json_message = {
-            "Id": "AAMkAGI2THVSAAA=",
-            "Subject": "Test",
-            "Body": {"ContentType": "Text", "Content": "Test content"},
-            "Sender": {
-                "EmailAddress": {
-                    "Name": "Test Sender",
-                    "Address": "sender@test.com"
-                }
-            },
-            "IsRead": False
-        }
-
-        expected_message = Message(self.account, subject='Test')
-        mock_service_method.return_value = expected_message
-
-        # Should not raise an exception
-        message = Message._json_to_message(self.account, json_message)
-
-        mock_service_method.assert_called_once()
+    def test_json_to_message__moved_to_service(self):
+        """Test that JSON to Message conversion is now handled by MessageService."""
+        # This functionality has been moved to MessageService._json_to_message
+        from pyOutlook.services.message import MessageService
+        service = MessageService(self.account)
+        
+        # Just verify the method exists on the service
+        self.assertTrue(hasattr(service, '_json_to_message'))
 
 
 class MessageEdgeCaseTestCase(unittest.TestCase):
@@ -1133,7 +1092,7 @@ class MessageEdgeCaseTestCase(unittest.TestCase):
         mock_response.status_code = 200
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         recipients = ['user1@test.com', 'user2@test.com']  # Use all strings to avoid Contact issues
         message.forward(recipients)
 
@@ -1141,7 +1100,7 @@ class MessageEdgeCaseTestCase(unittest.TestCase):
         # Verify the recipients were converted properly
         call_args = mock_post.call_args
         payload = json.loads(call_args[1]['data'])
-        self.assertEqual(len(payload['ToRecipients']), 2)
+        self.assertEqual(len(payload['toRecipients']), 2)
 
     def test_attach__preserves_order(self):
         """Test that attachments maintain order."""
@@ -1168,10 +1127,10 @@ class MessageEdgeCaseTestCase(unittest.TestCase):
         mock_response.json.return_value = {'Id': 'new_id_456'}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='old_id_123')
+        message = Message(self.account, id='old_id_123')
         message.move_to('Inbox')
 
-        self.assertEqual(message.message_id, 'new_id_456')
+        self.assertEqual(message.id, 'new_id_456')
 
     @patch('pyOutlook.core.message.requests.post')
     def test_move_to__message_id_preserved_if_not_in_response(self, mock_post):
@@ -1181,10 +1140,10 @@ class MessageEdgeCaseTestCase(unittest.TestCase):
         mock_response.json.return_value = {}
         mock_post.return_value = mock_response
 
-        message = Message(self.account, message_id='msg_123')
+        message = Message(self.account, id='msg_123')
         message.move_to('Inbox')
 
-        self.assertEqual(message.message_id, 'msg_123')
+        self.assertEqual(message.id, 'msg_123')
 
 
 if __name__ == '__main__':

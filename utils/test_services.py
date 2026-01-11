@@ -29,12 +29,12 @@ def get_access_token() -> Optional[str]:
     """Get access token from command line argument or environment variable."""
     if len(sys.argv) > 1:
         return sys.argv[1]
-    return os.environ.get('ACCESS_TOKEN')
+    return os.environ.get('OUTLOOK_ACCESS_TOKEN')
 
 
 def print_section(title: str):
     """Print a formatted section header."""
-    print('\n' + '=' * 80)
+    print(f'\n{'-' * 80}')
     print(f'  {title}')
     print('=' * 80)
 
