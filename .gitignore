@@ -7,3 +7,4 @@ dist/*
 docs/build/*
 pyOutlook.egg-info/
 venv/
+src/pyOutlook.egg-info/
