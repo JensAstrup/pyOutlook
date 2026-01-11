@@ -47,3 +47,7 @@ include = ["pyOutlook*"]
 
 [tool.pyrefly]
 search_path = ["src/pyOutlook"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
