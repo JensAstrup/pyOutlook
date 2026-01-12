@@ -1,12 +1,11 @@
+import json
 import unittest
-try:
-    from unittest.mock import patch, Mock, MagicMock
-except ImportError:
-    from mock import Mock, MagicMock, patch
+from unittest.mock import patch, Mock
 
 from pyOutlook.services.folder import FolderService
 from pyOutlook.core.folder import Folder
 from pyOutlook.internal.errors import AuthError, RequestError, APIError
+from pyOutlook.utils.constants import BASE_API_URL
 
 
 class FolderServiceTestCase(unittest.TestCase):
@@ -527,6 +526,181 @@ class FolderServiceTestCase(unittest.TestCase):
         # Assert
         call_args = mock_get.call_args
         self.assertEqual(call_args[1]['timeout'], 10)
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__successful_response(self, mock_check_response, mock_post):
+        """Test create() returns a Folder when successful."""
+        # Arrange
+        folder_name = 'My New Folder'
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            'id': 'new_folder_id',
+            'displayName': folder_name,
+            'parentFolderId': 'parent123',
+            'childFolderCount': 0,
+            'unreadItemCount': 0,
+            'totalItemCount': 0
+        }
+        mock_post.return_value = mock_response
+        mock_check_response.return_value = True
+
+        # Act
+        result = self.service.create(folder_name)
+
+        # Assert
+        self.assertIsInstance(result, Folder)
+        self.assertEqual(result.id, 'new_folder_id')
+        self.assertEqual(result.name, folder_name)
+        self.assertEqual(result.parent_id, 'parent123')
+        self.assertEqual(result.child_folder_count, 0)
+        self.assertEqual(result.unread_count, 0)
+        self.assertEqual(result.total_items, 0)
+        self.assertEqual(result.account, self.mock_account)
+
+        # Verify API call
+        mock_post.assert_called_once_with(
+            f'{BASE_API_URL}/me/mailFolders',
+            headers=self.mock_account._headers,
+            data=json.dumps({'displayName': folder_name}),
+            timeout=10
+        )
+        mock_check_response.assert_called_once_with(mock_response)
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__auth_error_raised(self, mock_check_response, mock_post):
+        """Test create() raises AuthError when check_response raises it."""
+        # Arrange
+        folder_name = 'My Folder'
+        mock_response = Mock()
+        mock_response.status_code = 401
+        mock_post.return_value = mock_response
+        mock_check_response.side_effect = AuthError('Access token expired')
+
+        # Act & Assert
+        with self.assertRaises(AuthError):
+            self.service.create(folder_name)
+
+        mock_post.assert_called_once()
+        mock_check_response.assert_called_once_with(mock_response)
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__request_error_raised(self, mock_check_response, mock_post):
+        """Test create() raises RequestError when check_response raises it."""
+        # Arrange
+        folder_name = 'My Folder'
+        mock_response = Mock()
+        mock_response.status_code = 400
+        mock_post.return_value = mock_response
+        mock_check_response.side_effect = RequestError('Bad request')
+
+        # Act & Assert
+        with self.assertRaises(RequestError):
+            self.service.create(folder_name)
+
+        mock_post.assert_called_once()
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__api_error_raised(self, mock_check_response, mock_post):
+        """Test create() raises APIError when check_response raises it."""
+        # Arrange
+        folder_name = 'My Folder'
+        mock_response = Mock()
+        mock_response.status_code = 500
+        mock_post.return_value = mock_response
+        mock_check_response.side_effect = APIError('Server error')
+
+        # Act & Assert
+        with self.assertRaises(APIError):
+            self.service.create(folder_name)
+
+        mock_post.assert_called_once()
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__verifies_account_headers_used(self, mock_check_response, mock_post):
+        """Test create() uses the account's headers for authentication."""
+        # Arrange
+        custom_headers = {'Authorization': 'Bearer custom_token', 'Custom': 'Header'}
+        self.mock_account._headers = custom_headers
+        folder_name = 'My Folder'
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            'id': 'test',
+            'displayName': folder_name,
+            'parentFolderId': 'p',
+            'childFolderCount': 0,
+            'unreadItemCount': 0,
+            'totalItemCount': 0
+        }
+        mock_post.return_value = mock_response
+        mock_check_response.return_value = True
+
+        # Act
+        self.service.create(folder_name)
+
+        # Assert
+        mock_post.assert_called_once_with(
+            f'{BASE_API_URL}/me/mailFolders',
+            headers=custom_headers,
+            data=json.dumps({'displayName': folder_name}),
+            timeout=10
+        )
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__timeout_parameter_set(self, mock_check_response, mock_post):
+        """Test create() sets timeout parameter to 10 seconds."""
+        # Arrange
+        folder_name = 'My Folder'
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            'id': 'test',
+            'displayName': folder_name,
+            'parentFolderId': 'p',
+            'childFolderCount': 0,
+            'unreadItemCount': 0,
+            'totalItemCount': 0
+        }
+        mock_post.return_value = mock_response
+        mock_check_response.return_value = True
+
+        # Act
+        self.service.create(folder_name)
+
+        # Assert
+        call_args = mock_post.call_args
+        self.assertEqual(call_args[1]['timeout'], 10)
+
+    @patch('pyOutlook.services.folder.requests.post')
+    @patch('pyOutlook.services.folder.check_response')
+    def test_create__payload_correct_format(self, mock_check_response, mock_post):
+        """Test create() sends payload in correct JSON format."""
+        # Arrange
+        folder_name = 'Test Folder Name'
+        mock_response = Mock()
+        mock_response.json.return_value = {
+            'id': 'test',
+            'displayName': folder_name,
+            'parentFolderId': 'p',
+            'childFolderCount': 0,
+            'unreadItemCount': 0,
+            'totalItemCount': 0
+        }
+        mock_post.return_value = mock_response
+        mock_check_response.return_value = True
+
+        # Act
+        self.service.create(folder_name)
+
+        # Assert
+        import json
+        call_args = mock_post.call_args
+        payload = call_args[1]['data']
+        self.assertEqual(payload, json.dumps({'displayName': folder_name}))
 
 
 if __name__ == '__main__':
