@@ -1,4 +1,6 @@
+from pyOutlook.utils.constants import BASE_API_URL
 from typing import TYPE_CHECKING
+import json
 
 import requests
 
@@ -38,7 +40,7 @@ class FolderService:
         :raises AuthError: If authentication fails.
         :raises RequestError: If the API request fails.
         """
-        endpoint = 'https://graph.microsoft.com/v1.0/me/mailFolders/'
+        endpoint = f'{BASE_API_URL}/me/mailFolders/'
         r = requests.get(endpoint, headers=self.account._headers, timeout=10)
 
         if check_response(r):
@@ -58,8 +60,28 @@ class FolderService:
         :raises AuthError: If authentication fails.
         :raises RequestError: If the folder is not found or the request fails.
         """
-        endpoint = f'https://graph.microsoft.com/v1.0/me/mailFolders/{folder_id}'
+        endpoint = f'{BASE_API_URL}/me/mailFolders/{folder_id}'
         r = requests.get(endpoint, headers=self.account._headers, timeout=10)
+
+        check_response(r)
+        return self._json_to_folder(r.json())
+
+    def create(self, folder_name: str) -> 'Folder':
+        """Create a new mail folder in the root folder.
+
+        :param folder_name: The display name for the new folder.
+        :type folder_name: str
+
+        :returns: The newly created Folder instance.
+        :rtype: Folder
+
+        :raises AuthError: If authentication fails.
+        :raises RequestError: If the API request fails.
+        """
+        endpoint = f'{BASE_API_URL}/me/mailFolders'
+        payload = json.dumps({'displayName': folder_name})
+
+        r = requests.post(endpoint, headers=self.account._headers, data=payload, timeout=10)
 
         check_response(r)
         return self._json_to_folder(r.json())
