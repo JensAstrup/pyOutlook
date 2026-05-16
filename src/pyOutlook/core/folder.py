@@ -86,7 +86,7 @@ class Folder(object):
         :rtype: Folder
         """
         from pyOutlook.services.folder import FolderService
-        return FolderService._json_to_folder(account, json_value)
+        return FolderService(account)._json_to_folder(json_value)
 
     @classmethod
     def _json_to_folders(cls, account, json_value: dict) -> list['Folder']:
@@ -105,7 +105,7 @@ class Folder(object):
         :rtype: list[Folder]
         """
         from pyOutlook.services.folder import FolderService
-        return FolderService._json_to_folders(account, json_value)
+        return FolderService(account)._json_to_folders(json_value)
 
     def rename(self, new_folder_name: str) -> 'Folder':
         """Renames the folder to the provided name.
