@@ -80,11 +80,13 @@ class FolderTestCase(unittest.TestCase):
     def test_json_to_folder__delegates_to_folder_service(self, mock_folder_service):
         """Test that _json_to_folder delegates to FolderService"""
         mock_json = {'Id': 'test_id', 'DisplayName': 'Test'}
-        mock_folder_service._json_to_folder.return_value = self.test_folder
+        mock_service_instance = mock_folder_service.return_value
+        mock_service_instance._json_to_folder.return_value = self.test_folder
 
         result = Folder._json_to_folder(self.mock_account, mock_json)
 
-        mock_folder_service._json_to_folder.assert_called_once_with(self.mock_account, mock_json)
+        mock_folder_service.assert_called_once_with(self.mock_account)
+        mock_service_instance._json_to_folder.assert_called_once_with(mock_json)
         self.assertEqual(result, self.test_folder)
 
     @patch('pyOutlook.services.folder.FolderService')
@@ -92,11 +94,13 @@ class FolderTestCase(unittest.TestCase):
         """Test that _json_to_folders delegates to FolderService"""
         mock_json = {'value': [{'Id': 'test_id', 'DisplayName': 'Test'}]}
         mock_folders = [self.test_folder]
-        mock_folder_service._json_to_folders.return_value = mock_folders
+        mock_service_instance = mock_folder_service.return_value
+        mock_service_instance._json_to_folders.return_value = mock_folders
 
         result = Folder._json_to_folders(self.mock_account, mock_json)
 
-        mock_folder_service._json_to_folders.assert_called_once_with(self.mock_account, mock_json)
+        mock_folder_service.assert_called_once_with(self.mock_account)
+        mock_service_instance._json_to_folders.assert_called_once_with(mock_json)
         self.assertEqual(result, mock_folders)
 
     @patch('pyOutlook.core.folder.requests.patch')
