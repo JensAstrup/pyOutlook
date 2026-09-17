@@ -260,7 +260,7 @@ git push origin v5.0.2
 **Documentation missing modules**
 
 - Ensure `sphinx-apidoc` has been run to generate API documentation
-- Check that all modules are included in `docs/source/pyOutlook.rst`
+- Check that all modules are included in the API `.rst` files under `docs/source/`
 
 ## Additional Resources
 

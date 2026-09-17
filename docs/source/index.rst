@@ -42,7 +42,14 @@ Contents:
 
    installation
    quickstart
-   modules
+   outlook_account
+   message
+   message_service
+   folder
+   folder_service
+   contact
+   contact_service
+   attachment
 
 
 Indices and tables
